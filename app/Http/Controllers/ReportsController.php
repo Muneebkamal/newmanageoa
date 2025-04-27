@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Buylist;
+use App\Models\Lead;
+use App\Models\LineItem;
+use App\Models\User;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+
+use Illuminate\Http\Request;
+
+class ReportsController extends Controller
+{
+    //
+    public function index()
+    {
+        if (!\Auth::user()->can('view_settings')) {
+            abort(403);
+        }
+        $employees = User::where('role_id', '!=', 1)->get();
+        return view('reports.index', get_defined_vars());
+    }
+    public function filterReport(Request $request){
+        $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
+        $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
+        $employeeId = $request->input('employee_id');
+
+        // Create a period from start to end date
+        $period = CarbonPeriod::create($startDate, $endDate);
+        $data = [];
+
+        foreach ($period as $date) {
+            $startOfDay = $date->copy()->startOfDay();
+            $endOfDay = $date->copy()->endOfDay();
+        
+            $leadsCount = Lead::where('created_by', $employeeId)
+                ->whereBetween('created_at', [$startOfDay, $endOfDay])
+                ->count();
+        
+            $buylists = Buylist::where(function ($query) use ($employeeId) {
+                $query->where('employee_id', $employeeId)
+                      ->orWhere('creatd_by', $employeeId);
+            })->pluck('id');
+        
+            $buylistUnits = LineItem::whereIn('buylist_id', $buylists)
+                ->whereBetween('created_at', [$startOfDay, $endOfDay])
+                ->sum('unit_purchased');
+        
+            // ✅ Only push data if leads or buylist > 0
+            if ($leadsCount > 0 || $buylistUnits > 0) {
+                $data[] = [
+                    'date' => $date->format('Y-m-d'),
+                    'leads' => $leadsCount,
+                    'buylist' => $buylistUnits,
+                ];
+            }
+        }
+        
+
+return response()->json($data);
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $startDate = Carbon::parse($startDate)->startOfDay()->toDateTimeString();
+        $endDate =  Carbon::parse($endDate)->endOfDay()->toDateTimeString();
+        $employeeId = $request->input('employee_id');
+
+        $leadsCout = Lead::where('created_by', $employeeId)
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->count();
+        $buylists = Buylist::where('employee_id', $employeeId)
+        ->orWhere('creatd_by', $employeeId)
+        ->get();
+        $buylistUnits = 0;
+        foreach ($buylists as $key => $value) {
+            # code...
+            $buylistUnits += LineItem::where('buylist_id',$value->id)->whereBetween('created_at', [$startDate, $endDate])->sum('unit_purchased');
+
+        }
+        $response = [
+            'leads' => $leadsCout,
+            'buylist' => $buylistUnits 
+        ];
+
+        return response()->json($response);
+    }
+}
