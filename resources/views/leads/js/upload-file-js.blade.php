@@ -7,6 +7,7 @@
     // Initialize Dropzone with a hidden file input and no preview
     const myDropzone = new Dropzone("#my-dropzone", {
         url: "/upload-file", // Replace with your actual upload route
+        clickable: ['#newMessages', '#dropzoneContent', '#my-dropzone'], // Allow click on center text also
         maxFilesize: 10, // Maximum file size in MB
         acceptedFiles: ".csv", // Only allow CSV files
         autoProcessQueue: true, // Automatically upload the file

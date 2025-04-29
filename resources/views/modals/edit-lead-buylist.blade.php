@@ -255,6 +255,7 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-danger d-none" id="rejectedBtn" onclick="updateTheLead('reject');"> Reject </button>
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary save-button" id="saveEditedLeadButton" onclick="updateTheLead();">Save</button>
             </div>

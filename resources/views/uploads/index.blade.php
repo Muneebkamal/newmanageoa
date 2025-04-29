@@ -225,19 +225,19 @@
                                         <div class="d-flex">
                                             <div class="row">
                                                 <div class="col-md-5">
-                                                    <div id="my-dropzone" class="dropzone my-1 h-100 d-flex flex-column align-items-center justify-content-center">
+                                                    <div id="my-dropzone" class="dropzone my-1 h-100 d-flex flex-column align-items-center justify-content-center" style="cursor:pointer !important;">
                                                         <form action="/upload-file" class="dropzone" id="my-dropzone" style="display: none;">
                                                             @csrf
                                                         </form>
                                                         <div id="dropzoneContent" class="text-center">
                                                             <span id="successMessage" class="d-none" style="color: #28a745; font-weight: bold;">File uploaded successfully!</span>
                                                         </div>
-                                                        <div id="newMessages" class="text-center">
-                                                            <i class="ri-file-excel-line fs-1 text-success"></i>
+                                                        <div id="newMessages" class="text-center" style="cursor:pointer !important;" >
+                                                            <i class="ri-file-excel-line fs-1 text-success" style="cursor:pointer !important;"></i>
                                                             <br>
-                                                            <strong>Select a CSV file to import</strong>
+                                                            <strong style="cursor:pointer !important;">Select a CSV file to import</strong>
                                                             <br>
-                                                            <span class="text-muted">or drag and drop it here</span>
+                                                            <span style="cursor:pointer !important;" class="text-muted">or drag and drop it here</span>
                                                         </div>
                                                     </div>
                                                     

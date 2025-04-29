@@ -43,7 +43,8 @@ class LineItem extends Model
         'unit_errors',
         'tax_paid',
         'tax_percent',
-        'created_by'
+        'created_by',
+        'is_approved',
     ];    
     public function bundles(){
         return $this->hasMany(BundleItem::class, 'item_id');

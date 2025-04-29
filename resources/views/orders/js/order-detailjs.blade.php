@@ -255,21 +255,30 @@
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="summary-box">
-                                    <table class="table table-bordered">
+                                    <table class="table table-bordered text-center">
                                         <thead>
                                             <tr>
-                                                <th style="padding-top: 10px; text-align: left;">Total Cost</th>
-                                                <th style="padding-top: 10px; text-align: left;">Total Selling Price</th>
-                                                <th style="padding-top: 10px; text-align: left;">Gross Profit</th>
-                                                <th style="padding-top: 10px; text-align: left;">Profit Per Piece</th>
+                                                <th></th>
+                                                <th>Qty</th>
+                                                <th>Selling Price</th>
+                                                <th>Cost Price</th>
+                                                <th>Gross Profit</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td style="padding-top: 10px;"><span class="qty_cost">$${totalItemCost.toFixed(2)}</span></td>
-                                                <td style="padding-top: 10px;"><span class="qty_selling">$${totalItemSelling.toFixed(2)}</span></td>
-                                                <td style="padding-top: 10px;"><span class="qty_profit">$${itemProfit.toFixed(2)}</span></td>
-                                                <td style="padding-top: 10px;"><span class="qty_profit">$${itemProfitPerPiece.toFixed(2)}</span></td>
+                                                <td><strong>Total</strong></td>
+                                                <td><strong>${quantity}</strong></td>
+                                                <td><span class="total_selling_price">$${totalItemSelling.toFixed(2)}</span></td>
+                                                <td><span class="total_cost_price">$${totalItemCost.toFixed(2)}</span></td>
+                                                <td><span class="total_gross_profit">$${itemProfit.toFixed(2)}</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Per Pcs</strong></td>
+                                                <td><strong></strong></td>
+                                                <td><span class="perpcs_selling_price">$${sellingPrice.toFixed(2)}</span></td>
+                                                <td><span class="perpcs_cost_price">$${cost.toFixed(2)}</span></td>
+                                                <td><span class="perpcs_gross_profit">$${itemProfitPerPiece.toFixed(2)}</span></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -340,7 +349,7 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li>
-                                                    <button type="button" class="dropdown-item" data-product-id="1" onclick="popWorkOrders(${product.id})">
+                                                    <button type="button" class="dropdown-item" data-product-id="${product.id}" onclick="popWorkOrders(${product.id})">
                                                         Send To Prep Work Order
                                                     </button>
                                                 </li>
@@ -388,6 +397,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                <button type="button" class="btn btn-success mt-2 btn-sm" data-product-id="${product.id}" onclick="popWorkOrders(${product.id})">
+                                    Send To Prep Work Order
+                                </button>
                             </td>
                         </tr>
                         <tr id="shipping_fba_row_${product.id}" class="d-none">

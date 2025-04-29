@@ -172,6 +172,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/filter', [ReportsController::class, 'filterReport'])->name('reports.filter');
     Route::get('/getProductByAsin/{asin?}', [LeadsController::class, 'getProductByAsin'])->name('getProductByAsin.data');
     Route::post('assign-work-order', [OrderController::class, 'assignedWorkOrder'])->name('assignedWorkOrder');
+    Route::get('updateLineItemLeadIds', [BuyerController::class, 'updateLineItemLeadIds'])->name('updateLineItemLeadIds');
 
 
 

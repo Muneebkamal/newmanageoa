@@ -656,13 +656,15 @@ class UploadController extends Controller
                     $leadData['created_by'] = auth()->user()->id;
                 }
     
-            if (isset($existingLeads[$leadData['asin']])) {
-                $existingLeads[$leadData['asin']]->update($leadData);
-                $newLeadIds[] = $existingLeads[$leadData['asin']]->id;
-            } else {
-                $newLead = Lead::create($leadData);
-                $newLeadIds[] = $newLead->id;
-            }
+                if (!empty($leadData['asin'])) {
+                    if (isset($existingLeads[$leadData['asin']])) {
+                        $existingLeads[$leadData['asin']]->update($leadData);
+                        $newLeadIds[] = $existingLeads[$leadData['asin']]->id;
+                    } else {
+                        $newLead = Lead::create($leadData);
+                        $newLeadIds[] = $newLead->id;
+                    }
+                }
         }
     
         $batchId = uniqid();

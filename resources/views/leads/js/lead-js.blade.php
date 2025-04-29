@@ -412,6 +412,7 @@
                 alert('An error occurred. Please try again.');
             }
         });
+        updateCalculations();
     }
     $('#asin').on('input',function(){
         $('.amazonUrl').attr('href','https://www.amazon.com/dp/'+$(this).val()+'')
@@ -1186,24 +1187,73 @@
         // Update the ROI display above the input
         document.getElementById('roi_display').textContent = roiValue ? `${parseFloat(roiValue * 100).toFixed(2)}%` : '0.00%';
     });
-    function updateCalculations() {
-        $('#qty_cost').text(`0.00`);
-        $('#qty_selling').text(`0.00`);
-        $('#qty_profit').text(`0.00`);
-        let $costInput = $("#cost");
-        let quantity_new = $("#quantity_new").val() || 0;
-        console.log(quantity_new);
-        let $sellPriceInput = $("#sell_price");
-        let $netProfitInput = $("#net_profit");
-        let cost = parseFloat($costInput.val()) || 0;
-        let sellPrice = parseFloat($sellPriceInput.val()) || 0;
-        let netProfit = parseFloat($netProfitInput.val()) || 0;
+    // function updateCalculations() {
+    //     $('#qty_cost').text(`0.00`);
+    //     $('#qty_selling').text(`0.00`);
+    //     $('#qty_profit').text(`0.00`);
+    //     let $costInput = $("#cost");
+    //     let quantity_new = $("#quantity_new").val() || 0;
+    //     console.log(quantity_new);
+    //     let $sellPriceInput = $("#sell_price");
+    //     let $netProfitInput = $("#net_profit");
+    //     let cost = parseFloat($costInput.val()) || 0;
+    //     let sellPrice = parseFloat($sellPriceInput.val()) || 0;
+    //     let netProfit = parseFloat($netProfitInput.val()) || 0;
         
-        // Update Net Profit input field
-        // Update display text
-        $('#qty_cost').text(`$${(cost * quantity_new).toFixed(2)}`);
-        $('#qty_selling').text(`$${(sellPrice * quantity_new).toFixed(2)}`);
-        $('#qty_profit').text(`$${(netProfit * quantity_new).toFixed(2)}`);
+    //     // Update Net Profit input field
+    //     // Update display text
+    //     $('#qty_cost').text(`$${(cost * quantity_new).toFixed(2)}`);
+    //     $('#qty_selling').text(`$${(sellPrice * quantity_new).toFixed(2)}`);
+    //     $('#qty_profit').text(`$${(netProfit * quantity_new).toFixed(2)}`);
+    // }
+    function updateCalculations() {
+        let quantity_new = parseInt($("#quantity_new").val()) || 0;
+        let cost = parseFloat($("#cost").val()) || 0;
+        let sellPrice = parseFloat($("#sell_price").val()) || 0;
+        let netProfit = parseFloat($("#net_profit").val()) || 0;
+
+        let totalItemCost = cost * quantity_new;
+        let totalItemSelling = sellPrice * quantity_new;
+        let itemProfit = netProfit * quantity_new;
+        let itemProfitPerPiece = itemProfit / (quantity_new || 1);
+
+        // Prepare the table HTML
+        let tableHtml = `
+            <div class="card-body">
+                <div class="summary-box">
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Qty</th>
+                                <th>Selling Price</th>
+                                <th>Cost Price</th>
+                                <th>Gross Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><strong>${quantity_new}</strong></td>
+                                <td><span class="total_selling_price">$${totalItemSelling.toFixed(2)}</span></td>
+                                <td><span class="total_cost_price">$${totalItemCost.toFixed(2)}</span></td>
+                                <td><span class="total_gross_profit">$${itemProfit.toFixed(2)}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Per Pcs</strong></td>
+                                <td><strong></strong></td>
+                                <td><span class="perpcs_selling_price">$${sellPrice.toFixed(2)}</span></td>
+                                <td><span class="perpcs_cost_price">$${cost.toFixed(2)}</span></td>
+                                <td><span class="perpcs_gross_profit">$${itemProfitPerPiece.toFixed(2)}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        // Append or Replace inside a container
+        $('#summaryBox').html(tableHtml);  // ✅ Make sure you have <div id="summaryBox"></div> in your HTML
     }
     $('#quantity_new').on('input',function(){
         updateCalculations()

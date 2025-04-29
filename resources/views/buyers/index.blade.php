@@ -832,8 +832,10 @@
         $('#modalMode').val(isViewOnly ? 'approved' : 'edit');
         if(isViewOnly){
             $('#editBuyListLeadModal .save-button').text('Approved'); // Hide the footer buttons
+            $('#editBuyListLeadModal #rejectedBtn').removeClass('d-none'); // Hide the footer buttons
         }else{
             $('#editBuyListLeadModal .save-button').text('Save'); // Hide the footer buttons
+            $('#editBuyListLeadModal #rejectedBtn').addClass('d-none'); // Hide the footer buttons
         }
         $.ajax({
             url: `/items/${itemId}/edit`,
@@ -915,7 +917,7 @@
         });
     });
 
-    
+
     function changeQty(type) {
         let qty =  parseInt($('#editQuantity').val()) || 1;
         if (type === 'plus') {
@@ -936,11 +938,15 @@
         $('.order-qty-gross-profit').text('$' + (qty * netProfit).toFixed(2));
     }
 
-    function updateTheLead() {
+    function updateTheLead(Modaltype='') {
         // Get buylist ID and item ID
         const buylistId = $('#selectedbuylistID').val();
         const itemId = $('#itemIdEdit').val();
-        const modalMode = $('#modalMode').val();
+        if(Modaltype == 'reject'){
+            var modalMode = 'reject';
+        }else{ 
+            var modalMode = $('#modalMode').val();
+        }
 
         // Build order edit data object
         const orderEditData = {

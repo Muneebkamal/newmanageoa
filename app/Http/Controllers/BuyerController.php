@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BundleItem;
 use App\Models\Buylist;
+use App\Models\Lead;
 use App\Models\LineItem;
 use App\Models\Order;
 use Carbon\Carbon;
@@ -12,6 +13,16 @@ use Yajra\DataTables\Facades\DataTables;
 
 class BuyerController extends Controller
 {
+    public function updateLineItemLeadIds(){
+        $lineItems = LineItem::get();
+        foreach($lineItems as $item){
+            $findLead = Lead::where('asin',$item->asin)->first();
+            if($findLead){
+                $item->lead_id = $findLead->id;
+                $item->save();
+            }
+        }
+    }
     /**
      * Display a listing of the resource.
      */
@@ -385,6 +396,24 @@ class BuyerController extends Controller
                     'message' => 'something wrong!',
                 ]);
             }
+        }else if(isset($data['modalMode']) && $data['modalMode'] == 'reject'){
+            $buylist = LineItem::findOrFail($id);
+            if($buylist){
+                $buylist->update([
+                    'is_rejected'=>1
+                ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Item Rejected Successfully!',
+                ]);
+
+            }else{
+                return response()->json([
+                    'success' => false,
+                    'message' => 'something wrong!',
+                ]);
+            }
+           
         }else{
             $buylist = LineItem::findOrFail($id);
             if($buylist){

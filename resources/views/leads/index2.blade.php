@@ -411,6 +411,7 @@ table.dataTable {
                 endDate: moment(),                          // ✅ Default End Date (today)
                 alwaysShowCalendars: true,
                 ranges: {
+                    'All': [moment('2000-01-01'), moment()],
                     'Today': [moment(), moment()],
                     'This Week': [moment().startOf('week'), moment().endOf('week')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],

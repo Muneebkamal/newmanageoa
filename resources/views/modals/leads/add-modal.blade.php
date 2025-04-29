@@ -148,7 +148,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="">Quantity</label>
-                                <input type="number" class="form-control" id="quantity_new" name="quantity">
+                                <input type="number" class="form-control" id="quantity_new" name="quantity" value="1">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -198,7 +198,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="summary-box">
-                                <table>
+                                <div class="card mb-3" id="summaryBox">
+
+                                </div>
+                                {{-- <table>
                                     <tr>
                                         <td><strong>Total Cost:</strong></td>
                                         <td><span id="qty_cost"></span></td>
@@ -211,7 +214,7 @@
                                         <td><strong>Gross Profit:</strong></td>
                                         <td><span id="qty_profit"></span></td>
                                     </tr>
-                                </table>
+                                </table> --}}
                             </div>
                         </div>
                         
