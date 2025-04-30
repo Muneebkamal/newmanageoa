@@ -866,9 +866,10 @@
                 $('#editOrderCategory').val(data.category);
                 // console.log(data.unit_purchased * data.buy_cost);
                 // console.log(data.unit_purchased * data.selling_price);
-                $('.order-qty-cost').html('$' + (data.unit_purchased * data.buy_cost).toFixed(2));
-                $('.order-qty-selling').html('$' + (data.unit_purchased * parseFloat(data.selling_price)).toFixed(2));
-                $('.order-qty-gross-profit').html('$' + (data.unit_purchased * parseFloat(netProfit)).toFixed(2));
+                // $('.order-qty-cost').html('$' + (data.unit_purchased * data.buy_cost).toFixed(2));
+                // $('.order-qty-selling').html('$' + (data.unit_purchased * parseFloat(data.selling_price)).toFixed(2));
+                // $('.order-qty-gross-profit').html('$' + (data.unit_purchased * parseFloat(netProfit)).toFixed(2));
+                appendTotalHtl(data.buy_cost,data.unit_purchased,netProfit,data.selling_price)
 
                 buyCost = data.buy_cost;
                 sellingPrice = data.selling_price;
@@ -932,10 +933,17 @@
 
     function updatePriceSpans(qty) {
         // console.log(qty, buyCost, sellingPrice, netProfit);
-        netProfit = parseFloat($("#editOrderNetProfit").val())
-        $('.order-qty-cost').text('$' + (qty * buyCost).toFixed(2));
-        $('.order-qty-selling').text('$' + (qty * sellingPrice).toFixed(2));
-        $('.order-qty-gross-profit').text('$' + (qty * netProfit).toFixed(2));
+        // netProfit = parseFloat($("#editOrderNetProfit").val())
+        // $('.order-qty-cost').text('$' + (qty * buyCost).toFixed(2));
+        // $('.order-qty-selling').text('$' + (qty * sellingPrice).toFixed(2));
+        // $('.order-qty-gross-profit').text('$' + (qty * netProfit).toFixed(2));
+        let quantity_new = qty;
+        let cost = buyCost;
+        let sellPricenew = sellingPrice;
+        let formattedPrice = parseFloat(sellPricenew).toFixed(2);
+        appendTotalHtl(cost,quantity_new,netProfit,formattedPrice)
+
+
     }
 
     function updateTheLead(Modaltype='') {
@@ -1314,25 +1322,73 @@
         $('#orderIsDisputed').prop('checked', false);
     }
     function updateOrderCalculations() {
-        $('#Orderqty_cost').text(`0.00`);
-        $('#Orderqty_selling').text(`0.00`);
-        $('#Orderqty_profit').text(`0.00`);
+        // $('#Orderqty_cost').text(`0.00`);
+        // $('#Orderqty_selling').text(`0.00`);
+        // $('#Orderqty_profit').text(`0.00`);
 
-        let orderCost = parseFloat($("#editOrderCost").val()) || 0;
-        let orderSellingPrice = parseFloat($("#editOrderSellingPrice").val()) || 0;
-        let orderNetProfit = parseFloat($("#editOrderNetProfit").val()) || 0;
-        console.log(orderNetProfit)
-        let orderQuantity = parseInt($("#orderQuantity").val()) || 0;
+        // let orderCost = parseFloat($("#editOrderCost").val()) || 0;
+        // let orderSellingPrice = parseFloat($("#editOrderSellingPrice").val()) || 0;
+        // let orderNetProfit = parseFloat($("#editOrderNetProfit").val()) || 0;
+        // console.log(orderNetProfit)
+        // let orderQuantity = parseInt($("#orderQuantity").val()) || 0;
 
-        // Calculate values and update display
-        $('#Orderqty_cost').text(`$${(orderCost * orderQuantity).toFixed(2)}`);
-        $('#Orderqty_selling').text(`$${(orderSellingPrice * orderQuantity).toFixed(2)}`);
-        $('#Orderqty_profit').text(`$${(orderNetProfit * orderQuantity).toFixed(2)}`);
+        // // Calculate values and update display
+        // $('#Orderqty_cost').text(`$${(orderCost * orderQuantity).toFixed(2)}`);
+        // $('#Orderqty_selling').text(`$${(orderSellingPrice * orderQuantity).toFixed(2)}`);
+        // $('#Orderqty_profit').text(`$${(orderNetProfit * orderQuantity).toFixed(2)}`);
+        let quantity_new = parseInt($("#orderQuantity").val()) || 0;
+        let cost = parseFloat($("#editOrderCost").val()) || 0;
+        let sellPrice = parseFloat($("#editOrderSellingPrice").val()) || 0;
+        let netProfit =  parseFloat($("#editOrderNetProfit").val()) || 0;
+        appendTotalHtl(cost,quantity_new,netProfit,sellPrice)
+
     }
 
     // Attach event listeners to update calculations on input change
     $('#editQuantity, #editOrderCost, #editOrderSellingPrice, #quantity').on('input', function () {
         updateOrderCalculations();
     });
+    function appendTotalHtl(cost,quantity_new,netProfit,sellPrice){
+        
+        let totalItemCost = cost * quantity_new;
+        let totalItemSelling = sellPrice * quantity_new;
+        let itemProfit = netProfit * quantity_new;
+        let itemProfitPerPiece = itemProfit / (quantity_new || 1);
+        // Prepare the table HTML
+        let tableHtml = `
+            <div class="card-body">
+                <div class="summary-box">
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Qty</th>
+                                <th>Selling Price</th>
+                                <th>Cost Price</th>
+                                <th>Gross Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><strong>${quantity_new}</strong></td>
+                                <td><span class="total_selling_price">$${totalItemSelling.toFixed(2)}</span></td>
+                                <td><span class="total_cost_price">$${totalItemCost.toFixed(2)}</span></td>
+                                <td><span class="total_gross_profit">$${itemProfit.toFixed(2)}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Per Pcs</strong></td>
+                                <td><strong></strong></td>
+                                <td><span class="perpcs_selling_price">$${sellPrice}</span></td>
+                                <td><span class="perpcs_cost_price">$${cost.toFixed(2)}</span></td>
+                                <td><span class="perpcs_gross_profit">$${itemProfitPerPiece.toFixed(2)}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+        // Append or Replace inside a container
+        $('.summary-box').html(tableHtml);  // ✅ Make sure you have <div id="summaryBox"></div> in your HTML
+    }
 </script>
 @endsection

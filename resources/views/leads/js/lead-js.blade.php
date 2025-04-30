@@ -668,6 +668,7 @@
                 }
             }
         })
+        updateOrderCalculations();
        
     }
     function getMsku(asin){
@@ -1272,17 +1273,59 @@
         let orderCost = parseFloat($("#orderCost").val()) || 0;
         let orderSellingPrice = parseFloat($("#orderSellingPrice").val()) || 0;
         let orderNetProfit = parseFloat($("#orderNetprofit").val()) || 0;
-        let orderQuantity = parseInt($("#orderQuantity").val()) || 0;
-
+        let orderQuantity = parseInt($("#orderQuantity").val()) || 1;
+        appendTotalHtl(orderCost,orderQuantity,orderNetProfit,orderSellingPrice)
         // Calculate values and update display
-        $('#Orderqty_cost').text(`$${(orderCost * orderQuantity).toFixed(2)}`);
-        $('#Orderqty_selling').text(`$${(orderSellingPrice * orderQuantity).toFixed(2)}`);
-        $('#Orderqty_profit').text(`$${(orderNetProfit * orderQuantity).toFixed(2)}`);
+        // $('#Orderqty_cost').text(`$${(orderCost * orderQuantity).toFixed(2)}`);
+        // $('#Orderqty_selling').text(`$${(orderSellingPrice * orderQuantity).toFixed(2)}`);
+        // $('#Orderqty_profit').text(`$${(orderNetProfit * orderQuantity).toFixed(2)}`);
     }
 
     // Attach event listeners to update calculations on input change
     $('#orderQuantity, #orderCost, #orderSellingPrice, #orderNetprofit').on('input', function () {
         updateOrderCalculations();
     });
+    function appendTotalHtl(cost,quantity_new,netProfit,sellPrice){
+        
+        let totalItemCost = cost * quantity_new;
+        let totalItemSelling = sellPrice * quantity_new;
+        let itemProfit = netProfit * quantity_new;
+        let itemProfitPerPiece = itemProfit / (quantity_new || 1);
+        // Prepare the table HTML
+        let tableHtml = `
+            <div class="card-body">
+                <div class="summary-box">
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Qty</th>
+                                <th>Selling Price</th>
+                                <th>Cost Price</th>
+                                <th>Gross Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><strong>${quantity_new}</strong></td>
+                                <td><span class="total_selling_price">$${totalItemSelling.toFixed(2)}</span></td>
+                                <td><span class="total_cost_price">$${totalItemCost.toFixed(2)}</span></td>
+                                <td><span class="total_gross_profit">$${itemProfit.toFixed(2)}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Per Pcs</strong></td>
+                                <td><strong></strong></td>
+                                <td><span class="perpcs_selling_price">$${sellPrice}</span></td>
+                                <td><span class="perpcs_cost_price">$${cost.toFixed(2)}</span></td>
+                                <td><span class="perpcs_gross_profit">$${itemProfitPerPiece.toFixed(2)}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+        // Append or Replace inside a container
+        $('.summary-box').html(tableHtml);  // ✅ Make sure you have <div id="summaryBox"></div> in your HTML
+    }
 
 </script>
