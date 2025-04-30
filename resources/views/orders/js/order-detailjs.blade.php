@@ -334,7 +334,8 @@
                             <td>$${product.list_price.toFixed(2)}</td>
                             <td>$${product.min.toFixed(2)}</td>
                             <td>$${product.max.toFixed(2)}</td>
-                            <td>
+                            <td class="text-center align-middle">
+                                <div class="d-flex flex-column justify-content-between align-items-center h-100" style="">
                                 <div class="d-flex justify-content-end">
                                     <div class="btn-group" style="max-height: 30px;">
                                         <!-- View Button -->
@@ -400,6 +401,7 @@
                                 <button type="button" class="btn btn-success mt-2 btn-sm" data-product-id="${product.id}" onclick="popWorkOrders(${product.id})">
                                     Send To Prep Work Order
                                 </button>
+                                </div>
                             </td>
                         </tr>
                         <tr id="shipping_fba_row_${product.id}" class="d-none">

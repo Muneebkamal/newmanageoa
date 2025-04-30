@@ -407,13 +407,12 @@
                                                                             <div class="col-sm-8">
                                                                                 <input type="text" id="nameTemplate" name="nameTemplate"
                                                                                     class="form-control"> <!---->
-                                                                                <span class="text-danger">A template with
-                                                                                    this name already exists</span>
+                                                                                <span class="text-danger" id="error-message"></span>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-md-3">
-                                                                        <button id="saveTemplateBtn" class="btn btn-primary">Create
+                                                                        <button id="saveTemplateBtn" class="btn btn-primary" disabled>Create
                                                                             Template</button>
                                                                     </div>
                                                                     <div class="col-md-12">

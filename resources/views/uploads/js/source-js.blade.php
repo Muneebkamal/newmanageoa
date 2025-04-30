@@ -187,7 +187,7 @@
                     $('.lead-source-list3').empty();
                     $('.lead-source-list4').empty();
 
-                    let sourceOptions = `<option disabled selected>Source Select</option>`;
+                    let sourceOptions = ``;
                     let sourceListItems = '';
                     response.data.forEach(function(source, index) {
                         // Build the list item for sources
@@ -209,11 +209,11 @@
                         sourceOptions +=
                             `<option value="${source.id}" ${source.id == sourceId ? 'selected' : ''}>${source.list_name}</option>`;
                     });
-
+                    var blankOption = `<option disabled selected></option>`;
                     $('.source-list').append(sourceListItems);
                     $('.lead-source-list').append(sourceOptions);
                     $('.lead-source-list2').append(sourceOptions);
-                    $('.lead-source-list3').append(sourceOptions);
+                    $('.lead-source-list3').append(blankOption+ sourceOptions);
                     $('.lead-source-list4').append(sourceOptions);
 
                     var sourceName = $('.lead-source-list option:selected').text();

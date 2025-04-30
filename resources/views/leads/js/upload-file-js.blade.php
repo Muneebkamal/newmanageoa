@@ -49,11 +49,15 @@
 
                     // Add '*' to name and asin columns
                     let displayText = dbColumn;
-                    if (dbColumn === 'name' || dbColumn === 'asin') {
+                    if (dbColumn === 'url') {
+                        displayText = 'supplier Url';
+                    } else if (dbColumn === 'supplier') {
+                        displayText = 'source';
+                    } else if (dbColumn === 'name' || dbColumn === 'asin') {
                         displayText += ' *';
                     }
 
-                    const columnText = $('<span class="font-weight-bold"></span>').text(displayText);
+                    const columnText = $('<span class="font-weight-bold text-capitalize"></span>').text(displayText);
                     leftCol.append(icon).append(columnText);
 
                     // Arrow icon
@@ -252,6 +256,7 @@
             success: function(response) {
                 if (response.exists) {
                     toastr.error('Template with this name already exists'); // Show error if template exists
+                    $('#error-message').text('Template with this name already exists').show(); // Show error message
                 } else {
                     toastr.success('Template saved successfully!'); // Show success message
                     var theFilePath = $('#theFilePath').val();
@@ -826,5 +831,29 @@
             }
         });
     }
+    const nameInput = document.getElementById('nameTemplate');
+    const errorEl = document.getElementById('error-message');
+    const saveBtn = document.getElementById('saveTemplateBtn');
+    nameInput.addEventListener('input', function () {
+        const value = this.value.trim();
+        const validPattern = /^[A-Za-z\s\-_]+$/;
+
+        if (value === '') {
+            errorEl.textContent = '';
+            errorEl.style.display = 'none';
+            saveBtn.disabled = true;
+            return;
+        }
+
+        if (!validPattern.test(value)) {
+            errorEl.textContent = "The template name may only contain letters, spaces, and dashes (-) (_).";
+            errorEl.style.display = 'inline';
+            saveBtn.disabled = true;
+        } else {
+            errorEl.textContent = '';
+            errorEl.style.display = 'none';
+            saveBtn.disabled = false;
+        }
+    });
 </script>
 

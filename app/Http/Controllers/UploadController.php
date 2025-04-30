@@ -156,7 +156,7 @@ class UploadController extends Controller
         $excludedColumns = ['id', 'source_id', 'created_at', 'deleted_at', 'updated_at'];
 
         // Loop through each excluded column and unset it from the $columns array
-        $excludedColumns = ['id', 'source_id', 'created_at', 'deleted_at', 'updated_at','bundle','createdBy','buyer_id'];
+        $excludedColumns = ['id', 'source_id', 'created_at', 'deleted_at', 'updated_at','bundle','createdBy','buyer_id','currency','is_hazmat','is_disputed','tags','msku','created_by'];
 
         // Loop through each excluded column and unset it from the $columns array
         foreach ($excludedColumns as $excluded) {
