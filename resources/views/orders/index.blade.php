@@ -35,8 +35,8 @@
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a href="javascript: void(0);">Buylists</a></li>
                         <li class="breadcrumb-item active"><a href="{{ url('orders') }}">Order</a></li>
-                        <li class="breadcrumb-item ">Calculator</li>
-                        <li class="breadcrumb-item "><a href="{{ url('shippingbatches') }}">Shipping</a></li>
+                        {{-- <li class="breadcrumb-item ">Calculator</li>
+                        <li class="breadcrumb-item "><a href="{{ url('shippingbatches') }}">Shipping</a></li> --}}
                     </ol>
                 </div>
 

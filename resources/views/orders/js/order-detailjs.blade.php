@@ -149,6 +149,7 @@
         $('#addNewOrderItemBtn').hide();  // Hide add button until the item is saved
     });
     var sale_text_rate_var = {!! json_encode($order->sales_tax_rate) !!}
+     var sales_tax = {!! json_encode($order->sales_tax) !!}
     // Save item to the array and send to the server via AJAX
     $(document).on('click', '.save-item-btn', function() {
         var parentRow = $(this).closest('.new-item-row');
@@ -239,7 +240,7 @@
                     let percentage = sale_text_rate_var;
                     let value = product.sku_total;
                     let totalSalesTax = (percentage / 100) * value;
-                    var totalNewSkuTotal = product.sku_total + totalSalesTax;
+                    var totalNewSkuTotal = product.sku_total + sales_tax;
                     var newBuyCost = totalNewSkuTotal / product.unit_purchased;
                     let cost = parseFloat(newBuyCost) || 0;
                     let sellingPrice = parseFloat(product.list_price) || 0;
@@ -273,7 +274,7 @@
                                                 <td><span class="total_cost_price">$${totalItemCost.toFixed(2)}</span></td>
                                                 <td><span class="total_gross_profit">$${itemProfit.toFixed(2)}</span></td>
                                             </tr>
-                                            <tr>
+                                            <tr style="background-color: #f8d7da;">
                                                 <td><strong>Per Pcs</strong></td>
                                                 <td><strong></strong></td>
                                                 <td><span class="perpcs_selling_price">$${sellingPrice.toFixed(2)}</span></td>
@@ -1195,30 +1196,41 @@
         // Set a background color based on the selected option
         switch (selectedOption) {
             case "draft":
-                select.style.backgroundColor = "#6c757d"; // Bootstrap secondary color
+                select.style.backgroundColor = "#6c757d"; // secondary
+                select.style.color = "#ffffff";
                 break;
             case "ordered":
-                select.style.backgroundColor = "#007bff"; // Bootstrap primary color
+                select.style.backgroundColor = "#007bff"; // primary
+                select.style.color = "#ffffff";
                 break;
             case "partially received":
-                select.style.backgroundColor = "#ffc107"; // Bootstrap warning color
+                select.style.backgroundColor = "#ffc107"; // warning
+                select.style.color = "#212529"; // dark text on light background
                 break;
             case "received in full":
-                select.style.backgroundColor = "#28a745"; // Bootstrap success color
+                select.style.backgroundColor = "#28a745"; // success
+                select.style.color = "#ffffff";
                 break;
             case "reconcile":
-                select.style.backgroundColor = "#17a2b8"; // Bootstrap info color
+                select.style.backgroundColor = "#17a2b8"; // info
+                select.style.color = "#ffffff";
                 break;
             case "closed":
-                select.style.backgroundColor = "#343a40"; // Bootstrap dark color
+            select.style.backgroundColor = "#343a40"; // dark
+            select.style.color = "#ffffff";
+            break;
+            case "canceled":
+                select.style.backgroundColor = "#dc3545"; // danger
+                select.style.color = "#ffffff";
                 break;
             default:
-                select.style.backgroundColor = ""; // Default color
+                select.style.backgroundColor = "#ffffff"; // default white
+                select.style.color = "#212529"; // default dark text
                 break;
         }
 
         // Optionally change text color
-        if (selectedOption === "closed" || selectedOption === "draft") {
+        if (selectedOption === "closed" || selectedOption === "draft" || selectedOption === "ordered") {
             select.style.color = "white"; // Light text for darker backgrounds
         } else {
             select.style.color = "black"; // Dark text for lighter backgrounds
@@ -2416,12 +2428,16 @@
 });
 document.addEventListener('DOMContentLoaded', () => {
     const salesTaxRateSpan = document.getElementById('sales_tax_rate');
+    const sales_tax_rate_span = document.getElementById('sales_tax_rate_span');
     const salesTaxRateInput = document.getElementById('orderViewSalesTaxRate');
+    const spanofpercentage = document.getElementById('spanofpercentage');
 
     // When the span is clicked, show the input field and hide the span
     salesTaxRateSpan.addEventListener('click', () => {
         salesTaxRateSpan.classList.add('d-none'); // Hide the span
+        sales_tax_rate_span.classList.add('d-none'); // Hide the span
         salesTaxRateInput.classList.remove('d-none'); // Show the input
+        spanofpercentage.classList.remove('d-none'); // Show the input
         salesTaxRateInput.focus(); // Focus on the input field
     });
 
@@ -2431,7 +2447,9 @@ document.addEventListener('DOMContentLoaded', () => {
         salesTaxRateSpan.textContent = `${inputValue.toFixed(2)}%`; // Update span content with formatted value
 
         salesTaxRateInput.classList.add('d-none'); // Hide the input
+        spanofpercentage.classList.add('d-none'); // Hide the input
         salesTaxRateSpan.classList.remove('d-none'); // Show the span
+        sales_tax_rate_span.classList.remove('d-none'); // Show the span
     });
 
     // Optional: Update span when pressing "Enter" in the input field

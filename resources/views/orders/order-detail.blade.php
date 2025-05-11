@@ -4,6 +4,12 @@
 
 @section('content')
     <style>
+        .orderSection input,
+        .orderSection div,
+        .orderSection span,
+        .orderSection select {
+            font-size: 14px !important;
+        }
         /* Add some margin to the top of the icon to align it with the label */
         .edit-note {
             margin-top: 4px;
@@ -167,7 +173,7 @@
                         <div class="card-header py-1">
                             <label class="col-form-label">Order Totals</label>
                         </div>
-                        <div class="card-body pb-0 pt-2 mb-2">
+                        <div class="card-body pb-0 pt-2 mb-2 orderSection ">
                             <form>
                                 <div class="row mb-1">
                                     <label for="orderViewPreTaxSubtotal" class="col-md-6 col-form-label">Subtotal (pre-tax)</label>
@@ -201,11 +207,17 @@
                                     <label for="orderViewSalesTaxRate" class="col-md-6 col-form-label">Sales Tax Rate</label>
                                     <div class="col-md-6 text-center">
                                         <!-- Display text -->
-                                        <span id="sales_tax_rate"  class="editable-sale-text form-control">
-                                            {{ isset($order->sales_tax_rate) ? number_format($order->sales_tax_rate,2) . '%' : '0.00%' }}
-                                        </span>
+                                        <div class="input-group">
+                                            <span class="input-group-text" id="sales_tax_rate_span">%</span>
+                                            <span id="sales_tax_rate"  class="editable-sale-text form-control">
+                                                {{ isset($order->sales_tax_rate) ? number_format($order->sales_tax_rate,2) . '%' : '0.00%' }}
+                                            </span>
+                                        </div>
                                         <!-- Input field (hidden by default) -->
-                                        <input type="number" step="0.1"  value="{{ number_format($order->sales_tax_rate,2) }}" placeholder="0.00%"  class="form-control d-none text-center" name="sales_tax_rate" id="orderViewSalesTaxRate">
+                                        <div class="input-group">
+                                            <span class="input-group-text d-none" id="spanofpercentage">%</span>
+                                            <input type="number" step="0.1"  value="{{ number_format($order->sales_tax_rate,2) }}" placeholder="0.00%"  class="form-control d-none text-center" name="sales_tax_rate" id="orderViewSalesTaxRate">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -231,7 +243,7 @@
                         <div class="card-header py-1">
                             <label class="col-form-label">O-R-S (E)</label>
                         </div>
-                        <div class="card-body py-0 mb-5">
+                        <div class="card-body py-0 mb-5 orderSection">
                             <div class="row py-0">
                                 <div class="col-12-md">
                                     <div class="row mt-2">
@@ -284,7 +296,7 @@
                     <div class="card-header py-1">
                         <label class="col-form-label">Payment Source</label>
                     </div>
-                    <div class="card-body pb-0 pt-2">
+                    <div class="card-body pb-0 pt-2 orderSection">
                         <form class="mb-3">
                             <div class="row mb-1">
                                 <label for="buyCostCalcCardUsed" class="col-md-6">Card Used</label>
@@ -341,7 +353,7 @@
                     <div class="card-header py-1">
                         <label class="col-form-label">Order Details</label>
                     </div>
-                    <div class="card-body pb-0 pt-2 mb-4">
+                    <div class="card-body pb-0 pt-2 mb-4 orderSection">
                         <form>
                             <div class="row mb-1">
                                 <label for="buyCostCalcCreatedAt" class="col-md-6 mb-1">Created</label>

@@ -29,10 +29,10 @@
             <input type="hidden" id="end_date" name="end_date" />  
             </div>
             <div class="me-2 w-25">
-            <label for="employee-select">
+            <label for="employee_id">
             Select Employee:
             </label>
-            <select id="employee-select" name="employee_id" class="form-control custom-select-sm">
+            <select id="employee_id" name="employee_id" class="form-control custom-select-sm">
             <option value=" ">-- Select Employee --</option>
             @foreach($employees as $employee)
                 <option value="{{ $employee->id }}">{{ $employee->name }}</option>
@@ -124,15 +124,35 @@
     function appendTable(data) {
         let tableBody = $('table tbody');
         tableBody.empty();
+        const employee_id = $('#employee_id').val() || '';
+        console.log(employee_id);
 
         data.forEach(item => {
             let row = `<tr>
             <td>${item.date}</td>
-            <td>${item.leads}</td>
-            <td>${item.buylist}</td>
+            <td>
+                <a href="/leads?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" target="_blank">
+                    ${item.leads}
+                </a>
+            </td>
+            <td>
+                <a href="/buylist?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" target="_blank">
+                    ${item.buylist}
+                </a>
+            </td>
+
+
             </tr>`;
             tableBody.append(row);
         });
+    }
+    function goToPage(type, userId,date) {
+        const start = date;
+        const end = date;
+        const employee_id = $('#employee_id').val() || '';
+        console.log(employee_id)
+        const url = ``;
+        window.location.href = url;
     }
 
     </script>

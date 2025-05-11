@@ -46,7 +46,7 @@ class ReportsController extends Controller
         
             $buylistUnits = LineItem::whereIn('buylist_id', $buylists)
                 ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                ->sum('unit_purchased');
+                ->count();
         
             // ✅ Only push data if leads or buylist > 0
             if ($leadsCount > 0 || $buylistUnits > 0) {

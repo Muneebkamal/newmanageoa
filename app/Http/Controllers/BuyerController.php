@@ -122,7 +122,11 @@ class BuyerController extends Controller
                 ]);
             }
         }
-        
+        if($request->start_date != null && $request->end_date != null){
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+            $items->whereBetween('created_at', [$startDate, $endDate]);
+        }
         $is_rejected = $request->is_rejected;
         
             // Get the count of rejected items

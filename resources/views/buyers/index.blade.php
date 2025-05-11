@@ -284,7 +284,15 @@
             }
         });
     });
+    var startDateFromURL = '';
+    var endDateFromURL = '';
+    var user_id = '';
     $(document).ready(function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        startDateFromURL = urlParams.get('start_date');
+        endDateFromURL = urlParams.get('end_date');
+        user_id = urlParams.get('user_id');
+
         $('.checkAll').on('change', function() {
             // Check or uncheck all checkboxes
             $('input[name="leadCheckBox"]').prop('checked', $(this).prop('checked'));
@@ -390,6 +398,7 @@
             success: function(buylists) {
                 const buylistContainer = $('.buyListsDev');
                 buylistContainer.empty();
+                
 
                 const hasTeamBuy = buylists.some(buylist => buylist.name === 'Team Buylist');
                 if (hasTeamBuy && !buylistContainer.find('.team-buy-menu').length) {
@@ -408,6 +417,7 @@
                     `;
                     buylistContainer.append(teamBuyMenu);
                 }
+                var na = "Team Buylist";
                 buylists.forEach(buylist => {
                     if (buylist.name !== 'Team Buylist') {
                         const buylistButton = `
@@ -420,8 +430,11 @@
                         </li>`;
                         buylistContainer.append(buylistButton);
                     }
+                    if (buylist.employee_id != null && user_id != null && buylist.employee_id == user_id) {
+                        na = buylist.name;
+                    }
                 });
-
+                console.log(na);
                 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                 tooltipTriggerList.forEach(function (tooltipTriggerEl) {
                     new bootstrap.Tooltip(tooltipTriggerEl);
@@ -429,7 +442,7 @@
 
                 // Initialize click handlers and set default buylist
                 initializeBuylistClickHandler();
-                selectDefaultBuylist("Team Buylist");
+                selectDefaultBuylist(na);
             },
             error: function(xhr) {
                 console.error('Error fetching buylists:', xhr.responseText);
@@ -534,6 +547,9 @@
                 data: {
                     is_rejected: is_rejected, // Replace 'someParameter' with the name of the parameter you want to send
                     is_approved:false,
+                    start_date : startDateFromURL,
+                    end_date : endDateFromURL,
+                    user_id :user_id,
                 },
                 dataSrc: function(json) {
                     // Check the rejected count in the response and toggle the rejected button
@@ -771,56 +787,7 @@
             }
         });
     });
-    // Edit Button Functionality
-    // $(document).on('click', '.editItem', function () {
-    //     const itemId = $(this).data('id'); // Get the item ID
-    //     // $('#editBuyListLeadModal').modal('show');
-    //     // Populate modal fields with existing data via AJAX if needed
-    //     $.ajax({
-    //         url: `{{ url('/items/${itemId}/edit') }}`,
-    //         type: 'GET',
-    //         success: function (data) {
-    //             console.log(data);
-    //             // Populate form fields in modal with data from the server
-    //             $('#editOrderName').val(data.name);
-    //             $('#itemIdEdit').val(data.id);
-    //             $('#editOrderAsin').val(data.asin).trigger('input'); // Trigger input event to update the link
-    //             $('#editOrderCost').val(data.buy_cost);
-    //             $('#editOrderNote').val(data.product_buyer_notes);
-    //             $('#editListPrice').val(data.list_price);
-    //             $('#editOrderSellingPrice').val(data.selling_price);
-    //             $('#editOrderBsr').val(data.bsr);
-    //             $('#editQuantity').val(data.unit_purchased);
-    //             $('#editOrderProductNote').val(data.order_note);
-    //             $('#editOrderCategory').val(data.category);
-    //             $('#editOrderSupplier').val(data.supplier);
-    //             const domain = new URL(data.source_url).hostname;
-    //             $('#editOrderSourceUrl').val(domain);
-    //             $('#editOrderPromo').val(data.promo);
-    //             $('#editCouponCode').val(data.coupon_code || ''); // Handle null or undefined
-    //             if (data.created_by) {
-    //                 $('#createdBy').text(data.created_by.name);
-    //             } else {
-    //                 $('#createdBy').text(''); // Handle null or undefined
-    //             }
-    //             $('#editAmazonUrl').attr('href','https://www.amazon.com/dp/'+data.asin+'')
-    //             $('.edit_source_url ').attr('href',data.source_url)
-
-    //             // Set checkbox values
-    //             $('#editOrderIsHazmat').prop('checked', data.is_hazmat === 1);
-    //             $('#editOrderIsDisputed').prop('checked', data.is_disputed === 1);
-
-    //             // Set min and max values
-    //             $('#editMinPrice').val(data.min);
-    //             $('#editMaxPrice').val(data.max);
-    //             $('#editMsku').val(data.msku);
-
-    //             // Open the modal using Bootstrap's modal method
-    //             $('#editBuyListLeadModal').modal('show');
-    //             // $('#editField').val(data.fieldName); // Example field
-    //         }
-    //     });
-    // });
+    
     let buyCost = 0;
     let sellingPrice = 0;
     let netProfit = 0;
@@ -1389,6 +1356,14 @@
             </div>`;
         // Append or Replace inside a container
         $('.summary-box').html(tableHtml);  // ✅ Make sure you have <div id="summaryBox"></div> in your HTML
+    }
+    function getUrlParams() {
+        const params = {};
+        const searchParams = new URLSearchParams(window.location.search);
+        for (const [key, value] of searchParams.entries()) {
+            params[key] = value;
+        }
+        return params;
     }
 </script>
 @endsection

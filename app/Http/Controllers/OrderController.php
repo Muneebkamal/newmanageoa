@@ -101,11 +101,17 @@ class OrderController extends Controller
                 if ($request->has('search') && !empty($request->search['value'])) {
                     $searchTerm = $request->search['value'];
                     $query->where(function ($subQuery) use ($searchTerm) {
-                        $subQuery->whereHas('LineItems', function ($lineItemQuery) use ($searchTerm) {
+                        // Search in the Order table columns
+                        $subQuery->whereRaw('LOWER(order_id) LIKE ?', [strtolower("%{$searchTerm}%")])
+                                 ->orWhereRaw('LOWER(status) LIKE ?', [strtolower("%{$searchTerm}%")])
+                                 ->orWhereRaw('LOWER(source) LIKE ?', [strtolower("%{$searchTerm}%")]);
+            
+                        // Search in the LineItems relationship
+                        $subQuery->orWhereHas('LineItems', function ($lineItemQuery) use ($searchTerm) {
                             $lineItemQuery->where(function ($q) use ($searchTerm) {
                                 $q->whereRaw('LOWER(name) LIKE ?', [strtolower("%{$searchTerm}%")])
-                                ->orWhereRaw('LOWER(asin) LIKE ?', [strtolower("%{$searchTerm}%")])
-                                ->orWhereRaw('LOWER(supplier) LIKE ?', [strtolower("%{$searchTerm}%")]);
+                                  ->orWhereRaw('LOWER(asin) LIKE ?', [strtolower("%{$searchTerm}%")])
+                                  ->orWhereRaw('LOWER(supplier) LIKE ?', [strtolower("%{$searchTerm}%")]);
                             });
                         });
                     });

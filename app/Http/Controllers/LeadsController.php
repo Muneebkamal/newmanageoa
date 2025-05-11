@@ -47,6 +47,10 @@ use Yajra\DataTables\Facades\DataTables;
                     $leads->whereIn('source_id', $selectedIds);
                 }
             }
+            if (request()->has('user_id') && !empty(request('user_id'))) {
+                $userId = request('user_id');
+                $leads->where('created_by', $userId);
+            }
         // Filter by Date Range
             // if ($request->has('date_range') && $request->input('date_range') !== null) {
             //     $dateRange = $request->input('date_range');
@@ -60,7 +64,9 @@ use Yajra\DataTables\Facades\DataTables;
             // }
             
             if ($request->has('start_date') && $request->has('end_date') && !empty($request->start_date) && !empty($request->end_date)) {
-                $leads->whereBetween('created_at', [$request->start_date, $request->end_date]);
+                $startDate = Carbon::parse($request->start_date)->startOfDay();
+                $endDate = Carbon::parse($request->end_date)->endOfDay();
+                $leads->whereBetween('created_at', [$startDate,  $endDate]);
             }
 
             // Sort By

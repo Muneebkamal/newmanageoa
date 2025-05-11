@@ -686,50 +686,52 @@ table.dataTable {
     <script>
         var savedPageSizeNew = sessionStorage.getItem("pageSize");
         savedPageSizeNew = savedPageSizeNew !== null && savedPageSizeNew !== undefined ? savedPageSizeNew : '10';
+        var startDateFromURL = '';
+        var endDateFromURL = '';
+        var user_id = '';
         $(document).ready(function () {
             let startOfWeek = moment().startOf('isoWeek');
             let endOfWeek = moment().endOf('isoWeek');
             let today = moment();
-
-            // Get the first day of the last 3 months
             let startOfLastThreeMonths = today.clone().subtract(3, 'months').startOf('month');
-
-            // Get the last day of the last 3 months
             let endOfLastThreeMonths = today.clone().subtract(1, 'months').endOf('month');
 
+            // Parse URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            startDateFromURL = urlParams.get('start_date');
+            endDateFromURL = urlParams.get('end_date');
+            user_id = urlParams.get('user_id');
 
-            // $('#dateRangePicker').daterangepicker({
-            //     autoUpdateInput: true,
-            //     locale: { cancelLabel: 'Clear' },
-            //     startDate: startOfLastThreeMonths,  // ✅ Default Start Date
-            //     endDate: endOfLastThreeMonths,  // ✅ Default End Date
-            //     alwaysShowCalendars: true,
-            //     ranges: {
-            //         'Today': [moment(), moment()],
-            //         'This Week': [startOfWeek, endOfWeek],
-            //         'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            //         'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            //         'This Month': [moment().startOf('month'), moment().endOf('month')],
-            //         'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-            //         'Last 3 Months': [startOfLastThreeMonths, endOfLastThreeMonths],
-            //         'Last 6 Months': [moment().subtract(5, 'month').startOf('month'), moment().endOf('month')],
-            //         'This Year': [moment().startOf('year'), moment().endOf('year')],
-            //         'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
-            //     }
-            // });
+            // Determine the start and end date
+            const startDate = startDateFromURL 
+                ? moment(startDateFromURL, 'YYYY-MM-DD') 
+                : moment().subtract(89, 'days');
+
+            const endDate = endDateFromURL 
+                ? moment(endDateFromURL, 'YYYY-MM-DD') 
+                : moment();
+
+            // Set hidden input values
+            $('#start_date').val(startDate.format('YYYY-MM-DD'));
+            $('#end_date').val(endDate.format('YYYY-MM-DD'));
+
+            // Initialize the daterangepicker
             $('#dateRangePicker').daterangepicker({
                 autoUpdateInput: true,
-                locale: { cancelLabel: 'Clear' },
-                startDate: moment().subtract(89, 'days'),   // ✅ Default Start Date (90 days ago)
-                endDate: moment(),                          // ✅ Default End Date (today)
+                locale: { 
+                    cancelLabel: 'Clear',
+                    format: 'YYYY-MM-DD'
+                },
+                startDate: startDate,
+                endDate: endDate,
                 alwaysShowCalendars: true,
                 ranges: {
-                    'All': [moment('2000-01-01'), moment()], // ✅ 'All' from very old date to today
+                    'All': [moment('2000-01-01'), moment()],
                     'Today': [moment(), moment()],
                     'This Week': [moment().startOf('week'), moment().endOf('week')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'Last 90 Days': [moment().subtract(89, 'days'), moment()], // ✅ Added & Default
+                    'Last 90 Days': [moment().subtract(89, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                     'Last 3 Months': [moment().subtract(2, 'month').startOf('month'), moment().endOf('month')],
@@ -737,34 +739,24 @@ table.dataTable {
                     'This Year': [moment().startOf('year'), moment().endOf('year')],
                     'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
                 }
+            }, function(start, end, label) {
+                $('#dateRangePicker').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                $('#start_date').val(start.format('YYYY-MM-DD'));
+                $('#end_date').val(end.format('YYYY-MM-DD'));
+                $('#filterTitle').text(label);
             });
 
+            // Force update initial visible value in picker
+            $('#dateRangePicker').val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
+            $('#filterTitle').text(startDateFromURL && endDateFromURL ? 'Custom Range' : 'Last 90 Days');
 
-            // Get today's date
-           
-            // ✅ Set initial values for hidden inputs
-            $('#start_date').val(startOfLastThreeMonths.format('YYYY-MM-DD'));
-            $('#end_date').val(endOfLastThreeMonths.format('YYYY-MM-DD'));
-            // ✅ Show selected dates in input field
-            $('#dateRangePicker').val(startOfLastThreeMonths.format('YYYY-MM-DD') + ' - ' + endOfLastThreeMonths.format('YYYY-MM-DD'));
-
-
-            // ✅ On apply, update the input field with selected dates
-            $('#dateRangePicker').on('apply.daterangepicker', function (ev, picker) {
-                let formattedDateRange = picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD');
-                $(this).val(formattedDateRange);
-                let rangeTitle = picker.chosenLabel;  // Get the selected range title
-                $('#start_date').val(picker.startDate.format('YYYY-MM-DD'));
-                $('#end_date').val(picker.endDate.format('YYYY-MM-DD'));
-                $('#filterTitle').text(rangeTitle);
-            });
-
-            // ✅ Clear input on cancel
+            // Handle cancel
             $('#dateRangePicker').on('cancel.daterangepicker', function () {
                 $(this).val('');
                 $('#start_date').val('');
                 $('#end_date').val('');
             });
+
         });
         var checkedValueTags = [];
         $(document).ready(function () {
@@ -800,6 +792,7 @@ table.dataTable {
                             return $(this).val();
                         }).get();
                         d.checkedValueTags = checkedValueTags;
+                        d.user_id = user_id;
                     },
                 },
                 columns: [
@@ -1207,7 +1200,14 @@ table.dataTable {
                 $('#apply-filter').click();
             }, 400);
         });
-
+        function getUrlParams() {
+            const params = {};
+            const searchParams = new URLSearchParams(window.location.search);
+            for (const [key, value] of searchParams.entries()) {
+                params[key] = value;
+            }
+            return params;
+        }
 
     </script>
     
