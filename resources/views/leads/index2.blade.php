@@ -68,7 +68,10 @@ table.dataTable {
 
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item active"><a href="{{ url('leads-new') }}"><h3>Leads New</h3></a></li>
+                       <li class="breadcrumb-item active d-flex align-items-center">
+                            <a href="{{ url('leads-new') }}"><h3 class="mb-0 me-3">Leads New</h3></a>
+                            <a href="{{ url('leads') }}" class="btn btn-sm btn-outline-primary">View Old Leads</a>
+                        </li>
                     </ol>
                 </div>
 
@@ -114,7 +117,14 @@ table.dataTable {
                         <div class="input-group-prepend">
                             <span class="input-group-text font-weight-bold">Date</span>
                         </div>
-                        
+                        {{-- <select id="inputDateOption" class="form-control custom-select-sm">
+                            <option value="0">Today</option>
+                            <option value="7" >Last 7 days</option>
+                            <option value="30" >Last 30 days</option>
+                            <option value="90" selected>Last 90 days</option>
+                            <option value="custom">Custom Range</option>
+                            <option value="827">All</option>
+                        </select> --}}
                         <input type="text" id="dateRangePicker" class="form-control custom-select-sm" />
                     </div>
                 </div>
@@ -257,7 +267,98 @@ table.dataTable {
                 <thead>
                     <tr>
                         <th>
+                            {{-- <div class="col-md-12 d-flex justify-content-between">
+                                <div>
+                                    <div class="d-flex justify-content-between ms-4">
+                                        <input type="checkbox" class="me-2" name="checkAllLead" id="checkAllLead">
+                                        <select id="dropdownApplyTagsToSelected" class="form-control custom-select-sm  ms-3" style="width:200px" disabled>
+                                            <option value="" selected disabled>Bulk Apply tags</option>
+                                        </select>
+                                        
+                                    </div>
+                                </div>
+                                <div>
+                                    <button type="button" id="" class="btn btn-outline-secondary dropdown-toggle me-2" data-bs-toggle="dropdown" 
+                                        aria-haspopup="true" aria-expanded="true">Select Lists
+                                    </button>
+                                    <div class="dropdown-menu" data-popper-placement="top-start"
+                                        style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(0px, -40px);">
+                                        <div class="mt-2" style="overflow-y: auto; max-height: 25vh;">
+                                            <h6 class="dropdown-header">My Lists</h6>
+                                            <ul id="sorucesUl">
+                                                <!-- Dynamic content will be appended here -->
+                                            </ul>
+                                        </div>
+                                        <a class="dropdown-item" id="selectToggleButton">
+                                            
+                                        </a>
+                                    </div>
 
+
+                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle me-2" data-bs-toggle="dropdown"  aria-haspopup="true"
+                                        aria-expanded="true">Select List Type
+                                    </button>
+                                    <div class="dropdown-menu" data-popper-placement="top-start"
+                                        style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(0px, -40px);">
+                                        <div id="" class="mt-2" style="overflow-y: auto; max-height: 25vh;">
+                                            <form class="p-2">
+                                                <div  class="form-check dropdown-item">
+                                                    <input  type="checkbox" value="Top Shelf Leads" id="topShelfCheckbox" data-gtm-form-interact-field-id="0"> <label  for="topShelfCheckbox">Top Shelf Leads</label>
+                                                </div> 
+                                                <div  class="form-check  dropdown-item">
+                                                    <input  type="checkbox" value="Honorable Mentions" id="honorableCheckbox" data-gtm-form-interact-field-id="1"> <label  for="honorableCheckbox">Honorable Mentions</label>
+                                                </div> 
+                                                <div  class="form-check dropdown-item">
+                                                    <input  type="checkbox" value="Replenishables" id="replenCheckbox"> <label  for="replenCheckbox">Replenishables</label>
+                                                </div> 
+                                                <div  class="form-check dropdown-item">
+                                                    <input  type="checkbox" value="Only Bundles" id="onlyBundlesCheckbox"> <label  for="onlyBundlesCheckbox">Only Show Bundles</label>
+                                                </div>
+                                            </form>
+                        
+                                        </div>
+                                       
+                                    </div>
+                                    
+                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle me-2" data-bs-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="true" onclick="tagsGet()">Select Tags
+                                    </button>
+                                    <div class="dropdown-menu" data-popper-placement="top-start"
+                                        style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(0px, -40px);">
+                                        <div class="mx-1 form-icon right">
+                                            <input type="text" class="form-control form-control-icon" id="iconrightInput" placeholder="Search">
+                                            <i class="ri-search-line"></i>
+                                        </div>
+                                        <div id="tags_get" class="mt-2" style="overflow-y: auto; max-height: 25vh;">
+                        
+                                        </div>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#" onclick="unCheckTags(); return false;"> <i
+                                                class="ri-close-line text-primary me-2"></i> Deselect All
+                                            Tags</a>
+                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#manage-tag-modal"
+                                            onclick="tagsList(); return false;">
+                                            <i class="ri-pencil-line text-primary me-2"></i> Manage Tags
+                                        </a>
+                                    </div>
+                                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModalScrollable" onclick="formLeadClear()">Add Lead</button>
+                                    <div class="input-group input-group-sm">
+                                        <div  class="input-group-prepend">
+                                            <label  for="perPageSelect" class="input-group-text">Page Size:</label>
+                                        </div>
+                                        <select  id="perPageSelect" class="select2">
+                                            <option  value="10" selected>10</option>
+                                            <option  value="25">25</option>
+                                            <option  value="50">50</option>
+                                            <option  value="100">100</option>
+                                            <option  value="250">250</option>
+                                        </select>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div> --}}
                             <div class="col-md-12 d-flex justify-content-between">
                                 <!-- Left section (Checkbox and Bulk Apply Tags) -->
                                 <div class="d-flex align-items-center ms-4">
@@ -381,6 +482,7 @@ table.dataTable {
             
         </div>
 
+        {{-- {{ $leads->links('pagination::bootstrap-5') }} --}}
     </div>
 
     @include('modals.leads.add-modal')
@@ -395,20 +497,44 @@ table.dataTable {
     <script>
         var savedPageSizeNew = sessionStorage.getItem("pageSize");
         savedPageSizeNew = savedPageSizeNew !== null && savedPageSizeNew !== undefined ? savedPageSizeNew : '10';
+        var startDateFromURL = '';
+        var endDateFromURL = '';
+        var user_id = '';
         $(document).ready(function () {
             let startOfWeek = moment().startOf('isoWeek');
             let endOfWeek = moment().endOf('isoWeek');
             let today = moment();
-
-            // Get the first day of the last 3 months
             let startOfLastThreeMonths = today.clone().subtract(3, 'months').startOf('month');
-            // Get the last day of the last 3 months
             let endOfLastThreeMonths = today.clone().subtract(1, 'months').endOf('month');
+
+            // Parse URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            startDateFromURL = urlParams.get('start_date');
+            endDateFromURL = urlParams.get('end_date');
+            user_id = urlParams.get('user_id');
+
+            // Determine the start and end date
+            const startDate = startDateFromURL 
+                ? moment(startDateFromURL, 'YYYY-MM-DD') 
+                : moment().subtract(89, 'days');
+
+            const endDate = endDateFromURL 
+                ? moment(endDateFromURL, 'YYYY-MM-DD') 
+                : moment();
+
+            // Set hidden input values
+            $('#start_date').val(startDate.format('YYYY-MM-DD'));
+            $('#end_date').val(endDate.format('YYYY-MM-DD'));
+
+            // Initialize the daterangepicker
             $('#dateRangePicker').daterangepicker({
                 autoUpdateInput: true,
-                locale: { cancelLabel: 'Clear' },
-                startDate: moment().subtract(89, 'days'),   // ✅ Default Start Date (90 days ago)
-                endDate: moment(),                          // ✅ Default End Date (today)
+                locale: { 
+                    cancelLabel: 'Clear',
+                    format: 'YYYY-MM-DD'
+                },
+                startDate: startDate,
+                endDate: endDate,
                 alwaysShowCalendars: true,
                 ranges: {
                     'All': [moment('2000-01-01'), moment()],
@@ -416,7 +542,7 @@ table.dataTable {
                     'This Week': [moment().startOf('week'), moment().endOf('week')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'Last 90 Days': [moment().subtract(89, 'days'), moment()], // ✅ Added & Default
+                    'Last 90 Days': [moment().subtract(89, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                     'Last 3 Months': [moment().subtract(2, 'month').startOf('month'), moment().endOf('month')],
@@ -424,23 +550,18 @@ table.dataTable {
                     'This Year': [moment().startOf('year'), moment().endOf('year')],
                     'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
                 }
-            });
-            // ✅ Set initial values for hidden inputs
-            $('#start_date').val(startOfLastThreeMonths.format('YYYY-MM-DD'));
-            $('#end_date').val(endOfLastThreeMonths.format('YYYY-MM-DD'));
-            // ✅ Show selected dates in input field
-            $('#dateRangePicker').val(startOfLastThreeMonths.format('YYYY-MM-DD') + ' - ' + endOfLastThreeMonths.format('YYYY-MM-DD'));
-            // ✅ On apply, update the input field with selected dates
-            $('#dateRangePicker').on('apply.daterangepicker', function (ev, picker) {
-                let formattedDateRange = picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD');
-                $(this).val(formattedDateRange);
-                let rangeTitle = picker.chosenLabel;  // Get the selected range title
-                $('#start_date').val(picker.startDate.format('YYYY-MM-DD'));
-                $('#end_date').val(picker.endDate.format('YYYY-MM-DD'));
-                $('#filterTitle').text(rangeTitle);
+            }, function(start, end, label) {
+                $('#dateRangePicker').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                $('#start_date').val(start.format('YYYY-MM-DD'));
+                $('#end_date').val(end.format('YYYY-MM-DD'));
+                $('#filterTitle').text(label);
             });
 
-            // ✅ Clear input on cancel
+            // Force update initial visible value in picker
+            $('#dateRangePicker').val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
+            $('#filterTitle').text(startDateFromURL && endDateFromURL ? 'Custom Range' : 'Last 90 Days');
+
+            // Handle cancel
             $('#dateRangePicker').on('cancel.daterangepicker', function () {
                 $(this).val('');
                 $('#start_date').val('');
@@ -481,6 +602,7 @@ table.dataTable {
                             return $(this).val();
                         }).get();
                         d.checkedValueTags = checkedValueTags;
+                        d.user_id = user_id;
                     },
                 },
                 columns: [
@@ -888,7 +1010,14 @@ table.dataTable {
                 $('#apply-filter').click();
             }, 400);
         });
-
+        function getUrlParams() {
+            const params = {};
+            const searchParams = new URLSearchParams(window.location.search);
+            for (const [key, value] of searchParams.entries()) {
+                params[key] = value;
+            }
+            return params;
+        }
 
     </script>
     

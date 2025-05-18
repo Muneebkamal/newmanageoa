@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Lead;
+use App\Services\KeepaService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
     class LeadsController extends Controller
     {
+        protected $keepaService;
+
+        public function __construct(KeepaService $keepaService)
+        {
+            $this->keepaService = $keepaService;
+        }
         /**
          * Display a listing of the resource.
          */
@@ -886,4 +893,9 @@ use Yajra\DataTables\Facades\DataTables;
             ]);
             return response()->json($newMsku);
         }
+        function getProductByAsin($asin) {
+            $productData = $this->keepaService->getProductDetails($asin);
+            dd($productData );
+            
+        }  
     }

@@ -2568,29 +2568,72 @@ function getDomain(url) {
     domain = domain.split('/')[0];
     return domain;
 }
-function popWorkOrders(id){
+// function popWorkOrders(id){
+//     $('#workOrderModal').modal('show');
+//     $('#lineItemId').val(id);
+//     $.ajax({
+//         url: 'http://app.prepcenter.me/api/get-prep-orders',
+//         type: 'GET',
+//         async:false,
+//         success: function(data) {
+//             // Assume `data` is an array of work orders like:
+//             // [{ id: 1, title: 'Prep Order 1' }, { id: 2, title: 'Prep Order 2' }]
+//             $('#workOrderSelect').empty();
+//             $.each(data,function(index,value){
+//                 let employeeName = value.employee ? ` | ${value.employee.name}` : 'Unassigned';
+//                 $('#workOrderSelect').append(
+//                     `<option value="${value.custom_id}">${value.custom_id} ${employeeName}</option>`
+//                 );
+//             })  
+//         },
+//         error: function(err) {
+//             // handle error
+//         }
+//     });
+
+// }
+async function popWorkOrders(id) {
     $('#workOrderModal').modal('show');
     $('#lineItemId').val(id);
-    $.ajax({
-        url: 'http://app.prepcenter.me/api/get-prep-orders',
-        type: 'GET',
-        async:false,
-        success: function(data) {
-            // Assume `data` is an array of work orders like:
-            // [{ id: 1, title: 'Prep Order 1' }, { id: 2, title: 'Prep Order 2' }]
-            $('#workOrderSelect').empty();
-            $.each(data,function(index,value){
-                let employeeName = value.employee ? ` | ${value.employee.name}` : 'Unassigned';
-                $('#workOrderSelect').append(
-                    `<option value="${value.custom_id}">${value.custom_id} ${employeeName}</option>`
-                );
-            })  
-        },
-        error: function(err) {
-            // handle error
-        }
-    });
 
+    // Disable dropdown while loading
+    $('#workOrderSelect')
+        .html('<option disabled selected>Loading work orders...</option>')
+        .prop('disabled', true);
+
+    try {
+        const data = await fetchWorkOrders();
+
+        $('#workOrderSelect').empty();
+
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach(value => {
+                const employeeName = value.employee ? ` | ${value.employee.name}` : 'Unassigned';
+                $('#workOrderSelect').append(
+                    `<option value="${value.custom_id}">${value.custom_id}${employeeName}</option>`
+                );
+            });
+        } else {
+            $('#workOrderSelect').html('<option disabled>No prep orders found</option>');
+        }
+    } catch (error) {
+        console.error('Error fetching prep orders:', error);
+        $('#workOrderSelect').html('<option disabled>Error loading work orders</option>');
+    } finally {
+        $('#workOrderSelect').prop('disabled', false);
+    }
+}
+// Helper function that returns a Promise wrapping the AJAX call
+function fetchWorkOrders() {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: 'https://app.prepcenter.me/api/get-prep-orders', // ✅ ensure HTTPS
+            type: 'GET',
+            dataType: 'json',
+            success: resolve,
+            error: reject
+        });
+    });
 }
 $('#assignWorkOrderBtn').on('click',function(){
     var prepOrderId = $('#workOrderSelect').val();

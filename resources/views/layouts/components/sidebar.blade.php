@@ -37,14 +37,14 @@
                 </li>
                 @endcan
                 @can('view_leads')
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link menu-link {{ Request::is('leads') ? 'active' : '' }}" href="{{ url('/leads') }}">
                         <i class="ri-filter-2-line"></i> <span data-key="t-widgets">Leads</span>
                     </a>
-                </li>
+                </li> --}}
                  <li class="nav-item">
                     <a class="nav-link menu-link {{ Request::is('leads-new') ? 'active' : '' }}" href="{{ url('/leads-new') }}">
-                        <i class="ri-filter-2-line"></i> <span data-key="t-widgets">Leads New</span>
+                        <i class="ri-filter-2-line"></i> <span data-key="t-widgets">Leads</span>
                     </a>
                 </li>
                 @endcan

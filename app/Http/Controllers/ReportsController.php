@@ -35,19 +35,33 @@ class ReportsController extends Controller
             $startOfDay = $date->copy()->startOfDay();
             $endOfDay = $date->copy()->endOfDay();
         
-            $leadsCount = Lead::where('created_by', $employeeId)
-                ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                ->count();
-        
-            $buylists = Buylist::where(function ($query) use ($employeeId) {
-                $query->where('employee_id', $employeeId)
-                      ->orWhere('creatd_by', $employeeId);
-            })->pluck('id');
-        
-            $buylistUnits = LineItem::whereIn('buylist_id', $buylists)
-                ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                ->count();
-        
+           $employeeIds = explode(',', $employeeId);
+
+// Leads count
+$leadsCount = Lead::when(count($employeeIds) > 1, function ($query) use ($employeeIds) {
+        return $query->whereIn('created_by', $employeeIds);
+    }, function ($query) use ($employeeId) {
+        return $query->where('created_by', $employeeId);
+    })
+    ->whereBetween('created_at', [$startOfDay, $endOfDay])
+    ->count();
+
+// Buylist IDs (from employee_id or created_by)
+$buylists = Buylist::where(function ($query) use ($employeeIds, $employeeId) {
+        if (count($employeeIds) > 1) {
+            $query->whereIn('employee_id', $employeeIds)
+                  ->orWhereIn('creatd_by', $employeeIds);
+        } else {
+            $query->where('employee_id', $employeeId)
+                  ->orWhere('creatd_by', $employeeId);
+        }
+    })->pluck('id');
+
+// Line item count
+$buylistUnits = LineItem::whereIn('buylist_id', $buylists)
+    ->whereBetween('created_at', [$startOfDay, $endOfDay])
+    ->count();
+
             // ✅ Only push data if leads or buylist > 0
             if ($leadsCount > 0 || $buylistUnits > 0) {
                 $data[] = [

@@ -32,13 +32,16 @@
             <label for="employee_id">
             Select Employee:
             </label>
+            @php
+                $allEmployeeIds = $employees->pluck('id')->implode(',');
+            @endphp
             <select id="employee_id" name="employee_id" class="form-control custom-select-sm">
-            <option value=" ">-- Select Employee --</option>
-            @foreach($employees as $employee)
-                <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-            @endforeach
+                <option value="{{ $allEmployeeIds }}">-- All Employees --</option>
+                @foreach($employees as $employee)
+                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                @endforeach
             </select>
-            </div>
+                        </div>
             <div class="mt-4 d-flex">
             <button type="submit" id="sub_btn" class="btn btn-primary me-2">Search</button>
             <button type="button" class="btn btn-danger" id="resetButton">Clear</button>
@@ -56,7 +59,7 @@
                             <tr>
                                 <th>Date</th>
                                 <th>Total Leads</th>
-                                <th>Buylist Unit Purchased</th>
+                                <th>Buy List Unit Purchased</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -72,17 +75,17 @@
     <script>
     $(document).ready(function () {
         // Initialize date range picker with default range (This Week)
-        let startOfWeek = moment().startOf('isoWeek');
-        let endOfWeek = moment().endOf('isoWeek');
+        let startOfRange = moment().subtract(29, 'days');
+        let endOfRange = moment();
         $('#dateRangePicker').daterangepicker({
             autoUpdateInput: true,
             locale: { cancelLabel: 'Clear' },
-            startDate: startOfWeek,
-            endDate: endOfWeek,
+            startDate: startOfRange,
+            endDate: endOfRange,
             alwaysShowCalendars: true,
             ranges: {
                 'Today': [moment(), moment()],
-                'This Week': [startOfWeek, endOfWeek], 
+                'This Week': [moment().startOf('isoWeek'), moment().endOf('isoWeek')], 
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                 'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                 'This Month': [moment().startOf('month'), moment().endOf('month')],
@@ -97,8 +100,8 @@
             $('#end_date').val(end.format('YYYY-MM-DD'));
         });
         // Set initial values
-        $('#start_date').val(startOfWeek.format('YYYY-MM-DD'));
-        $('#end_date').val(endOfWeek.format('YYYY-MM-DD'));
+        $('#start_date').val(startOfRange.format('YYYY-MM-DD'));
+        $('#end_date').val(endOfRange.format('YYYY-MM-DD'));
         $('#search_form').on('submit', function (e) {
             e.preventDefault();
             let formData = $(this).serialize();
@@ -120,6 +123,9 @@
             $('#search_form')[0].reset();
             $('table tbody').empty();
         });
+        setTimeout(() => {
+            $('#search_form').submit();
+        }, 1000);
     });
     function appendTable(data) {
         let tableBody = $('table tbody');
@@ -131,13 +137,13 @@
             let row = `<tr>
             <td>${item.date}</td>
             <td>
-                <a href="/leads?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" target="_blank">
-                    ${item.leads}
+                <a style="color:#007BFF" href="/leads-new?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" target="_blank">
+                    ${item.leads} view Leads
                 </a>
             </td>
             <td>
-                <a href="/buylist?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" target="_blank">
-                    ${item.buylist}
+                <a style="color:#007BFF" href="/buylist?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" target="_blank">
+                    ${item.buylist} view Purchased
                 </a>
             </td>
 
