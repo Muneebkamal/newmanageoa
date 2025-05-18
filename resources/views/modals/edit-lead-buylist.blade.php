@@ -100,7 +100,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <label for="editAsin" class="col col-form-label">ASIN <a class="text-info" id="editAmazonUrl" href="" target="_blank">Find on Amazon</a></label>
+                                    <label for="editAsin" class="col col-form-label">ASIN <a class="text-info" id="editAmazonUrl" href="" target="_blank">Amazon Link</a></label>
                                     <div class="col-sm-auto">
                                         <input type="text" name="editOrderAsin" id="editOrderAsin" class="form-control">
                                     </div>

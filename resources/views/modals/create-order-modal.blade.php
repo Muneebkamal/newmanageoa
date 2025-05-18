@@ -96,7 +96,7 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-6">
-                                    <label for="asin" class="col col-form-label">ASIN <a class="text-info" id="amazonUrl" href="" target="_blank">Find on Amazon</a></label>
+                                    <label for="asin" class="col col-form-label">ASIN <a class="text-info" id="amazonUrl" href="" target="_blank">Amazon Link</a></label>
                                     <div class="col-sm-auto">
                                         <input type="text" name="orderAsin" id="orderAsin" class="form-control">
                                     </div>

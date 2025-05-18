@@ -79,7 +79,7 @@
         
                     <div class="form-group row">
                         <div class="col-md-6">
-                            <label for="editAsinCreateOrderItem" class="col-form-label">ASIN <a href="" target="_blank">Find on Amazon</a></label>
+                            <label for="editAsinCreateOrderItem" class="col-form-label">ASIN <a href="" target="_blank">Amazon Link</a></label>
                             <input type="text" id="editAsinCreateOrderItem" class="form-control">
                             
                             <label for="editCategoryCreateOrderItem" class="col-form-label">Category</label>

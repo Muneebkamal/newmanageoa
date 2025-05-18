@@ -78,7 +78,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="">ASIN* <a class="text-info amazonUrl"  href="#">Find on Amazon</a></label>
+                                <label for="">ASIN* <a class="text-info amazonUrl"  href="#">Amazon Link</a></label>
                                 <input type="text" class="form-control" id="asin" name="asin" required>
                             </div>
                         </div>
