@@ -38,7 +38,7 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="">Publish Date</label>
-                                <input type="date" class="form-control" id="date" name="date" value="<?php echo date('Y-m-d'); ?>">
+                               <input type="datetime-local" class="form-control" id="date" name="date" value="<?php echo date('Y-m-d\TH:i'); ?>">
 
                             </div>
                         </div>

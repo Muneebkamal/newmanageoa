@@ -58,8 +58,8 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Total Leads</th>
-                                <th>Buy List Unit Purchased</th>
+                                <th colspan="2">Total Leads</th>
+                                <th colspan="2">Buy List Unit Purchased</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,8 +75,8 @@
     <script>
     $(document).ready(function () {
         // Initialize date range picker with default range (This Week)
-        let startOfRange = moment().subtract(29, 'days');
-        let endOfRange = moment();
+        let startOfRange = moment().startOf('month');
+        let endOfRange = moment().endOf('month'); // instead of moment()
         $('#dateRangePicker').daterangepicker({
             autoUpdateInput: true,
             locale: { cancelLabel: 'Clear' },
@@ -131,23 +131,35 @@
         let tableBody = $('table tbody');
         tableBody.empty();
         const employee_id = $('#employee_id').val() || '';
-        console.log(employee_id);
 
         data.forEach(item => {
             let row = `<tr>
-            <td>${item.date}</td>
-            <td>
-                <a style="color:#007BFF" href="/leads-new?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" target="_blank">
-                    ${item.leads} view Leads
-                </a>
-            </td>
-            <td>
-                <a style="color:#007BFF" href="/buylist?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" target="_blank">
-                    ${item.buylist} view Purchased
-                </a>
-            </td>
-
-
+                <td>${item.date}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="me-2 fw-bold">${item.leads}</div>
+                       
+                    </div>
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary" 
+                    href="/leads-new?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" 
+                    target="_blank">
+                        View Leads
+                    </a>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="me-2 fw-bold">${item.buylist}</div>
+                    </div>
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-outline-success" 
+                    href="/buylist?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" 
+                    target="_blank">
+                        View Purchased
+                    </a>
+                </td>
             </tr>`;
             tableBody.append(row);
         });

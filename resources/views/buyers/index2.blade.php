@@ -284,7 +284,15 @@
             }
         });
     });
+    var startDateFromURL = '';
+    var endDateFromURL = '';
+    var user_id = '';
     $(document).ready(function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        startDateFromURL = urlParams.get('start_date');
+        endDateFromURL = urlParams.get('end_date');
+        user_id = urlParams.get('user_id');
+
         $('.checkAll').on('change', function() {
             // Check or uncheck all checkboxes
             $('input[name="leadCheckBox"]').prop('checked', $(this).prop('checked'));
@@ -408,6 +416,7 @@
                     `;
                     buylistContainer.append(teamBuyMenu);
                 }
+                var na = "Team Buylist";
                 buylists.forEach(buylist => {
                     if (buylist.name !== 'Team Buylist') {
                         const buylistButton = `
@@ -420,8 +429,10 @@
                         </li>`;
                         buylistContainer.append(buylistButton);
                     }
+                    if (buylist.employee_id != null && user_id != null && buylist.employee_id == user_id) {
+                        na = buylist.name;
+                    }
                 });
-
                 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                 tooltipTriggerList.forEach(function (tooltipTriggerEl) {
                     new bootstrap.Tooltip(tooltipTriggerEl);
@@ -429,7 +440,7 @@
 
                 // Initialize click handlers and set default buylist
                 initializeBuylistClickHandler();
-                selectDefaultBuylist("Team Buylist");
+                selectDefaultBuylist(na);
             },
             error: function(xhr) {
                 console.error('Error fetching buylists:', xhr.responseText);
@@ -534,6 +545,9 @@
                 data: {
                     is_rejected: is_rejected, // Replace 'someParameter' with the name of the parameter you want to send
                     is_approved:true,
+                    start_date : startDateFromURL,
+                    end_date : endDateFromURL,
+                    user_id :user_id,
                 },
                 dataSrc: function(json) {
                     // Check the rejected count in the response and toggle the rejected button
@@ -772,6 +786,9 @@
         });
     });
     
+    let buyCost = 0;
+    let sellingPrice = 0;
+    let netProfit = 0;
     $(document).on('click', '.editItem, .approvelItem', function () {
         const itemId = $(this).data('id');
         const isViewOnly = $(this).data('viewonly') === true || $(this).data('viewonly') === "true";
@@ -794,10 +811,32 @@
                 $('#editOrderNote').val(data.product_buyer_notes);
                 $('#editListPrice').val(data.list_price);
                 $('#editOrderSellingPrice').val(data.selling_price);
+                // Check if net_profit is null or 0, then calculate it
+                let netProfit = data.net_profit;
+                if (netProfit === null || netProfit == 0) {
+                    let cost = parseFloat(data.buy_cost) || 0;
+                    let sellingPrice = parseFloat(data.selling_price) || 0;
+                    netProfit = sellingPrice - cost;
+                    netProfit = netProfit.toFixed(2);
+                }
+
+                $('#editOrderNetProfit').val(netProfit);
                 $('#editOrderBsr').val(data.bsr);
                 $('#editQuantity').val(data.unit_purchased);
+                $('#editBuyListLeadModal #quantity').val(data.unit_purchased);
                 $('#editOrderProductNote').val(data.order_note);
                 $('#editOrderCategory').val(data.category);
+                // console.log(data.unit_purchased * data.buy_cost);
+                // console.log(data.unit_purchased * data.selling_price);
+                // $('.order-qty-cost').html('$' + (data.unit_purchased * data.buy_cost).toFixed(2));
+                // $('.order-qty-selling').html('$' + (data.unit_purchased * parseFloat(data.selling_price)).toFixed(2));
+                // $('.order-qty-gross-profit').html('$' + (data.unit_purchased * parseFloat(netProfit)).toFixed(2));
+                appendTotalHtl(data.buy_cost,data.unit_purchased,netProfit,data.selling_price)
+
+                buyCost = data.buy_cost;
+                sellingPrice = data.selling_price;
+                netProfit = netProfit;
+
                 let supplier = data.supplier;
                 if (supplier && !supplier.includes('.com')) {
                     supplier += '.com';
@@ -841,11 +880,43 @@
         });
     });
 
-    function updateTheLead() {
+
+    function changeQty(type) {
+        let qty =  parseInt($('#editQuantity').val()) || 1;
+        if (type === 'plus') {
+            qty += 1;
+        } else if (type === 'minus' && qty > 1) {
+            qty -= 1;
+        }
+
+        $('#editBuyListLeadModal #quantity').val(qty);
+        updatePriceSpans(qty); // just update display
+    }
+
+    function updatePriceSpans(qty) {
+        // console.log(qty, buyCost, sellingPrice, netProfit);
+        // netProfit = parseFloat($("#editOrderNetProfit").val())
+        // $('.order-qty-cost').text('$' + (qty * buyCost).toFixed(2));
+        // $('.order-qty-selling').text('$' + (qty * sellingPrice).toFixed(2));
+        // $('.order-qty-gross-profit').text('$' + (qty * netProfit).toFixed(2));
+        let quantity_new = qty;
+        let cost = buyCost;
+        let sellPricenew = sellingPrice;
+        let formattedPrice = parseFloat(sellPricenew).toFixed(2);
+        appendTotalHtl(cost,quantity_new,netProfit,formattedPrice)
+
+
+    }
+
+    function updateTheLead(Modaltype='') {
         // Get buylist ID and item ID
         const buylistId = $('#selectedbuylistID').val();
         const itemId = $('#itemIdEdit').val();
-        const modalMode = $('#modalMode').val();
+        if(Modaltype == 'reject'){
+            var modalMode = 'reject';
+        }else{ 
+            var modalMode = $('#modalMode').val();
+        }
 
         // Build order edit data object
         const orderEditData = {
@@ -867,6 +938,7 @@
             source_url: $('#editOrderSourceUrl').val().trim(), // Source URL
             order_note: $('#editOrderProductNote').val().trim() || null, // Additional notes
             selling_price: parseFloat($('#editOrderSellingPrice').val()) || 0, // Selling price
+            net_profit: parseFloat($('#editOrderNetProfit').val()) || 0, // Net profit
             bsr: $('#editOrderBsr').val().trim() || null, // Best Seller Rank
             is_hazmat: $('#editOrderIsHazmat').is(':checked') ? 1 : 0, // Hazmat
             is_disputed: $('#editOrderIsDisputed').is(':checked') ? 1 : 0, // Disputed
@@ -1212,24 +1284,81 @@
         $('#orderIsDisputed').prop('checked', false);
     }
     function updateOrderCalculations() {
-        $('#Orderqty_cost').text(`0.00`);
-        $('#Orderqty_selling').text(`0.00`);
-        $('#Orderqty_profit').text(`0.00`);
+        // $('#Orderqty_cost').text(`0.00`);
+        // $('#Orderqty_selling').text(`0.00`);
+        // $('#Orderqty_profit').text(`0.00`);
 
-        let orderCost = parseFloat($("#editOrderCost").val()) || 0;
-        let orderSellingPrice = parseFloat($("#editOrderSellingPrice").val()) || 0;
-        let orderNetProfit = parseFloat($("#orderNetprofit").val()) || 0;
-        let orderQuantity = parseInt($("#orderQuantity").val()) || 0;
+        // let orderCost = parseFloat($("#editOrderCost").val()) || 0;
+        // let orderSellingPrice = parseFloat($("#editOrderSellingPrice").val()) || 0;
+        // let orderNetProfit = parseFloat($("#editOrderNetProfit").val()) || 0;
+        // console.log(orderNetProfit)
+        // let orderQuantity = parseInt($("#orderQuantity").val()) || 0;
 
-        // Calculate values and update display
-        $('#Orderqty_cost').text(`$${(orderCost * orderQuantity).toFixed(2)}`);
-        $('#Orderqty_selling').text(`$${(orderSellingPrice * orderQuantity).toFixed(2)}`);
-        $('#Orderqty_profit').text(`$${(orderNetProfit * orderQuantity).toFixed(2)}`);
+        // // Calculate values and update display
+        // $('#Orderqty_cost').text(`$${(orderCost * orderQuantity).toFixed(2)}`);
+        // $('#Orderqty_selling').text(`$${(orderSellingPrice * orderQuantity).toFixed(2)}`);
+        // $('#Orderqty_profit').text(`$${(orderNetProfit * orderQuantity).toFixed(2)}`);
+        let quantity_new = parseInt($("#orderQuantity").val()) || 0;
+        let cost = parseFloat($("#editOrderCost").val()) || 0;
+        let sellPrice = parseFloat($("#editOrderSellingPrice").val()) || 0;
+        let netProfit =  parseFloat($("#editOrderNetProfit").val()) || 0;
+        appendTotalHtl(cost,quantity_new,netProfit,sellPrice)
+
     }
 
     // Attach event listeners to update calculations on input change
     $('#editQuantity, #editOrderCost, #editOrderSellingPrice, #quantity').on('input', function () {
         updateOrderCalculations();
     });
+    function appendTotalHtl(cost,quantity_new,netProfit,sellPrice){
+        
+        let totalItemCost = cost * quantity_new;
+        let totalItemSelling = sellPrice * quantity_new;
+        let itemProfit = netProfit * quantity_new;
+        let itemProfitPerPiece = itemProfit / (quantity_new || 1);
+        // Prepare the table HTML
+        let tableHtml = `
+            <div class="card-body">
+                <div class="summary-box">
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Qty</th>
+                                <th>Selling Price</th>
+                                <th>Cost Price</th>
+                                <th>Gross Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><strong>${quantity_new}</strong></td>
+                                <td><span class="total_selling_price">$${totalItemSelling.toFixed(2)}</span></td>
+                                <td><span class="total_cost_price">$${totalItemCost.toFixed(2)}</span></td>
+                                <td><span class="total_gross_profit">$${itemProfit.toFixed(2)}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Per Pcs</strong></td>
+                                <td><strong></strong></td>
+                                <td><span class="perpcs_selling_price">$${sellPrice}</span></td>
+                                <td><span class="perpcs_cost_price">$${cost.toFixed(2)}</span></td>
+                                <td><span class="perpcs_gross_profit">$${itemProfitPerPiece.toFixed(2)}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+        // Append or Replace inside a container
+        $('.summary-box').html(tableHtml);  // ✅ Make sure you have <div id="summaryBox"></div> in your HTML
+    }
+    function getUrlParams() {
+        const params = {};
+        const searchParams = new URLSearchParams(window.location.search);
+        for (const [key, value] of searchParams.entries()) {
+            params[key] = value;
+        }
+        return params;
+    }
 </script>
 @endsection

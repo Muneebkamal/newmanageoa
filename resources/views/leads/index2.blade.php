@@ -369,74 +369,69 @@ table.dataTable {
                                 </div>
                             
                                 <!-- Right section (Buttons and dropdowns) -->
-                                <div class="d-flex align-items-center ms-auto">
+                                <div class="d-flex align-items-center ms-auto flex-wrap gap-2">
+
                                     <!-- Select Lists Button -->
-                                    <button type="button" id="" class="btn btn-outline-secondary dropdown-toggle me-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        Select Lists
-                                    </button>
-                                    <div class="dropdown-menu" data-popper-placement="top-start" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(0px, -40px);">
-                                        <div class="mt-2" style="overflow-y: auto; max-height: 25vh;">
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle square-btn" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            Select Lists
+                                        </button>
+                                        <div class="dropdown-menu p-2" style="max-height: 25vh; overflow-y: auto;">
                                             <h6 class="dropdown-header">My Lists</h6>
-                                            <ul id="sorucesUl">
-                                                <!-- Dynamic content will be appended here -->
-                                            </ul>
+                                            <ul id="sorucesUl" class="list-unstyled mb-2"></ul>
+                                            <a class="dropdown-item" id="selectToggleButton"></a>
                                         </div>
-                                        <a class="dropdown-item" id="selectToggleButton"></a>
                                     </div>
-                            
+
                                     <!-- Select List Type Button -->
-                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle me-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        Select List Type
-                                    </button>
-                                    <div class="dropdown-menu" data-popper-placement="top-start" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(0px, -40px);">
-                                        <div id="" class="mt-2" style="overflow-y: auto; max-height: 25vh;">
-                                            <form class="p-2">
-                                                <div class="form-check dropdown-item">
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle square-btn" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            Select List Type
+                                        </button>
+                                        <div class="dropdown-menu p-2" style="max-height: 25vh; overflow-y: auto;">
+                                            <form>
+                                                <div class="form-check">
                                                     <input type="checkbox" value="Top Shelf Leads" id="topShelfCheckbox"> <label for="topShelfCheckbox">Top Shelf Leads</label>
                                                 </div>
-                                                <div class="form-check dropdown-item">
+                                                <div class="form-check">
                                                     <input type="checkbox" value="Honorable Mentions" id="honorableCheckbox"> <label for="honorableCheckbox">Honorable Mentions</label>
                                                 </div>
-                                                <div class="form-check dropdown-item">
+                                                <div class="form-check">
                                                     <input type="checkbox" value="Replenishables" id="replenCheckbox"> <label for="replenCheckbox">Replenishables</label>
                                                 </div>
-                                                <div class="form-check dropdown-item">
+                                                <div class="form-check">
                                                     <input type="checkbox" value="Only Bundles" id="onlyBundlesCheckbox"> <label for="onlyBundlesCheckbox">Only Show Bundles</label>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
-                            
+
                                     <!-- Select Tags Button -->
-                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle me-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" onclick="tagsGet()">
-                                        Select Tags
-                                    </button>
-                                    <div class="dropdown-menu" data-popper-placement="top-start" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(0px, -40px);">
-                                        <div class="mx-1 form-icon right">
-                                            <input type="text" class="form-control form-control-icon" id="iconrightInput" placeholder="Search">
-                                            <i class="ri-search-line"></i>
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle square-btn" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" onclick="tagsGet()">
+                                            Select Tags
+                                        </button>
+                                        <div class="dropdown-menu p-2" style="max-height: 25vh; overflow-y: auto;">
+                                            <div class="input-group input-group-sm mb-2">
+                                                <input type="text" class="form-control" id="iconrightInput" placeholder="Search">
+                                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                            </div>
+                                            <div id="tags_get" class="mb-2"></div>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#" onclick="unCheckTags(); return false;"><i class="ri-close-line text-primary me-2"></i> Deselect All Tags</a>
+                                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#manage-tag-modal" onclick="tagsList(); return false;"><i class="ri-pencil-line text-primary me-2"></i> Manage Tags</a>
                                         </div>
-                                        <div id="tags_get" class="mt-2" style="overflow-y: auto; max-height: 25vh;"></div>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#" onclick="unCheckTags(); return false;">
-                                            <i class="ri-close-line text-primary me-2"></i> Deselect All Tags
-                                        </a>
-                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#manage-tag-modal" onclick="tagsList(); return false;">
-                                            <i class="ri-pencil-line text-primary me-2"></i> Manage Tags
-                                        </a>
                                     </div>
-                            
+
                                     <!-- Add Lead Button -->
-                                    <button class="btn btn-outline-primary btn-sm w-25 ms-2 me-2" type="button" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable" onclick="formLeadClear()">
+                                    <button class="btn btn-outline-primary square-btn" type="button" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable" onclick="formLeadClear()">
                                         Add Lead
                                     </button>
-                            
+
                                     <!-- Page Size Dropdown -->
-                                    <div class="input-group input-group-sm">
-                                        <div class="input-group-prepend">
-                                            <label for="perPageSelect" class="input-group-text">Page Size:</label>
-                                        </div>
-                                        <select id="perPageSelect" class="form-select w-25 select2">
+                                    <div class="input-group input-group-sm" style="width: auto;">
+                                        <label for="perPageSelect" class="input-group-text">Page Size:</label>
+                                        <select id="perPageSelect" class="form-select select2" style="width: auto; min-width: 70px;">
                                             <option value="10" selected>10</option>
                                             <option value="25">25</option>
                                             <option value="50">50</option>
