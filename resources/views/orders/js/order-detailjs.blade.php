@@ -287,13 +287,14 @@
                             </div>
                         </div>
                     `;
+                    $('#appendDataProfit').empty();
                     $('#appendDataProfit').append(productSummaryCard);
 
                         console.log(product)
-                        var orderedItem = product.total_units_purchased != 0 ? `<span class="badge bg-dark" title="Ordered">${product.total_units_purchased}</span>` : '<span title="Ordered">-</span>'
-                        var receivedItems = product.total_units_received != 0 ? `<span class="badge bg-info" title="received" id="itemTotalReceived${product.id}">${product.total_units_received}</span>` : `<span title="received" id="itemTotalReceived${product.id}">-</span>`
-                        var shippedItems = product.total_units_shipped != 0 ? `<span class="badge bg-success" title="Shipped" id="itemTotalShipped${product.id}">${product.total_units_shipped}</span>` : `<span title="Shipped" id="itemTotalShipped${product.id}">-</span>`
-                        var errorItems = product.unit_errors != 0 ? `<span class="badge bg-danger" title="Error" id="itemTotalError${product.id}">${product.unit_errors}</span>` : '<span title="Error" id="itemTotalError'+product.id+'">-</span>';
+                        var orderedItem = product.total_units_purchased != 0 ? `<span style="cursor:pointer;" class="badge bg-dark" title="Ordered">${product.total_units_purchased}</span>` : '<span title="Ordered">-</span>'
+                        var receivedItems = product.total_units_received != 0 ? `<span style="cursor:pointer;" class="badge bg-info" title="Received" id="itemTotalReceived${product.id}">${product.total_units_received}</span>` : `<span style="cursor:pointer;" title="received" id="itemTotalReceived${product.id}">-</span>`
+                        var shippedItems = product.total_units_shipped != 0 ? `<span style="cursor:pointer;" class="badge bg-success" title="Shipped" id="itemTotalShipped${product.id}">${product.total_units_shipped}</span>` : `<span style="cursor:pointer;" title="Shipped" id="itemTotalShipped${product.id}">-</span>`
+                        var errorItems = product.unit_errors != 0 ? `<span style="cursor:pointer;" class="badge bg-danger" title="Error" id="itemTotalError${product.id}">${product.unit_errors}</span>` : '<span title="Error" id="itemTotalError'+product.id+'">-</span>';
                         
                        
                         let row = `<tr>
@@ -351,8 +352,8 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li>
-                                                    <button type="button" class="dropdown-item" data-product-id="${product.id}" onclick="popWorkOrders(${product.id})">
-                                                        Send To Prep Work Order
+                                                    <button type="button" class="dropdown-item" data-product-id="${product.id}" onclick="handleDropdownClick(${product.id},'ship')">
+                                                        Ship to FBA
                                                     </button>
                                                 </li>
                                                 <li>
@@ -499,13 +500,13 @@
                                                     <label for="productNameOverride${product.id}" class="form-label">Title Override </label>
                                                     <input type="text" id="productNameOverride${product.id}" name="product_name_override" class="form-control" placeholder="Title">
                                                     <label for="listPriceOverride${product.id}" class="form-label">List Price Override</label>
-                                                    <input type="number" step="0.1" id="listPriceOverride${product.id}" name="list_price_orverride" class="form-control" placeholder="List Price">
+                                                    <input type="number" step="0.1" id="listPriceOverride${product.id}" name="list_price_orverride" class="form-control" value="0" placeholder="List Price">
                                                 </div>
                                                 <div class="col-md-1 d-none additionalInputs${product.id}">
                                                     <label for="minOverride${product.id}" class="form-label">Min Override </label>
-                                                    <input type="number" step="0.1" id="minOverride${product.id}" name="min_orverride" class="form-control" placeholder="Min Price">
+                                                    <input type="number" step="0.1" id="minOverride${product.id}" name="min_orverride" value="0" class="form-control" placeholder="Min Price">
                                                         <label for="maxOverride${product.id}" class="form-label">Max Override</label>
-                                                    <input type="number" step="0.1" id="maxOverride${product.id}" name="max_orverride" class="form-control" placeholder="Max Price">
+                                                    <input type="number" step="0.1" id="maxOverride${product.id}" name="max_orverride" value="0" class="form-control" placeholder="Max Price">
                                                 </div>
                                                    
                                                 <div class="col-md-1">
@@ -573,7 +574,7 @@
                                             <div class="col-12 col-md-2 mb-3">
                                                 <label for="replacementSupplierNotes" class="my-2">Supplier Notes</label>
                                                 <textarea id="replacementSupplierNotes" rows="2" placeholder="Notes"  name="supplier_notes" class="form-control"></textarea>
-                                            </div>receivedItem
+                                            </div>
                                             <div class="col-12 col-md-2 mb-3">
                                                 <label for="replacementNotes" class="my-2">Issue Notes</label>
                                                 <textarea id="replacementNotes" name="issue_notes" rows="2" placeholder="Notes" class="form-control"></textarea>
@@ -1516,6 +1517,7 @@
                     } 
                     getAllEvents();
                     getItemEventLogs(data.order_item_id);
+                    loadOrderItems(orderId);
                 }
                 switch (formType) {
                     case 'ship':
@@ -2016,6 +2018,7 @@
                 $('#orderTotalShipped').text(data.total_ship_order)
                 getAllEvents()
                 getItemEventLogs(data.order_item_id)
+                loadOrderItems(orderId)
             }
             
         })
@@ -2638,7 +2641,7 @@ function fetchWorkOrders() {
 $('#assignWorkOrderBtn').on('click',function(){
     var prepOrderId = $('#workOrderSelect').val();
     var lineItemId = $('#lineItemId').val();
-     var productQtyInput = $('#productQtyInput').val();
+    var productQtyInput = $('#productQtyInput').val();
     $.ajax({
         url: "{{ url('assign-work-order') }}",
         type: "POST",

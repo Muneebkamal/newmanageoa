@@ -3,9 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="shippingBatchModalLabel">Create New Shipping Batch</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="newShippingBatchForm">
@@ -40,7 +38,7 @@
                 <button type="button" class="btn btn-primary" id="saveBatchButton"  onclick="saveShipping()">
                     <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
                 </button>
-                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" aria-label="Close">
                     <i class="fa fa-times" aria-hidden="true"></i> Cancel
                 </button>
             </div>
