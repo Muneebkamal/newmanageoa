@@ -39,6 +39,7 @@ return new class extends Migration
             $table->decimal('tax_percent', 5, 2)->default(0.00); // For percentages
             $table->integer('created_by')->default(0);
             $table->integer('buyer_id')->default(0);
+            $table->integer('is_pending')->default(0);
             $table->timestamps();
         });
     }

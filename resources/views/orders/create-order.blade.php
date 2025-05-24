@@ -10,7 +10,7 @@
         color: black !important;
     }
 </style>
-    <div class="row">
+    <div class="row d-none">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <div class="page-title-right">
@@ -52,7 +52,7 @@
             @endphp
             <input id="source" name="source" class="form-control"  value="{{$parse }}" >
             <div class="col-md-1 mt-1">
-                <button class=" btn btn-success d-none" type="button" id="saveButton" onclick="saveChanges()">Save</button>
+                
             </div>
           </div>
         </form>
@@ -114,8 +114,9 @@
       </div>
       <!-- Skip and Reset Buttons -->
       <div class="col-md-1 d-flex justify-content-end align-items-start">
-        <button class="btn btn-primary mx-1">Skip</button>
-        <button class="btn btn-danger mx-1">Reset</button>
+        {{-- <button class="btn btn-primary mx-1">Skip</button>
+        <button class="btn btn-danger mx-1">Reset</button> --}}
+        <button class=" btn btn-success " type="button" id="saveButton" onclick="saveChanges()">Save</button>
       </div>
     </div>    
     <hr class="mt-3">

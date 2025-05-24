@@ -195,24 +195,6 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <div class="summary-box col-sm-auto mt-2">
-                                        <table>
-                                            <tr>
-                                                <td><strong>Total Cost:</strong></td>
-                                                <td><span class="order-qty-cost" id="Orderqty_cost"></span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Total Selling Price:</strong></td>
-                                                <td><span class="order-qty-selling ms-`" id="Orderqty_selling"></span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Gross Profit:</strong></td>
-                                                <td><span class="order-qty-gross-profit" id="Orderqty_profit"></span></td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
                                     <label for="editItemFlags" class="col-sm-auto col-form-label">Lead Flags</label>
                                     <div class="col-sm-auto" id="editItemFlags">
                                         <div role="group" aria-label="Item toggles" class="btn-group">
@@ -230,6 +212,24 @@
                                             </button>
                                             
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="summary-box col-sm-auto mt-2">
+                                        <table>
+                                            <tr>
+                                                <td><strong>Total Cost:</strong></td>
+                                                <td><span class="order-qty-cost" id="Orderqty_cost"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Total Selling Price:</strong></td>
+                                                <td><span class="order-qty-selling ms-`" id="Orderqty_selling"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Gross Profit:</strong></td>
+                                                <td><span class="order-qty-gross-profit" id="Orderqty_profit"></span></td>
+                                            </tr>
+                                        </table>
                                     </div>
                                 </div>
                                 <div class="col-md-4"></div>

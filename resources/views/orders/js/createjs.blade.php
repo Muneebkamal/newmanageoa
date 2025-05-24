@@ -735,7 +735,7 @@
             success: function (response) {
                 toastr.success("Data saved successfully!");
                 window.location.href = `/order/${orderId}`;
-                $('#saveButton').addClass('d-none'); // Hide the Save button after saving
+                // $('#saveButton').addClass('d-none'); // Hide the Save button after saving
             },
             error: function (error) {
                 console.error("An error occurred:", error);

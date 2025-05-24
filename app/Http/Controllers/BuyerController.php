@@ -152,6 +152,9 @@ class BuyerController extends Controller
                         </button>
                     </li>';
                 }
+                $orderButton = '<button class="btn btn-success singleOrder" style="padding: 2px 6px; font-size: 11px; line-height: 1;" data-id="'.$order->id.'">
+                    <i class="ri-shopping-cart-2-line"></i> Create Single Item Order
+                    </button>'; 
 
                 $rejectButton = '<button class="dropdown-item text-danger rejectItem" data-id="' . $order->id . '"><i class="ri-forbid-2-line text-danger"></i> Reject Item</button>';
             return '<div class="d-flex align-items-center gap-2">
@@ -159,7 +162,12 @@ class BuyerController extends Controller
                     <a style="cursor: pointer" id="dropdownActions'.$order->id.'" class="me-2 mt-2" data-bs-toggle="dropdown" aria-expanded="false">
                         <strong style="font-size: 17px;"><b><i class="ri-more-2-line ms-2"></i></b></strong>
                     </a>
-                    '. $isAprroved.'
+                    <div class="d-flex align-items-center gap-2">
+                        '. $isAprroved.'
+                         <br>
+                         <br>
+                        '.$orderButton.'
+                    </div>
                     
                     <ul class="dropdown-menu">
                         <li>
@@ -193,7 +201,9 @@ class BuyerController extends Controller
                         </li>
                     </ul>
 
-                </div>';
+                </div> 
+               
+                ';
             })
             ->editColumn('rejection_reason', function($order) {
                 return  $order->rejection_reason;
@@ -466,9 +476,10 @@ class BuyerController extends Controller
             $total_sku = $lineItem ->unit_purchased * $lineItem->buy_cost;
             $order = Order::create([
                 'date' => now(),
-                'status' => 'ordered', // Set a default status
+                'status' => 'draft', // Set a default status
                 'total_units_purchased'  => $lineItem->unit_purchased,
-                'source'  => $lineItem->source_url
+                'source'  => $lineItem->source_url,
+                'is_pending'  => 1
                 // Add any other necessary order fields here
             ]);
 

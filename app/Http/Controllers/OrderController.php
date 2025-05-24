@@ -74,7 +74,7 @@ class OrderController extends Controller
                 'total_units_received',
                 'total_units_shipped',
                 'unit_errors'
-            ])->with('LineItems');
+            ])->where('is_pending',0)->with('LineItems');
             if (isset($request->type) && $request->type === 'dashboard') {
                 $orders->whereDate('date', '>=', Carbon::now()->subDays(6));
 
@@ -544,6 +544,7 @@ class OrderController extends Controller
         $data = $request->all();
         unset($data['undefined']);
         unset($data['fileID']);
+         // Convert to integer
         if (!isset($data['total']) || !is_numeric($data['total'])) {
             $data['total'] = number_format(0, 2); // Format to 2 decimal places
         }
@@ -552,6 +553,8 @@ class OrderController extends Controller
         }
         $order = Order::where('id',$data['id'])->first();
         if($order){
+            $data['is_pending'] =  0;
+            dd($data);
             $order->update($data);
             return response()->json(['success' => true]);
         }else{

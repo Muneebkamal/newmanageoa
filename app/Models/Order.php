@@ -36,7 +36,8 @@ class Order extends Model
         'tax_paid',
         'tax_percent',
         'created_by',
-        'buyer_id'
+        'buyer_id',
+        'is_pending'
     ];
     public function LineItems(){
          return $this->hasMany(LineItem::class, 'order_id', 'id'); // Adjust foreign and local keys as per your schema
