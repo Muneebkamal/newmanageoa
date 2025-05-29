@@ -26,7 +26,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/leads';
+    protected $redirectTo = '/leads-new';
 
     /**
      * Create a new controller instance.
@@ -40,6 +40,6 @@ class LoginController extends Controller
     }
         protected function authenticated(Request $request, $user)
     {
-        return redirect('/leads');
+        return redirect('/leads-new');
     }
 }

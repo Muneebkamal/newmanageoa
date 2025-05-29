@@ -114,8 +114,8 @@
       </div>
       <!-- Skip and Reset Buttons -->
       <div class="col-md-1 d-flex justify-content-end align-items-start">
-        {{-- <button class="btn btn-primary mx-1">Skip</button>
-        <button class="btn btn-danger mx-1">Reset</button> --}}
+        <button class="btn btn-primary mx-1" onclick="saveChanges()">Skip</button>
+        <button class="btn btn-danger mx-1" id="resetAll">Reset</button>
         <button class=" btn btn-success " type="button" id="saveButton" onclick="saveChanges()">Save</button>
       </div>
     </div>    

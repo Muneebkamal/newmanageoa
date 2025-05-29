@@ -40,10 +40,16 @@
         
         <div class="col-md-12">
             <div class="card h-100">
-                <div class="card-header d-flex justify-content-between">
-                    <h4>Information For This Week</h4>
-                    <div data-v-c2ce40f4="" class="col-md-3 pl-0 float-end">
-                        <button data-v-c2ce40f4="" id="createNewOrderButton" type="button" class="btn btn-outline-primary ml-0 float-right"><i data-v-c2ce40f4="" aria-hidden="true" class=" ri-share-box-fill"></i>&nbsp; Create New Order</button>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="m-0">Orders For This Week</h4>
+                    
+                    <div class="d-flex gap-2">
+                        <a href="{{ url('orders') }}" class="btn btn-primary">
+                            Orders
+                        </a>
+                        <button id="createNewOrderButton" type="button" class="btn btn-outline-primary">
+                            <i class="ri-share-box-fill" aria-hidden="true"></i>&nbsp; Create New Order
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -71,8 +77,11 @@
     <div class="row mt-3">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
-                    Products
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="m-0">Leads</h5>
+                    <button class="btn btn-primary">
+                        Leads
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

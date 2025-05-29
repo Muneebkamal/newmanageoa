@@ -867,4 +867,31 @@
             }
         });
     });
+    
+</script>
+<script>
+   
+let isFormChanged = false;
+
+// Mark form as changed on any input change
+document.addEventListener('DOMContentLoaded', function () {
+    const formElements = document.querySelectorAll('input, textarea, select');
+
+    formElements.forEach(function (element) {
+        element.addEventListener('change', function () {
+            isFormChanged = true;
+        });
+    });
+});
+    $('#resetAll').on('click', function() {
+       // Trigger beforeunload only if changes exist
+        window.addEventListener('beforeunload', function (e) {
+            if (isFormChanged) {
+                e.preventDefault();
+                e.returnValue = ''; // Required for most browsers
+            }
+        });
+        window.location.reload(true)
+    });
+
 </script>

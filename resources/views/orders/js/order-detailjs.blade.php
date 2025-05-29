@@ -1179,6 +1179,8 @@
             data: formData,
             success: function (response) {
                 toastr.success("Data saved successfully!");
+                // Redirect to the custom order detail page after saving
+                window.location.href = "{{ url('order') }}/" + orderId;
                 // $('#saveButton').addClass('d-none'); // Hide the Save button after saving
             },
             error: function (error) {
