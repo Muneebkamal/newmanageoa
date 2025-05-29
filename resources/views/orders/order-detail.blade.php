@@ -460,6 +460,7 @@
                     <th>Listing Price</th>
                     <th>Min</th>
                     <th>Max</th>
+                    <th>Per Piece Profit</th>
                     <th>Actions</th>
                 </tr>
             </thead>

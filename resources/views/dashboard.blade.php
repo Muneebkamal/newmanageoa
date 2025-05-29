@@ -100,6 +100,7 @@
                                     <th>Listing Price</th>
                                     <th>Min</th>
                                     <th>Max</th>
+                                    <th>Per Piece Profit</th>
                                 </tr>
                             </thead>
                             <tbody id="product-table-body">
@@ -257,7 +258,17 @@
         let productCount = $('#product-count');
         productTableBody.empty();
         items.forEach(product => {
-            console.log(product)
+
+
+            let cost = parseFloat(product.buy_cost) || 0;
+            let sellingPrice = parseFloat(product.list_price) || 0;
+            let quantity = parseInt(product.unit_purchased) || 1;
+
+            let totalItemCost = cost * quantity;
+            let totalItemSelling = sellingPrice * quantity;
+            let itemProfit = totalItemSelling - totalItemCost;
+            let itemProfitPerPiece =itemProfit/ quantity;
+
             var orderedItem = product.total_units_purchased != 0 ? `<span class="badge bg-dark" title="Ordered">${product.total_units_purchased}</span>` : '<span title="Ordered">-</span>'
             var receivedItems = product.total_units_received != 0 ? `<span class="badge bg-info" title="received" id="itemTotalReceived${product.id}">${product.total_units_received}</span>` : `<span title="received" id="itemTotalReceived${product.id}">-</span>`
             var shippedItems = product.total_units_shipped != 0 ? `<span class="badge bg-success" title="Shipped" id="itemTotalShipped${product.id}">${product.total_units_shipped}</span>` : `<span title="Shipped" id="itemTotalShipped${product.id}">-</span>`
@@ -306,6 +317,7 @@
                 <td>$${product.list_price.toFixed(2)}</td>
                 <td>$${product.min.toFixed(2)}</td>
                 <td>$${product.max.toFixed(2)}</td>
+                <td>$${itemProfitPerPiece.toFixed(2)}</td>
                 
             </tr>`;
             productTableBody.append(row);

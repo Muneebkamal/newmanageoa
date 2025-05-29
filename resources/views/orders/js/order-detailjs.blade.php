@@ -336,6 +336,7 @@
                             <td>$${product.list_price.toFixed(2)}</td>
                             <td>$${product.min.toFixed(2)}</td>
                             <td>$${product.max.toFixed(2)}</td>
+                            <td>$${itemProfitPerPiece.toFixed(2)}</td>
                             <td class="text-center align-middle">
                                 <div class="d-flex flex-column justify-content-between align-items-center h-100" style="">
                                 <div class="d-flex justify-content-end">
