@@ -278,7 +278,61 @@ table.dataTable {
                             
                                 <!-- Right section (Buttons and dropdowns) -->
                                 <div class="d-flex align-items-center ms-auto flex-wrap gap-2">
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle square-btn " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            Select Lists
+                                        </button>
+                                        <div class="dropdown-menu p-2" style="max-height: 25vh; overflow-y: auto;">
+                                            <h6 class="dropdown-header">My Lists</h6>
+                                            <ul id="sorucesUl" class="list-unstyled mb-2"></ul>
+                                            <a class="dropdown-item" id="selectToggleButton"></a>
+                                        </div>
+                                    </div>
 
+                                    <!-- Select List Type Button -->
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle square-btn" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            Select List Type
+                                        </button>
+                                        <div class="dropdown-menu p-2" style="max-height: 25vh; overflow-y: auto;">
+                                            <form>
+                                                <div class="form-check">
+                                                    <input type="checkbox" value="Top Shelf Leads" id="topShelfCheckbox"> <label for="topShelfCheckbox">Top Shelf Leads</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="checkbox" value="Honorable Mentions" id="honorableCheckbox"> <label for="honorableCheckbox">Honorable Mentions</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="checkbox" value="Replenishables" id="replenCheckbox"> <label for="replenCheckbox">Replenishables</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="checkbox" value="Only Bundles" id="onlyBundlesCheckbox"> <label for="onlyBundlesCheckbox">Only Show Bundles</label>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- Select Tags Button -->
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle square-btn " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" onclick="tagsGet()">
+                                            Select Tags
+                                        </button>
+                                        <div class="dropdown-menu p-2" style="max-height: 25vh; overflow-y: auto;">
+                                            <div class="input-group input-group-sm mb-2">
+                                                <input type="text" class="form-control" id="iconrightInput" placeholder="Search">
+                                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                            </div>
+                                            <div id="tags_get" class="mb-2"></div>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#" onclick="unCheckTags(); return false;"><i class="ri-close-line text-primary me-2"></i> Deselect All Tags</a>
+                                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#manage-tag-modal" onclick="tagsList(); return false;"><i class="ri-pencil-line text-primary me-2"></i> Manage Tags</a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Add Lead Button -->
+                                    <button class="btn btn-outline-primary square-btn me-2" type="button" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable" onclick="formLeadClear()">
+                                        Add Lead
+                                    </button>
                                    
 
                                     <!-- Page Size Dropdown -->
@@ -463,61 +517,7 @@ table.dataTable {
                             var newbtn = ' '
                             if (meta.row === 0) {
                                 newbtn = `
-                                    <div class="dropdown">
-                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle square-btn me-2 p-3" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                            Select Lists
-                                        </button>
-                                        <div class="dropdown-menu p-2" style="max-height: 25vh; overflow-y: auto;">
-                                            <h6 class="dropdown-header">My Lists</h6>
-                                            <ul id="sorucesUl" class="list-unstyled mb-2"></ul>
-                                            <a class="dropdown-item" id="selectToggleButton"></a>
-                                        </div>
-                                    </div>
-
-                                    <!-- Select List Type Button -->
-                                    <div class="dropdown">
-                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle square-btn me-2 p-3" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                            Select List Type
-                                        </button>
-                                        <div class="dropdown-menu p-2" style="max-height: 25vh; overflow-y: auto;">
-                                            <form>
-                                                <div class="form-check">
-                                                    <input type="checkbox" value="Top Shelf Leads" id="topShelfCheckbox"> <label for="topShelfCheckbox">Top Shelf Leads</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input type="checkbox" value="Honorable Mentions" id="honorableCheckbox"> <label for="honorableCheckbox">Honorable Mentions</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input type="checkbox" value="Replenishables" id="replenCheckbox"> <label for="replenCheckbox">Replenishables</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input type="checkbox" value="Only Bundles" id="onlyBundlesCheckbox"> <label for="onlyBundlesCheckbox">Only Show Bundles</label>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-
-                                    <!-- Select Tags Button -->
-                                    <div class="dropdown">
-                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle square-btn me-2 p-3" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" onclick="tagsGet()">
-                                            Select Tags
-                                        </button>
-                                        <div class="dropdown-menu p-2" style="max-height: 25vh; overflow-y: auto;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <input type="text" class="form-control" id="iconrightInput" placeholder="Search">
-                                                <span class="input-group-text"><i class="ri-search-line"></i></span>
-                                            </div>
-                                            <div id="tags_get" class="mb-2"></div>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#" onclick="unCheckTags(); return false;"><i class="ri-close-line text-primary me-2"></i> Deselect All Tags</a>
-                                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#manage-tag-modal" onclick="tagsList(); return false;"><i class="ri-pencil-line text-primary me-2"></i> Manage Tags</a>
-                                        </div>
-                                    </div>
-
-                                    <!-- Add Lead Button -->
-                                    <button class="btn btn-outline-primary square-btn me-2" type="button" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable" onclick="formLeadClear()">
-                                        Add Lead
-                                    </button>`
+                                    `
                             }
                             return `<div class="card itemcard" id="item_${data.id}" onclick="activeCard(${data.id})">
                                 <div class="card-header">
@@ -559,35 +559,28 @@ table.dataTable {
                                         </div>
                                         <div class="col-md-6">
                                             <div class="d-flex justify-content-end">
-                                                ${newbtn}
-                                                
-                                                <button class="btn btn-light me-1"  data-bs-toggle="tooltip" data-bs-placement="top" title="Create Order" onclick="openModal(${data.id})"><i class="ri-external-link-line"></i></button>
-                                                <button class="btn btn-success me-1" onclick="opneBuyListModal(${data.id})"><i class="ri-money-dollar-box-line"  data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Buy"></i></button>
-                                                <button class="btn btn-primary me-1"> <a class="text-white" href="https://keepa.com/#!product/1-${data.asin}" target="_blank">+Keepa</a> </button>
-                                                <button class="btn btn-light" data-bs-toggle="dropdown" aria-haspopup="true"
-                                                    aria-expanded="false">
-                                                    <i class="mdi mdi-dots-vertical fs-5 ms-2"></i>
-
+                                                <button class="btn btn-sm btn-outline-info me-1" onclick="copyToClipBoard(${data.id}, 'card')">
+                                                    <i class="ri-file-copy-fill me-1"></i> Copy
                                                 </button>
-                                                <div class="dropdown-menu">
-                                                    <input type="hidden" name="asinCard${data.id}"  id="asinDataCard${data.id}" value="${data.asin}">
-                                                    <input type="hidden" name="nameCard${data.id}"  id="nameDataCard${data.id}" value="${data.name}">
-                                                    <a class="dropdown-item" style="cursor:pointer;"  onclick="copyToClipBoard(${data.id},'card')">
-                                                        <i class="ri-file-copy-fill text-info me-2"></i>Copy to ClipBoard
-                                                    </a>
-                                                    <a class="dropdown-item" style="cursor:pointer;"  data-bs-toggle="modal" data-bs-target="#select-tag-modal"
-                                                        onclick="asinNumber('${data.asin}', ${data.id},'${data.tags}')">
-                                                        <i class="ri-price-tag-3-fill text-primary me-2"></i>Change Tags
-                                                    </a>
-                                                    <a class="dropdown-item" style="cursor:pointer;"  data-bs-toggle="modal"
-                                                        data-bs-target="#exampleModalScrollable"
-                                                        onclick="leadFind(${data.id}), fetchSources(${data.source_id})">
-                                                        <i class="ri-pencil-line text-primary me-2"></i>Update Lead
-                                                    </a>
-                                                    <a class="dropdown-item" style="cursor:pointer;"  onclick="leadDelete(${data.id})">
-                                                        <i class="ri-delete-bin-line text-danger me-2"></i>Delete Lead
-                                                    </a>
-                                                </div>
+
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#select-tag-modal"
+                                                    onclick="asinNumber('${data.asin}', ${data.id}, '${data.tags}')">
+                                                    <i class="ri-price-tag-3-fill me-1"></i> Change Tags
+                                                </button>
+
+                                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable"
+                                                    onclick="leadFind(${data.id}); fetchSources(${data.source_id});">
+                                                    <i class="ri-pencil-line ms-2"></i> Update
+                                                </button>
+
+                                                <button class="btn btn-sm btn-outline-danger" onclick="leadDelete(${data.id})">
+                                                    <i class="ri-delete-bin-line me-2"></i> Delete
+                                                </button>
+
+                                                <button class="btn btn-light me-1"  data-bs-toggle="tooltip" data-bs-placement="top" title="Create Order" onclick="openModal(${data.id})"><i class="ri-external-link-line"></i> Create Order </button>
+                                                <button class="btn btn-success me-1" onclick="opneBuyListModal(${data.id})"><i class="ri-money-dollar-box-line"  data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Buy"></i> Add to Buy</button>
+                                                <button class="btn btn-primary me-1"> <a class="text-white" href="https://keepa.com/#!product/1-${data.asin}" target="_blank">+Keepa</a> </button>
+                                                
                                             </div>
                                         </div>
                                     </div>

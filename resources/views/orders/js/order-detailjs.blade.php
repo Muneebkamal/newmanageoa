@@ -314,7 +314,7 @@
                                 <i class="ri-file-copy-line ms-2" style="cursor: pointer;" onclick="copyToClipboard('${product.asin}')" title="Copy ASIN"></i>
                             </td>
 
-                            <td><input type="number" value="${product.unit_purchased}" class="form-control form-control-sm"></td>
+                            <td><input type="number" value="${product.unit_purchased}" class="form-control form-control-sm" id="totalQty${product.id}"></td>
                              <!-- Buy Cost Column with Editable Input -->
                             <td ondblclick="showEditableInput(this)">
                                 <span class="display-text">$${parseFloat(newBuyCost || 0).toFixed(2)}</span>
@@ -2601,6 +2601,8 @@ function getDomain(url) {
 async function popWorkOrders(id) {
     $('#workOrderModal').modal('show');
     $('#lineItemId').val(id);
+    var purchased_units =$('#totalQty'+id).val();
+    $('#productQtyInput').val(purchased_units);
 
     // Disable dropdown while loading
     $('#workOrderSelect')

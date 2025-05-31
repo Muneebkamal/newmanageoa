@@ -371,16 +371,14 @@ use Yajra\DataTables\Facades\DataTables;
                                 <div class="form-check">
                                     <input class="form-check-input fs-15" name="sourceLeadChckbox" type="checkbox" id="singleCheck_' . $row->id . '" value="' . $row->id . '" onclick="singleCheck(' . $row->id . ')">
                                 </div>
-                                <i class="mdi mdi-dots-vertical fs-5 ms-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" data-bs-toggle="modal"
+                                <a class="btn btn-outline-primary btn-sm ms-1" data-bs-toggle="modal"
                                         data-bs-target="#exampleModalScrollable" onclick="leadFind(' . $row->id . ')">
                                         <i class="ri-pencil-line text-primary me-2"></i>Update Lead
                                     </a>
-                                    <a class="dropdown-item" onclick="leadDelete(' . $row->id . ')">
+                                    <a class="btn btn-outline-danger btn-sm ms-1" onclick="leadDelete(' . $row->id . ')">
                                         <i class="ri-delete-bin-line text-danger me-2"></i>Delete Lead
                                     </a>
-                                </div>
+                                
                             </div>',
                         'name' => $row->name,
                         'asin' => '<a href="https://www.amazon.com/dp/' . $row->asin . '" class="text-primary" target="_blank">' . $row->asin . '</a>',

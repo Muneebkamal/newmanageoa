@@ -878,6 +878,7 @@
                 } else {
                     $('#editBuyListLeadModal input, #editBuyListLeadModal textarea, #editBuyListLeadModal select').prop('disabled', false);
                     $('#editBuyListLeadModal input[type=checkbox]').prop('disabled', false);
+                    $('#editMsku').prop('disabled', true);
                 }
 
                 $('#editBuyListLeadModal').modal('show');

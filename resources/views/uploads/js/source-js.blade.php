@@ -49,19 +49,17 @@
                         `<span>${response.data.list_name}</span>`
                     )
                     $('#source-action').append(
-                        `<button class="btn btn-sm btn-light" data-bs-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false" style="border-radius: 50%;">
-                        <i class="mdi mdi-dots-vertical fs-5"></i>
+                        `<button class="btn btn-sm btn-outline-secondary me-1" onclick="alert('Show Recently Uploaded')">
+                            <i class="ri-eye-line me-1"></i> Show Recently Uploaded
                         </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Show Recently Uploaded</a>
-                            <div class="dropdown-divider"></div>
-                            <a data-bs-toggle="modal" data-bs-target="#myModal" class="dropdown-item" href="#" onclick="editSource('${response.data.list_name}', ${response.data.id})">
-                                <i class="ri-pencil-line text-primary me-2"></i> Rename Lead Source</a>
-                            <a class="dropdown-item" onclick="sourceDelete(${response.data.id})">
-                                <i class="ri-delete-bin-line text-danger me-2"></i> Delete Lead Source</a>
-                        </div>`
-                    )
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#myModal"
+                            onclick="editSource('${response.data.list_name}', ${response.data.id})">
+                            <i class="ri-pencil-line me-1"></i> Rename
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="sourceDelete(${response.data.id})">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>`
+                    );
                 } else {
                     alert('Failed to fetch source details.');
                 }

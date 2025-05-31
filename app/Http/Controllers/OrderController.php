@@ -179,22 +179,18 @@ class OrderController extends Controller
             ->editColumn('total', function($order) {
                 return '$' . number_format($order->total, 2);
             })
-            ->addColumn('actions', function($order) {
+           ->addColumn('actions', function($order) {
                 return '
-                    <a style="cursor: pointer;" href="/order/' . $order->id . '" class="btn btn-outline-info">
+                    <a href="/order/' . $order->id . '" class="btn btn-outline-info btn-sm" style="cursor: pointer;">
                         <i class="ri-folder-open-fill" aria-hidden="true"></i>
                     </a>
-                    <div class="btn-group dropleft">
-                        <i style="cursor: pointer;" class="border mdi mdi-dots-vertical fs-5 ms-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable" onclick="duplicateOrder(' . $order->id . ')">
-                                <i class="ri-pencil-line text-primary me-2"></i>Duplicate ORder
-                            </a>
-                            <a class="dropdown-item" style="cursor: pointer;" onclick="deleteOrder(' . $order->id . ')">
-                                <i class="ri-delete-bin-line text-danger me-2"></i>Delete Order
-                            </a>
-                        </div>
-                    </div>';
+                    <button type="button" class="btn btn-outline-primary btn-sm ms-1" onclick="duplicateOrder(' . $order->id . ')">
+                        <i class="ri-pencil-line me-1"></i> Duplicate Order
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm ms-1" onclick="deleteOrder(' . $order->id . ')">
+                        <i class="ri-delete-bin-line me-1"></i> Delete
+                    </button>
+                ';
             })
             ->setRowAttr([
                 'data-href' => function($order) {

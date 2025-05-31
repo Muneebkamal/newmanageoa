@@ -78,7 +78,7 @@
             </div>
             
         </div>
-        <div data-v-c2ce40f4="" class="col-md-auto">
+        <div data-v-c2ce40f4="" class="col-md-auto d-none">
             <div data-v-c2ce40f4="" class="col-auto px-1" style="justify-content: left;">
                 <button data-v-c2ce40f4="" class="btn btn-sm btn-outline-primary" data-original-title="" title="" id="refreshTable"><i data-v-c2ce40f4="" aria-hidden="true" class=" ri-refresh-fill"></i>&nbsp; Refresh Data</button>
             </div>
@@ -336,16 +336,20 @@
         });
     });
     $(document).on('click', '#orders-table tbody tr', function (e) {
-    // Skip if the clicked element is inside a 'no-click' cell
-    if ($(e.target).closest('td.no-click').length) {
-        return;
-    }
+        // Get the clicked td
+        const clickedTd = $(e.target).closest('td');
 
-    const url = $(this).data('href');
-    if (url) {
-        window.open(url, '_blank'); // Open in a new tab
-    }
-});
+        // Skip if it's a 'no-click' td or the last td in the row
+        if (clickedTd.hasClass('no-click') || clickedTd.is(':last-child')) {
+            return;
+        }
+
+        const url = $(this).data('href');
+        if (url) {
+            window.open(url, '_blank'); // Open in a new tab
+        }
+    });
+
 
 
 
