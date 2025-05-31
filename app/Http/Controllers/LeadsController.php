@@ -50,12 +50,12 @@ use Yajra\DataTables\Facades\DataTables;
             $selectedIds = $request->input('selected_soruce_ids', []);
             if(auth()->user()->role_id == 1){
                 if (!empty($selectedIds)) {
-                    $leads = Lead::whereIn('source_id', $selectedIds)->with('source');
+                    $leads = Lead::whereIn('source_id', $selectedIds)->with('source')->where('is_rejected',0);
                 }else{
-                    $leads = Lead::with('source');
+                    $leads = Lead::with('source')->where('is_rejected',0);
                 }
             }else{
-                $leads = Lead::with('source')->where('created_by', auth()->user()->id);
+                $leads = Lead::with('source')->where('created_by', auth()->user()->id)->where('is_rejected',0);
                 // Apply filtering based on selected IDs
                 if (!empty($selectedIds)) {
                     $leads->whereIn('source_id', $selectedIds);
@@ -925,4 +925,24 @@ use Yajra\DataTables\Facades\DataTables;
             dd($productData );
             
         }  
+        public function rejectLead(Request $request)
+        {
+            $lead = Lead::find($request->id);
+
+            if (!$lead) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Lead not found.'
+                ]);
+            }
+
+            $lead->is_rejected = 1; // Assuming you have a `status` field
+            $lead->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Lead has been rejected successfully.'
+            ]);
+        }
+
     }

@@ -961,7 +961,20 @@ public function assignedWorkOrder(Request $request){
    $response = Http::asForm()->post('http://app.prepcenter.me/api/assign-work-order', $data);
 
     
-    return $response->json();
+        if ($response->successful()) {
+        $json = $response->json();
+        return response()->json([
+            'status' => true,
+            'message' => $json['message'] ?? 'Work order assigned successfully',
+            'data' => $json['data'] ?? null,
+        ]);
+    } else {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to assign work order',
+            'error' => $response->body(),
+        ], $response->status());
+    }
 
     return $response->json();
 }

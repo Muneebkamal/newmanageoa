@@ -559,6 +559,9 @@ table.dataTable {
                                         </div>
                                         <div class="col-md-6">
                                             <div class="d-flex justify-content-end">
+                                                <button class="btn btn-sm btn-outline-danger me-1" onclick="rejectLead(${data.id}, 'card')">
+                                                    Reject Lead
+                                                </button>
                                                 <button class="btn btn-sm btn-outline-info me-1" onclick="copyToClipBoard(${data.id}, 'card')">
                                                     <i class="ri-file-copy-fill me-1"></i> Copy
                                                 </button>
@@ -922,6 +925,35 @@ table.dataTable {
             }
             return params;
         }
+        function rejectLead(id, source = '') {
+            if (!confirm("Are you sure you want to reject this lead?")) {
+                return;
+            }
+
+            $.ajax({
+                url: `{{ url('/leads/reject') }}`,  // Your Laravel route
+                method: 'POST',
+                data: {
+                    id: id,
+                    _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
+                },
+                success: function(response) {
+                    if (response.status) {
+                        alert(response.message); // You can replace this with a toast
+                        // Optionally reload or remove the row
+                        $('#leads-table').DataTable().ajax.reload(null, false); // false => keep current pagination
+
+                    } else {
+                        alert(response.message || 'Failed to reject lead');
+                    }
+                },
+                error: function(xhr) {
+                    alert('Something went wrong. Please try again.');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+
 
     </script>
     

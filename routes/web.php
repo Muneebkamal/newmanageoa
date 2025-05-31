@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get-top-shelf-leads', [LeadsController::class, 'getTopLeads'])->name('get.top.shelf.leads');
     Route::post('/update-bluk-tag', [LeadsController::class, 'updateBlukTags'])->name('updateBlukTags');
     Route::get('/table-view-data', [LeadsController::class, 'getTableViewData'])->name('getTableViewData');
+    Route::post('/leads/reject', [LeadsController::class, 'rejectLead'])->name('rejectLead');
 
 
 

@@ -33,6 +33,7 @@ return new class extends Migration
             $table->boolean('is_hazmat')->default(0);
             $table->boolean('is_disputed')->default(0);
             $table->text('tags')->nullable();
+            $table->boolean('is_rejected')->default(0);
             $table->integer('created_by')->nullable();
             $table->softDeletes();
             $table->timestamps();

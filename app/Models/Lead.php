@@ -31,6 +31,7 @@ class Lead extends Model
         'coupon',
         'is_hazmat',
         'is_disputed',
+        'is_rejected',
         'created_by'
     ];
 
