@@ -91,17 +91,17 @@ table.dataTable {
                     <div class="w-100 d-xl-none d-sm-none"></div>
                     <div class="col-auto">
                         <h6 class="card-subtitle my-1 text-center">
-                            <span class="text-muted">SKUs</span>: <span id="totalSku">0</span>
+                            <span class="text-muted">SKUs</span>: <span id="totalSku">{{ $sku }}</span>
                         </h6>
                     </div>
                     <div class="col-auto">
                         <h6 class="card-subtitle my-1 text-center">
-                            <span class="text-muted">Cost</span>: <span id="totalCost">$0.00</span>
+                            <span class="text-muted">Cost</span>: <span id="totalCost">${{ $cost }}</span>
                         </h6>
                     </div>
                     <div class="col-auto">
                         <h6 class="card-subtitle my-1 text-center">
-                            <span class="text-muted">Units</span>: <span id="Totalunits">0</span>
+                            <span class="text-muted">Units</span>: <span id="Totalunits">{{ $units }}</span>
                         </h6>
                     </div>
                 </div>
@@ -665,6 +665,14 @@ table.dataTable {
             }).on('xhr.dt', function (e, settings, json, xhr) {
                 if (json.total_leads !== undefined) {
                     $('#leadsCount').text(json.total_leads); // Update count in your UI
+                    $('#lowFBAInputMin').val(json.fba_min); // Update count in your UI
+                    $('#lowFBAInputMax').val(json.fba_max); // Update count in your UI
+                    $('#netProfitInputMin').val(json.net_profit_min); // Update count in your UI
+                    $('#netProfitInputMax').val(json.net_profit_max); // Update count in your UI
+                    $('#ninetyDayAvgInputMin').val(json.bsr_min); // Update count in your UI
+                    $('#ninetyDayAvgInputMax').val(json.bsr_max); // Update count in your UI
+                    $('#roiInputMin').val(json.roi_min); // Update count in your UI
+                    $('#roiInputMax').val(json.roi_max); // Update count in your UI
                     
 
                 }

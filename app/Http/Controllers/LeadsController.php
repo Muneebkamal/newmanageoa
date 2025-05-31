@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Lead;
+use App\Models\LineItem;
 use App\Services\KeepaService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,8 +27,11 @@ use Yajra\DataTables\Facades\DataTables;
             if (!\Auth::user()->can('view_leads')) {
                 abort(403);
             }
+            $sku = LineItem::where('is_buylist',1)->where('is_rejected',0)->count();
+            $cost = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('buy_cost');
+            $units = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('unit_purchased');
             $leads = Lead::latest('created_at')->paginate(5);
-            return view('leads.index', compact('leads'));
+            return view('leads.index', get_defined_vars());
         }
         public function index2()
         {
@@ -35,8 +39,11 @@ use Yajra\DataTables\Facades\DataTables;
             if (!\Auth::user()->can('view_leads')) {
                 abort(403);
             }
+            $sku = LineItem::where('is_buylist',1)->where('is_rejected',0)->count();
+            $cost = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('buy_cost');
+            $units = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('unit_purchased');
             $leads = Lead::latest('created_at')->paginate(5);
-            return view('leads.index2', compact('leads'));
+            return view('leads.index2', get_defined_vars());
         }
         public function getLeadsData(Request $request)
         {
@@ -58,18 +65,7 @@ use Yajra\DataTables\Facades\DataTables;
                 $userId = request('user_id');
                 $leads->where('created_by', $userId);
             }
-        // Filter by Date Range
-            // if ($request->has('date_range') && $request->input('date_range') !== null) {
-            //     $dateRange = $request->input('date_range');
-            //     if ($dateRange === 'custom' && $request->has(['start_date', 'end_date']) && $request->input('start_date') !== null && $request->input('end_date') !== null) {
-            //         $startDate = $request->input('start_date');
-            //         $endDate = $request->input('end_date');
-            //         $leads->whereBetween('created_at', [$startDate, $endDate]);
-            //     } elseif ($dateRange !== '827') { // 827 = All
-            //         $leads->where('created_at', '>=', now()->subDays($dateRange));
-            //     }
-            // }
-            
+    
             if ($request->has('start_date') && $request->has('end_date') && !empty($request->start_date) && !empty($request->end_date)) {
                 $startDate = Carbon::parse($request->start_date)->startOfDay();
                 $endDate = Carbon::parse($request->end_date)->endOfDay();
@@ -140,12 +136,45 @@ use Yajra\DataTables\Facades\DataTables;
                     ->orWhereRaw("DATE_FORMAT(date, '%b %d, %Y') like ?", ["%{$searchTerm}%"]);
                 });
             }
+            $clonedLeads = clone $leads;
+            // Remove any orderBy/limit clauses
+            $clonedLeads->getQuery()->orders = null;
+            $clonedLeads->getQuery()->limit = null;
             
+            $stats = $clonedLeads->selectRaw('
+                MIN(CAST(roi AS UNSIGNED)) as roi_min,
+                MAX(CAST(roi AS UNSIGNED)) as roi_max,
+                MIN(CAST(bsr AS UNSIGNED)) as bsr_min,
+                MAX(CAST(bsr AS UNSIGNED)) as bsr_max,
+                MIN(sell_price) as fba_min,
+                MAX(sell_price) as fba_max,
+                MIN(net_profit) as net_profit_min,
+                MAX(net_profit) as net_profit_max
+            ')->first();
+            
+            $roiMin = $stats->roi_min;
+            $roiMax = $stats->roi_max;
+            $bsrMin = $stats->bsr_min;
+            $bsrMax = $stats->bsr_max;
+            $fbaMin = $stats->fba_min;
+            $fbaMax = $stats->fba_max;
+            $netProfitMin = $stats->net_profit_min;
+            $netProfitMax = $stats->net_profit_max;
             return DataTables::of($leads)
             ->editColumn('date', function ($lead) {
                 return $lead->date; // Format date
             })
-            ->with('total_leads', $leads->count()) // Include the total count in the response
+            ->with([
+                'total_leads' => $leads->count(),
+                'roi_min' => $roiMin,
+                'roi_max' => $roiMax,
+                'bsr_min' => $bsrMin,
+                'bsr_max' => $bsrMax,
+                'fba_min' => $fbaMin,
+                'fba_max' => $fbaMax,
+                'net_profit_min' => $netProfitMin,
+                'net_profit_max' => $netProfitMax,
+            ])
             ->make(true);
             return view('leads.index', compact('leads'));
         }
