@@ -603,6 +603,10 @@ table.dataTable {
                                             <span class="fw-bold text-success">$${data.net_profit || 'N/A'}</span>
                                         </div>
                                         <div class="col text-center">
+                                            <small>Quantity</small><br>
+                                            <span class="fw-bold text-info">${data.quantity || '0'}</span>
+                                        </div>
+                                        <div class="col text-center">
                                             <small>ROI</small><br>
                                             <span class="fw-bold text-info">${data.roi || 'N/A'}%</span>
                                         </div>

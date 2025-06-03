@@ -31,14 +31,20 @@ class BuyerController extends Controller
         if (!\Auth::user()->can('view_buy_list')) {
             abort(403);
         }
-        return view('buyers.index');
+        $sku = LineItem::where('is_buylist',1)->where('is_rejected',0)->count();
+        $cost = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('buy_cost');
+        $units = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('unit_purchased');
+        return view('buyers.index',get_defined_vars());
     }
     public function index2()
     {
         if (!\Auth::user()->can('view_buy_list')) {
             abort(403);
         }
-        return view('buyers.index2');
+        $sku = LineItem::where('is_buylist',1)->where('is_rejected',0)->count();
+        $cost = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('buy_cost');
+        $units = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('unit_purchased');
+        return view('buyers.index2',get_defined_vars());
     }
 
     /**

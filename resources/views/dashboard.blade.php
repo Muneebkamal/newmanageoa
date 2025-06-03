@@ -317,7 +317,7 @@
                 <td>$${product.list_price.toFixed(2)}</td>
                 <td>$${product.min.toFixed(2)}</td>
                 <td>$${product.max.toFixed(2)}</td>
-                <td><span class="text-success">$${itemProfitPerPiece.toFixed(2)}</span></td>
+                <td><span class="text-success">$${itemProfit.toFixed(2)}</span></td>
                 
             </tr>`;
             productTableBody.append(row);

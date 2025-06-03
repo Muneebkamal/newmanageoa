@@ -21,7 +21,7 @@
 
 @section('content')
 <div class="row">
-    <div class="col-12">
+    <div class="col-6">
         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
 
             <div class="page-title-right">
@@ -34,6 +34,32 @@
             </div>
 
         </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="filterClass card card-body py-2 px-3 mb-0 w-100" style="margin-top: -22px;">
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    <h6 class="text-center my-1">Totals: <span id="totals"></span></h6>
+                </div>
+                <div class="w-100 d-xl-none d-sm-none"></div>
+                <div class="col-auto">
+                    <h6 class="card-subtitle my-1 text-center">
+                        <span class="text-muted">SKUs</span>: <span id="totalSku">{{ $sku }}</span>
+                    </h6>
+                </div>
+                <div class="col-auto">
+                    <h6 class="card-subtitle my-1 text-center">
+                        <span class="text-muted">Cost</span>: <span id="totalCost">${{ $cost }}</span>
+                    </h6>
+                </div>
+                <div class="col-auto">
+                    <h6 class="card-subtitle my-1 text-center">
+                        <span class="text-muted">Units</span>: <span id="Totalunits">{{ $units }}</span>
+                    </h6>
+                </div>
+            </div>
+        </div>
+        <!-- Collapse Example -->
     </div>
 </div>
 <div class="row">

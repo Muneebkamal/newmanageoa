@@ -279,7 +279,7 @@
                                                 <td><strong></strong></td>
                                                 <td><span class="perpcs_selling_price">$${sellingPrice.toFixed(2)}</span></td>
                                                 <td><span class="perpcs_cost_price">$${cost.toFixed(2)}</span></td>
-                                                <td><span class="perpcs_gross_profit">$${itemProfitPerPiece.toFixed(2)}</span></td>
+                                                <td><span class="perpcs_gross_profit">$${itemProfit.toFixed(2)}</span></td>
                                             </tr>
                                         </tbody>
                                     </table>
