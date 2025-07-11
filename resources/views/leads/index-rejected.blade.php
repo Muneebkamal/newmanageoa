@@ -68,10 +68,10 @@ table.dataTable {
 
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                       <li class="breadcrumb-item active d-flex align-items-center">
-                            <a href="{{ url('leads-new') }}"><h3 class="mb-0 me-3">Leads New</h3></a>
-                            <a href="{{ url('leads') }}" class="btn btn-sm btn-outline-primary">View Old Leads</a>
-                            <a href="{{ url('leads-rejected') }}" class="btn btn-sm btn-outline-primary">View Rejected Leads</a>
+                        <li class="breadcrumb-item active d-flex align-items-center">
+                            <a href="{{ url('leads-rejected') }}" class="me-2"><h3>Rejected Leads</h3> </</a>
+                            <a href="{{ url('leads-new') }}" class="btn btn-sm btn-outline-primary me-2">View Leads</</a>
+                            <a href="{{ url('leads') }}" class="btn btn-sm btn-outline-primary me-2">View Old Leads</a>
                         </li>
                     </ol>
                 </div>
@@ -551,7 +551,7 @@ table.dataTable {
                         d.end_date = $('#end_date').val();
                         d.sort_by_new = $('#inputSortSelect').val();
                         d.order_in = $('#orderbyinput').val();
-                        d.is_rejected = 0;
+                        d.is_rejected = 1;
                         if (filterApplied) {
                             d.roi_min = $('#roiInputMin').val();
                             d.roi_max = $('#roiInputMax').val();
@@ -759,7 +759,7 @@ table.dataTable {
                         d.end_date = $('#end_date').val();
                         d.sort_by_new = $('#inputSortSelect').val();
                         d.order_in = $('#orderbyinput').val();
-                        d.is_rejected =0;
+                        d.is_rejected = 1;
                         if(filterApplied){
                             d.roi_min = $('#roiInputMin').val();
                             d.roi_max = $('#roiInputMax').val();
@@ -1086,67 +1086,4 @@ table.dataTable {
         }
         
     </script>
-    <script>
-        // document.addEventListener("DOMContentLoaded", function () {
-        //     const tableId = '#leads-table-view';
-
-        //     if (!$.fn.DataTable.isDataTable(tableId)) {
-        //         console.warn("DataTable is not initialized yet.");
-        //         return;
-        //     }
-
-        //     const table = $(tableId).DataTable();
-
-        //     const columnNames = [
-        //         "Type", "Name", "Tags", "List", "Buy Cost", "FBA Price", "Net Profit",
-        //         "ROI", "90 Day Avg", "Category", "Supplier", "ASIN", "Promo", "Coupon", "Lead Notes"
-        //     ];
-
-        //     const columnForm = document.getElementById('columnVisibilityForm');
-
-        //     columnNames.forEach((colName, index) => {
-        //         const colIndex = index + 1;
-
-        //         const wrapper = document.createElement("div");
-        //         wrapper.className = "form-check dropdown-item";
-
-        //         const checkbox = document.createElement("input");
-        //         checkbox.type = "checkbox";
-        //         checkbox.className = "form-check-input";
-        //         checkbox.id = "tableColumnCheckbox" + index;
-        //         checkbox.dataset.columnIndex = colIndex;
-        //         checkbox.checked = true;
-
-        //         const label = document.createElement("label");
-        //         label.className = "form-check-label ms-1";
-        //         label.htmlFor = checkbox.id;
-        //         label.innerText = colName;
-
-        //         wrapper.appendChild(checkbox);
-        //         wrapper.appendChild(label);
-        //         columnForm.appendChild(wrapper);
-
-        //         checkbox.addEventListener("change", function () {
-        //             const index = parseInt(this.dataset.columnIndex);
-        //             table.column(index).visible(this.checked);
-        //         });
-        //     });
-
-        //     document.getElementById("columnsCheckAllButton").addEventListener("click", function () {
-        //         columnForm.querySelectorAll("input[type='checkbox']").forEach(cb => {
-        //             cb.checked = true;
-        //             table.column(parseInt(cb.dataset.columnIndex)).visible(true);
-        //         });
-        //     });
-
-        //     document.getElementById("columnsUncheckAllButton").addEventListener("click", function () {
-        //         columnForm.querySelectorAll("input[type='checkbox']").forEach(cb => {
-        //             cb.checked = false;
-        //             table.column(parseInt(cb.dataset.columnIndex)).visible(false);
-        //         });
-        //     });
-        // });
-
-    </script>
-
 @endsection

@@ -66,11 +66,22 @@
     <div class="col-12">
         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
 
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="{{ url('my-uploads') }}"> <h3>My Uploads</h3></a></li>
-                   
+            <div class="page-title-right d-flex align-items-center">
+                <ol class="breadcrumb m-0 me-3">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url('my-uploads') }}">
+                            <h3 class="mb-0">My Uploads</h3>
+                        </a>
+                    </li>
                 </ol>
+            </div>
+            <div class="d-flex flex-column flex-sm-row gap-2">
+                <select id="sourceFilter" class="form-select me-2" onchange="sourceFindAgain(this)" style="width:auto; min-width:180px;">
+                    
+                </select>
+                <button class="btn btn-outline-primary" type="button" onclick="fileUploadView()">Upload Lead File</button>
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
+                    data-bs-target="#exampleModalScrollable" onclick="formLeadClear()">Add Lead</button>
             </div>
 
         </div>
@@ -78,26 +89,8 @@
 </div>
     <div class="row">
         <input type="hidden" id="theFilePath" name="theFilePath" value="">
-        <div class="col-md-3">
-           
-            <button class="btn btn-outline-primary w-100 mb-2" type="button" onclick="fileUploadView()">Upload Lead
-                File</button>
-            <button class="btn btn-outline-primary w-100 mb-2" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModalScrollable" onclick="formLeadClear()">Add Lead</button>
-
-            <div id="scrollbar">
-                <div class="container-fluid">
-
-                    <div id="two-column-menu">
-                    </div>
-                    <ul class="navbar-nav source-list mb-4" id="navbar-nav">
-
-                    </ul>
-                </div>
-                <!-- Sidebar -->
-            </div>
-        </div>
-        <div class="col-md-9 mt-4">
+        
+        <div class="col-md-12 mt-4">
             <div id="source-alert"></div>
             <div id="leads-alert"></div>
 
@@ -184,6 +177,8 @@
                             <th>Category</th>
                             <th>Cost</th>
                             <th>Selling Price</th>
+                            <th>Net Profit</th>
+                            <th>Quantity
                             <th>Note</th>
                             <th>Publish Date</th>
                         </thead>

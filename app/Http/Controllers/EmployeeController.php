@@ -478,6 +478,27 @@ class EmployeeController extends Controller
                     foreach ($chunk as $item) {
                         if (!empty($item['Product Name'])) {
                             if($item['Product Name'] != null){
+                                $possibleQuantityKeys = [
+                                    'suggested buy trial quantity',
+                                    'quantity',
+                                    'qty',
+                                    'trial quantity',
+                                    'buy qty',
+                                    'buy quantity'
+                                ];
+
+                                $quantity = 0;
+
+                                // Normalize the $item keys to lowercase for flexible matching
+                                $lowerItem = array_change_key_case($item, CASE_LOWER);
+
+                                // Loop through lowercase keys and get the matching value
+                                foreach ($possibleQuantityKeys as $key) {
+                                    if (!empty($lowerItem[$key]) && is_numeric($lowerItem[$key])) {
+                                        $quantity = (int) $lowerItem[$key];
+                                        break;
+                                    }
+                                }
                                 $data = [
                                     'source_id'=> $source_id,
                                     'date'=>date('Y-m-d H:i:s', strtotime($item['Date'])),
@@ -492,6 +513,7 @@ class EmployeeController extends Controller
                                     'roi'=>$item['ROI'],
                                     'notes'=>$item['Notes'],
                                     'promo'=>$item['Promo/Coupon Code'],
+                                    'quantity'=> $quantity,
                                 ];
                                 $priceFields = ['cost', 'sell_price', 'net_profit'];
                                 foreach ($priceFields as $field) {
@@ -516,12 +538,16 @@ class EmployeeController extends Controller
                                 ->where('name', $data['name'])
                                 ->where('asin', $data['asin'])
                                 ->where('source_id', $data['source_id'])
-                                ->exists();
+                                ->first();
                                 if (!$existingLead) {
                                     Lead::create($data);
                                     $insertData[] = $data;
                                     $insertedCount += count($insertData);
 
+                                }else{
+                                   
+                                    $existingLead->quantity = $quantity;
+                                    $existingLead->save();
                                 }
                             
                             }

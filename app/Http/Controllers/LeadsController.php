@@ -45,17 +45,42 @@ use Yajra\DataTables\Facades\DataTables;
             $leads = Lead::latest('created_at')->paginate(5);
             return view('leads.index2', get_defined_vars());
         }
+        public function rejectedLeads()
+        {
+            // Check if the user has permission to edit this specific employee
+            if (!\Auth::user()->can('view_leads')) {
+                abort(403);
+            }
+            $sku = LineItem::where('is_buylist',1)->where('is_rejected',0)->count();
+            $cost = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('buy_cost');
+            $units = LineItem::where('is_buylist',1)->where('is_rejected',0)->sum('unit_purchased');
+            $leads = Lead::latest('created_at')->paginate(5);
+            return view('leads.index-rejected', get_defined_vars());
+        }
         public function getLeadsData(Request $request)
         {
             $selectedIds = $request->input('selected_soruce_ids', []);
             if(auth()->user()->role_id == 1){
                 if (!empty($selectedIds)) {
-                    $leads = Lead::whereIn('source_id', $selectedIds)->with('source')->where('is_rejected',0);
+                    if($request->is_rejected == 1){
+                        $leads = Lead::whereIn('source_id', $selectedIds)->with('source')->where('is_rejected',1);
+                    }else{
+                        $leads = Lead::whereIn('source_id', $selectedIds)->with('source')->where('is_rejected',0);
+                    }
                 }else{
-                    $leads = Lead::with('source')->where('is_rejected',0);
+                    if($request->is_rejected == 1){
+                        $leads = Lead::with('source')->where('is_rejected',1);
+                    }else{
+                        $leads = Lead::with('source')->where('is_rejected',0);
+                    }
                 }
             }else{
-                $leads = Lead::with('source')->where('created_by', auth()->user()->id)->where('is_rejected',0);
+                if($request->is_rejected == 1){
+                    $leads = Lead::with('source')->where('created_by', auth()->user()->id)->where('is_rejected',1);
+                }else{
+                    $leads = Lead::with('source')->where('created_by', auth()->user()->id)->where('is_rejected',0);
+                }
+               
                 // Apply filtering based on selected IDs
                 if (!empty($selectedIds)) {
                     $leads->whereIn('source_id', $selectedIds);
@@ -226,6 +251,7 @@ use Yajra\DataTables\Facades\DataTables;
             $lead->notes = $request->notes;
             $lead->currency = $request->currency;
             $lead->coupon = $request->coupon;
+            $lead->quantity = $request->quantity;
             if(auth()->user()){
                 $lead->created_by = auth()->user()->id;
             }
@@ -386,6 +412,8 @@ use Yajra\DataTables\Facades\DataTables;
                         'category' => $row->category,
                         'cost' => $row->cost,
                         'sell_price' => $row->sell_price,
+                        'net_profit' => $row->net_profit,
+                        'quantity' => $row->quantity,
                         'notes' => $row->notes,
                         'date' => $row->date,
                     ];
@@ -503,6 +531,7 @@ use Yajra\DataTables\Facades\DataTables;
             $lead->notes = $request->notes;
             $lead->currency = $request->currency;
             $lead->coupon = $request->coupon;
+            $lead->quantity = $request->quantity;
             if(isset($request->is_hazmat)){
                 $lead->is_hazmat = 1;
             }else{
@@ -584,13 +613,13 @@ use Yajra\DataTables\Facades\DataTables;
             } 
         }
         public function ListView(Request $request){
-        return view('lists.index');
+            return view('lists.index');
         }
         public function getTopLeads(Request $request)
         {
             $leads = Lead::with('source')->take(10);
             
-        // Filter by Date Range
+            // Filter by Date Range
             if ($request->has('date_range') && $request->input('date_range') !== null) {
                 $dateRange = $request->input('date_range');
                 if ($dateRange === 'custom' && $request->has(['start_date', 'end_date']) && $request->input('start_date') !== null && $request->input('end_date') !== null) {
@@ -681,17 +710,32 @@ use Yajra\DataTables\Facades\DataTables;
         }
         public function getTableViewData(Request $request)
         {
-            $leads = Lead::with('source');
-        // Filter by Date Range
-            if ($request->has('date_range') && $request->input('date_range') !== null) {
-                $dateRange = $request->input('date_range');
-                if ($dateRange === 'custom' && $request->has(['start_date', 'end_date']) && $request->input('start_date') !== null && $request->input('end_date') !== null) {
-                    $startDate = $request->input('start_date');
-                    $endDate = $request->input('end_date');
-                    $leads->whereBetween('created_at', [$startDate, $endDate]);
-                } elseif ($dateRange !== '827') { // 827 = All
-                    $leads->where('created_at', '>=', now()->subDays($dateRange));
+            $selectedIds = $request->input('selected_soruce_ids', []);
+            if(auth()->user()->role_id == 1){
+                if (!empty($selectedIds)) {
+                    $leads = Lead::whereIn('source_id', $selectedIds)->with('source')->where('is_rejected',0);
+                }else{
+                    $leads = Lead::with('source')->where('is_rejected',0);
                 }
+            }else{
+                $leads = Lead::with('source')->where('created_by', auth()->user()->id)->where('is_rejected',0);
+                // Apply filtering based on selected IDs
+                if (!empty($selectedIds)) {
+                    $leads->whereIn('source_id', $selectedIds);
+                }
+            }
+            if (request()->has('user_id') && !empty(request('user_id'))) {
+                $userId = request('user_id');
+                $leads->where('created_by', $userId);
+            }
+            if($request->is_rejected == 1){
+                $leads->where('is_rejected', 1);
+            }
+    
+            if ($request->has('start_date') && $request->has('end_date') && !empty($request->start_date) && !empty($request->end_date)) {
+                $startDate = Carbon::parse($request->start_date)->startOfDay();
+                $endDate = Carbon::parse($request->end_date)->endOfDay();
+                $leads->whereBetween('created_at', [$startDate,  $endDate]);
             }
 
             // Sort By
@@ -723,6 +767,15 @@ use Yajra\DataTables\Facades\DataTables;
 
                 $leads->whereBetween('sell_price', [$lowFbaMin, $lowFbaMax]);
             }
+            
+            if ($request->has('checkedValueTags')) {
+                $checkValuesTags = $request->input('checkedValueTags');
+                if (in_array(0, $checkValuesTags)) {
+                    $leads->whereNull('tags');
+                } else {
+                    $leads->whereIn('tags', $checkValuesTags);
+                }
+            }
 
             // 90 Day Avg Filter
             if ($request->has(['ninety_day_avg_min', 'ninety_day_avg_max']) && $request->input('ninety_day_avg_min') !== null && $request->input('ninety_day_avg_max') !== null) {
@@ -747,6 +800,30 @@ use Yajra\DataTables\Facades\DataTables;
                     ->orWhereRaw("DATE_FORMAT(date, '%b %d, %Y') like ?", ["%{$searchTerm}%"]);
                 });
             }
+            $clonedLeads = clone $leads;
+            // Remove any orderBy/limit clauses
+            $clonedLeads->getQuery()->orders = null;
+            $clonedLeads->getQuery()->limit = null;
+            
+            $stats = $clonedLeads->selectRaw('
+                MIN(CAST(roi AS UNSIGNED)) as roi_min,
+                MAX(CAST(roi AS UNSIGNED)) as roi_max,
+                MIN(CAST(bsr AS UNSIGNED)) as bsr_min,
+                MAX(CAST(bsr AS UNSIGNED)) as bsr_max,
+                MIN(sell_price) as fba_min,
+                MAX(sell_price) as fba_max,
+                MIN(net_profit) as net_profit_min,
+                MAX(net_profit) as net_profit_max
+            ')->first();
+            
+            $roiMin = $stats->roi_min;
+            $roiMax = $stats->roi_max;
+            $bsrMin = $stats->bsr_min;
+            $bsrMax = $stats->bsr_max;
+            $fbaMin = $stats->fba_min;
+            $fbaMax = $stats->fba_max;
+            $netProfitMin = $stats->net_profit_min;
+            $netProfitMax = $stats->net_profit_max;
 
             return DataTables::of($leads)
                 ->editColumn('actions', function ($row) {
@@ -878,7 +955,18 @@ use Yajra\DataTables\Facades\DataTables;
                 })
                 ->editColumn('notes', function ($row) {
                     return $row->notes !== null ? $row->notes : 'N/A'; // Show notes or N/A
-                })            
+                })    
+                ->with([
+                    'total_leads' => $leads->count(),
+                    'roi_min' => $roiMin,
+                    'roi_max' => $roiMax,
+                    'bsr_min' => $bsrMin,
+                    'bsr_max' => $bsrMax,
+                    'fba_min' => $fbaMin,
+                    'fba_max' => $fbaMax,
+                    'net_profit_min' => $netProfitMin,
+                    'net_profit_max' => $netProfitMax,
+                ])        
                 ->rawColumns(['actions','itemType','name','tags','date','cost','sale_price','net_profit','rio','bsr','category','supplier','asin','promo','coupon','notes'])  // Specify raw HTML columns
                 ->make(true);
         }

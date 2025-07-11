@@ -71,6 +71,54 @@
         $('#sourceItemID'+sourceId).find('span').addClass('buylist_active');
         $('#selectSource').val(sourceId);
     }
+    function sourceFindAgain(selectElement) {
+        const sourceId = selectElement.value;
+        $('#update_source_id').val(sourceId);
+        // Example: Send it via AJAX or update the UI
+        $.ajax({
+            url: '/sources/' + sourceId,
+            type: 'GET',
+            success: function(response) {
+                if (response.status === 'success') {
+
+                    $('#file-section').addClass('d-none');
+                    $('#upload-file-section').addClass('d-none');
+                    $('#table-section').removeClass('d-none');
+                    leadsTable(sourceId);
+
+                    // console.log(response.data);
+                    $('.menu-link').removeClass('lead-menu-active');
+                    $('#sourceName').empty();
+                    $('#source-action').empty();
+
+                    $('#source_' + sourceId).addClass('lead-menu-active');
+                    $('#sourceName').append(
+                        `<span>${response.data.list_name}</span>`
+                    )
+                    $('#source-action').append(
+                        `<button class="btn btn-sm btn-outline-secondary me-1" onclick="alert('Show Recently Uploaded')">
+                            <i class="ri-eye-line me-1"></i> Show Recently Uploaded
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#myModal"
+                            onclick="editSource('${response.data.list_name}', ${response.data.id})">
+                            <i class="ri-pencil-line me-1"></i> Rename
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="sourceDelete(${response.data.id})">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>`
+                    );
+                } else {
+                    alert('Failed to fetch source details.');
+                }
+            },
+            error: function(xhr) {
+                alert('An error occurred. Please try again.');
+            }
+        });
+        $('#selectSource').val(sourceId);
+
+    }
+
     function sourceFindNew(id,batchId=null) {
         fetchSources(id);
         var sourceId = id;
@@ -168,17 +216,17 @@
             success: function(response) {
                 if (response.status === 'success') {
                     $('.source-list').empty();
-                    $('.source-list').append(
-                        `<li class="menu-title" style="cursor:pointer;">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="p-0 my-2 d-flex align-items-center" data-key="t-menu">Lead List Sources
-                                    <i class="ms-1 las la-info-circle d-block fs-5"></i>
-                                </span>
-                                <i onclick="formClear()" data-bs-toggle="modal" data-bs-target="#myModal"
-                                    class="las la-plus d-block fs-5 text-primary"></i>
-                            </div>
-                        </li>`
-                    )
+                    // $('.source-list').append(
+                    //     `<li class="menu-title" style="cursor:pointer;">
+                    //         <div class="d-flex justify-content-between align-items-center">
+                    //             <span class="p-0 my-2 d-flex align-items-center" data-key="t-menu">Lead List Sources
+                    //                 <i class="ms-1 las la-info-circle d-block fs-5"></i>
+                    //             </span>
+                    //             <i onclick="formClear()" data-bs-toggle="modal" data-bs-target="#myModal"
+                    //                 class="las la-plus d-block fs-5 text-primary"></i>
+                    //         </div>
+                    //     </li>`
+                    // )
 
                     $('.lead-source-list').empty();
                     $('.lead-source-list2').empty();
@@ -186,6 +234,7 @@
                     $('.lead-source-list4').empty();
 
                     let sourceOptions = ``;
+                    let selectOption = `<option disabled selected>Select Source</option>`;
                     let sourceListItems = '';
                     response.data.forEach(function(source, index) {
                         // Build the list item for sources
@@ -208,11 +257,12 @@
                             `<option value="${source.id}" ${source.id == sourceId ? 'selected' : ''}>${source.list_name}</option>`;
                     });
                     var blankOption = `<option disabled selected></option>`;
-                    $('.source-list').append(sourceListItems);
+                    // $('.source-list').append(sourceListItems);
                     $('.lead-source-list').append(sourceOptions);
                     $('.lead-source-list2').append(sourceOptions);
                     $('.lead-source-list3').append(blankOption+ sourceOptions);
                     $('.lead-source-list4').append(sourceOptions);
+                    $('#sourceFilter').append(selectOption +sourceOptions);
 
                     var sourceName = $('.lead-source-list option:selected').text();
                     $('#lead-source-trans').text(sourceName);

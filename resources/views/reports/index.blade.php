@@ -128,42 +128,51 @@
         }, 1000);
     });
     function appendTable(data) {
-        let tableBody = $('table tbody');
-        tableBody.empty();
-        const employee_id = $('#employee_id').val() || '';
+    let tableBody = $('table tbody');
+    tableBody.empty();
 
-        data.forEach(item => {
-            let row = `<tr>
-                <td>${item.date}</td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <div class="me-2 fw-bold">${item.leads}</div>
-                       
-                    </div>
-                </td>
-                <td>
-                    <a class="btn btn-sm btn-outline-primary" 
-                    href="/leads-new?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" 
-                    target="_blank">
-                        View Leads
-                    </a>
-                </td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <div class="me-2 fw-bold">${item.buylist}</div>
-                    </div>
-                </td>
-                <td>
-                    <a class="btn btn-sm btn-outline-success" 
-                    href="/buylist?user_id=${employee_id}&start_date=${item.date}&end_date=${item.date}" 
-                    target="_blank">
-                        View Purchased
-                    </a>
-                </td>
+    data.forEach(employee => {
+        // Insert a row for the employee header
+        const headerRow = `
+            <tr class="table-primary">
+                <td colspan="5" class="fw-bold">${employee.employee_name}</td>
             </tr>`;
+        tableBody.append(headerRow);
+
+        employee.data.forEach(item => {
+            const row = `
+                <tr>
+                    <td>${item.date}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2 fw-bold">${item.leads}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" 
+                            href="/leads-new?user_id=${employee.employee_id}&start_date=${item.date}&end_date=${item.date}" 
+                            target="_blank">
+                            View Leads
+                        </a>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2 fw-bold">${item.buylist}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-success" 
+                            href="/buylist?user_id=${employee.employee_id}&start_date=${item.date}&end_date=${item.date}" 
+                            target="_blank">
+                            View Purchased
+                        </a>
+                    </td>
+                </tr>`;
             tableBody.append(row);
         });
-    }
+    });
+}
+
     function goToPage(type, userId,date) {
         const start = date;
         const end = date;

@@ -279,7 +279,7 @@
                                                 <td><strong></strong></td>
                                                 <td><span class="perpcs_selling_price">$${sellingPrice.toFixed(2)}</span></td>
                                                 <td><span class="perpcs_cost_price">$${cost.toFixed(2)}</span></td>
-                                                <td><span class="perpcs_gross_profit">$${itemProfit.toFixed(2)}</span></td>
+                                                <td><span class="perpcs_gross_profit">$${itemProfitPerPiece.toFixed(2)}</span></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -290,7 +290,7 @@
                     $('#appendDataProfit').empty();
                     $('#appendDataProfit').append(productSummaryCard);
 
-                        console.log(product)
+                        // console.log(product)
                         var orderedItem = product.total_units_purchased != 0 ? `<span style="cursor:pointer;" class="badge bg-dark" title="Ordered">${product.total_units_purchased}</span>` : '<span title="Ordered">-</span>'
                         var receivedItems = product.total_units_received != 0 ? `<span style="cursor:pointer;" class="badge bg-info" title="Received" id="itemTotalReceived${product.id}">${product.total_units_received}</span>` : `<span style="cursor:pointer;" title="received" id="itemTotalReceived${product.id}">-</span>`
                         var shippedItems = product.total_units_shipped != 0 ? `<span style="cursor:pointer;" class="badge bg-success" title="Shipped" id="itemTotalShipped${product.id}">${product.total_units_shipped}</span>` : `<span style="cursor:pointer;" title="Shipped" id="itemTotalShipped${product.id}">-</span>`

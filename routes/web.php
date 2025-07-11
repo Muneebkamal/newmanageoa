@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/leads', [LeadsController::class, 'index'])->name('leads');
     Route::get('/leads-new', [LeadsController::class, 'index2'])->name('leads.new');
+    Route::get('/leads-rejected', [LeadsController::class, 'rejectedLeads'])->name('leads.rejected');
     Route::get('/my-uploads', [UploadController::class, 'index'])->name('my.uploads');
     Route::post('/source-create', [UploadController::class, 'sourceStore'])->name('source.create');
     Route::post('/source-update/{id}', [UploadController::class, 'sourceUpdate'])->name('source.update');

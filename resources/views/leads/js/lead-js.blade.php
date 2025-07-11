@@ -258,6 +258,14 @@
                     name: 'sell_price'
                 },
                 {
+                    data: 'net_profit',
+                    name: 'net_profit'
+                },
+                {
+                    data: 'quantity',
+                    name: 'quantity'
+                },
+                {
                     data: 'notes',
                     name: 'notes'
                 },

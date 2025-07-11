@@ -30,6 +30,7 @@ class Lead extends Model
         'currency',
         'coupon',
         'is_hazmat',
+        'quantity',
         'is_disputed',
         'is_rejected',
         'created_by'
