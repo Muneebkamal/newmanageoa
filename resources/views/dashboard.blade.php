@@ -111,6 +111,65 @@
              </div>   
         </div>
     </div> 
+    <div class="row mt-3">
+        <div class="col-md-12">
+           @foreach ($employees as $employee)
+            @php
+                $source = $employee->source;
+                $sourceId = $source?->id;
+                $employeeLeads = $leads[$sourceId] ?? collect();
+            @endphp
+
+                @if ($source && $employeeLeads->isNotEmpty())
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="m-0">Leads Uploaded Today for {{ $employee->name }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Name</th>
+                                            <th>ASIN</th>
+                                            <th>Source</th>
+                                            <th>Sell Price</th>
+                                            <th>Cost</th>
+                                            <th>Profit</th> 
+                                            <th>ROI</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($employeeLeads as $lead)
+                                            <tr>
+                                                <td> 
+                                                    <a href="{{ url('leads-new') . '?asin=' . $lead->asin }}" target="_blank">
+                                                        {{ \Carbon\Carbon::parse($lead->created_at)->format('Y-m-d') }}    
+                                                    </a> 
+                                                </td>
+
+                                                <td>{{ $lead->name }}</td>
+                                                <td> <a href="https://www.amazon.com/dp/{{  $lead->asin }}" target="_blank">{{ $lead->asin }}</a> </td>
+                                                <td> <a href="{{  $lead->url }}">{{ $lead->supplier }}</a> </td>
+                                                <td>${{ $lead->sell_price }}</td>
+                                                <td>${{ $lead->cost }}</td>
+                                                 <td>${{ $lead->net_profit }}</td>
+                                                <td>{{ $lead->roi }}%</td>
+                                               
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>  
+                @endif
+            @endforeach
+
+        </div>
+    </div> 
 @endsection
 @section('script')
 <script>

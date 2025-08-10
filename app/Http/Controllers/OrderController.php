@@ -550,7 +550,7 @@ class OrderController extends Controller
         $order = Order::where('id',$data['id'])->first();
         if($order){
             $data['is_pending'] =  0;
-            dd($data);
+            // dd($data);
             $order->update($data);
             return response()->json(['success' => true]);
         }else{

@@ -10,4 +10,8 @@ class Source extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    public function leads()
+    {
+        return $this->hasMany(Lead::class);
+    }
 }

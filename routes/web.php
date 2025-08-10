@@ -37,9 +37,7 @@ Route::get('/clear-cache', function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', function () {
-        return view('dashboard');
-    });
+    Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
     Route::get('/leads', [LeadsController::class, 'index'])->name('leads');
     Route::get('/leads-new', [LeadsController::class, 'index2'])->name('leads.new');
@@ -165,6 +163,7 @@ Route::middleware('auth')->group(function () {
     Route::get('locations/list', [SystemManagerController::class, 'list'])->name('locations.list');
     Route::resource('/employees', 'App\Http\Controllers\EmployeeController');
     Route::get('/sync-lead-cron', 'App\Http\Controllers\EmployeeController@syncEmployeeLeadsCron');
+    Route::get('/sync-lead-cron-email', 'App\Http\Controllers\EmployeeController@sendDailyEmailCron');
     Route::get('//get-employee-leads/{id?}', 'App\Http\Controllers\EmployeeController@getEmployeeLeadsNew');
     Route::get('settings', [SystemManagerController::class, 'settingsIndex'])->name('settings.index');
     Route::post('add-cashback-source', [SystemManagerController::class, 'storeCashBack'])->name('settings.storeCashBack');

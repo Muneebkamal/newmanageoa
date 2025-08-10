@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lead;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +26,14 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $employees = User::with('source')
+        ->whereNotNull('sync_lead_url')
+        ->get();
+        //Get today's date
+        $start = Carbon::yesterday('America/New_York')->setTime(8, 0); // Yesterday 8 AM EST
+        $end = Carbon::today('America/New_York')->setTime(8, 0);       // Today 8 AM EST
+        $leads = Lead::whereBetween('created_at', [$start, $end])->get()->groupBy('source_id');
+       
+        return view('dashboard',compact('employees','leads'));
     }
 }

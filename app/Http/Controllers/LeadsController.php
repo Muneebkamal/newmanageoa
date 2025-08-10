@@ -367,60 +367,77 @@ use Yajra\DataTables\Facades\DataTables;
         //     // return view('welcome');
         // }
         public function show(Request $request, string $id)
-    {
-        if ($request->ajax()) {
-            $perPage = (int) $request->get('length', 10); // Number of items per page
-            $start = (int) $request->get('start', 0); // Starting point for pagination
-            $draw = (int) $request->get('draw', 1); // Draw counter for DataTables
-            // Base query
-            $query = Lead::where('source_id', $id);
-            // Apply user-specific filter (non-admin users)
-            if (auth()->user()->role_id != 1) {
-                $query->where('created_by', auth()->user()->id);
-            }
-            if ($request->has('sortField') && $request->get('sortField')) {
-                $sortField = $request->get('sortField');
-                $sortOrder = $request->get('sortOrder', 'ASC');
-                $query->orderBy($sortField, $sortOrder);
-            }
-            $totalRecords = Lead::where('source_id', $id)->count();
-            $recordsFiltered = $query->count();
-            $data = $query->offset($start)->limit($perPage)->get();
-            return response()->json([
-                'draw' => $draw,
-                'recordsTotal' => $totalRecords,
-                'recordsFiltered' => $recordsFiltered,
-                'data' => $data->map(function ($row) {
-                    return [
-                        'action' => '
-                            <div class="d-flex">
-                                <div class="form-check">
-                                    <input class="form-check-input fs-15" name="sourceLeadChckbox" type="checkbox" id="singleCheck_' . $row->id . '" value="' . $row->id . '" onclick="singleCheck(' . $row->id . ')">
-                                </div>
-                                <a class="btn btn-outline-primary btn-sm ms-1" data-bs-toggle="modal"
+        {
+            if ($request->ajax()) {
+                $perPage = (int) $request->get('length', 10);
+                $start = (int) $request->get('start', 0);
+                $draw = (int) $request->get('draw', 1);
+
+                $query = Lead::where('source_id', $id);
+
+                if (auth()->user()->role_id != 1) {
+                    $query->where('created_by', auth()->user()->id);
+                }
+
+                if ($request->has('sortField') && $request->get('sortField')) {
+                    $sortField = $request->get('sortField');
+                    $sortOrder = $request->get('sortOrder', 'ASC');
+                    $query->orderBy($sortField, $sortOrder);
+                }
+                $searchValue = $request->input('search.value');
+
+                if (!empty($searchValue)) {
+                    $query->where(function ($q) use ($searchValue) {
+                        $q->where('name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('asin', 'like', '%' . $searchValue . '%')
+                        ->orWhere('url', 'like', '%' . $searchValue . '%')
+                        ->orWhere('supplier', 'like', '%' . $searchValue . '%')
+                        ->orWhere('category', 'like', '%' . $searchValue . '%')
+                        ->orWhere('notes', 'like', '%' . $searchValue . '%');
+                    });
+                }
+
+                $totalRecords = (clone $query)->count(); // fixed to reflect filtering
+                $recordsFiltered = $totalRecords;
+
+                $data = $query->offset($start)->limit($perPage)->get();
+
+                return response()->json([
+                    'draw' => $draw,
+                    'recordsTotal' => $totalRecords,
+                    'recordsFiltered' => $recordsFiltered,
+                    'data' => $data->map(function ($row) {
+                        return [
+                            'action' => '
+                                <div class="d-flex">
+                                    <div class="form-check">
+                                        <input class="form-check-input fs-15" name="sourceLeadChckbox" type="checkbox" id="singleCheck_' . $row->id . '" value="' . $row->id . '" onclick="singleCheck(' . $row->id . ')">
+                                    </div>
+                                    <a class="btn btn-outline-primary btn-sm ms-1" data-bs-toggle="modal"
                                         data-bs-target="#exampleModalScrollable" onclick="leadFind(' . $row->id . ')">
                                         <i class="ri-pencil-line text-primary me-2"></i>Update Lead
                                     </a>
                                     <a class="btn btn-outline-danger btn-sm ms-1" onclick="leadDelete(' . $row->id . ')">
                                         <i class="ri-delete-bin-line text-danger me-2"></i>Delete Lead
                                     </a>
-                                
-                            </div>',
-                        'name' => $row->name,
-                        'asin' => '<a href="https://www.amazon.com/dp/' . $row->asin . '" class="text-primary" target="_blank">' . $row->asin . '</a>',
-                        'url' => '<a href="' . $row->url . '" class="text-primary" target="_blank">' . $row->supplier . '</a>',
-                        'category' => $row->category,
-                        'cost' => $row->cost,
-                        'sell_price' => $row->sell_price,
-                        'net_profit' => $row->net_profit,
-                        'quantity' => $row->quantity,
-                        'notes' => $row->notes,
-                        'date' => $row->date,
-                    ];
-                }),
-            ]);
+                                </div>',
+                            'name' => $row->name,
+                            'asin' => '<a href="https://www.amazon.com/dp/' . $row->asin . '" class="text-primary" target="_blank">' . $row->asin . '</a>',
+                            'url' => '<a href="' . $row->url . '" class="text-primary" target="_blank">' . $row->supplier . '</a>',
+                            'category' => $row->category,
+                            'cost' => $row->cost,
+                            'sell_price' => $row->sell_price,
+                            'net_profit' => $row->net_profit,
+                            'quantity' => $row->quantity,
+                            'notes' => $row->notes,
+                            'date' => $row->date,
+                        ];
+                    }),
+                ]);
+            }
+
+            return abort(403, 'Unauthorized access');
         }
-    }
 
 
 

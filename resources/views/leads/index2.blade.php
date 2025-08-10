@@ -1146,6 +1146,21 @@ table.dataTable {
         //         });
         //     });
         // });
+        setTimeout(() => {
+            // Get 'asin' from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const asin = urlParams.get('asin');
+
+            if (asin) {
+                const table = $('#leads-table').DataTable();
+
+                // Only update the search input inside leads-table's wrapper
+                const leadsFilterInput = $('#leads-table').closest('.dataTables_wrapper').find('.dataTables_filter input');
+
+                leadsFilterInput.val(asin).trigger('input');
+                table.search(asin).draw();
+            }
+        }, 1000);
 
     </script>
 

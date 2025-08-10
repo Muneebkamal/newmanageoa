@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Lead;
 use App\Models\Source;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,6 +13,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
@@ -188,96 +190,444 @@ class EmployeeController extends Controller
     {
         //
     }
-    public function syncEmployeeLeadsCron(){
-        $employees = User::whereNotNull('sync_lead_url')->get();
-        foreach($employees as $employee){
-            if($employee->sync_lead_url != null){
-                $checkSource = Source::where('employee_id',$employee->id)->first();
-                if($checkSource){
-                    $source_id = $checkSource->id;
-                }else{
-                    $newSource = new Source;
-                    $newSource->list_name = $employee->name;
-                    $newSource->employee_id = $employee->id;
-                    $newSource->save();
-                    $source_id = $newSource->id;
-                }
-                   // URL to the Google Sheet's CSV export
-                // Provided Google Sheets URL
-                $googleSheetUrl = $employee->sync_lead_url;
+    // public function syncEmployeeLeadsCron(){
+    //     $employees = User::whereNotNull('sync_lead_url')->get();
+    //     foreach($employees as $employee){
+    //         if($employee->sync_lead_url != null){
+    //             $checkSource = Source::where('employee_id',$employee->id)->first();
+    //             if($checkSource){
+    //                 $source_id = $checkSource->id;
+    //             }else{
+    //                 $newSource = new Source;
+    //                 $newSource->list_name = $employee->name;
+    //                 $newSource->employee_id = $employee->id;
+    //                 $newSource->save();
+    //                 $source_id = $newSource->id;
+    //             }
+    //             // URL to the Google Sheet's CSV export
+    //             // Provided Google Sheets URL
+    //             $sync_lead_url = $employee->sync_lead_url;
+    //             // Get Sheet ID from URL
+    //             $sheetId = null;
+    //             if (preg_match('/\/d\/([a-zA-Z0-9-_]+)/', $sync_lead_url, $match)) {
+    //                 $sheetId = $match[1];
+    //             }
+    //             if (!$sheetId) {
+    //                 return response()->json(['error' => 'Invalid Sheet URL'], 400);
+    //             }
+    //             $tabs = $this->getGoogleSheetTabs($sheetId);
+    //             if (empty($tabs)) {
+    //                 return response()->json(['error' => 'No tabs found'], 400);
+    //             }
+    //             $source_id = $checkSource->id;
+    //             $insertedCount = 0;
+    //             $chunkSize = 50;
+    //             foreach ($tabs as $tab) {
+    //                 $gid = $tab['gid'];
+    //                 $csvUrl = "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv&gid={$gid}";
 
-                // Parse the URL to extract the sheet ID
-                $parsedUrl = parse_url($googleSheetUrl);
-                $path = $parsedUrl['path']; // Path contains the sheet ID
-                $pathParts = explode('/', $path); // Split by '/'
+    //                 $response = Http::get($csvUrl);
+    //                 if (!$response->successful()) continue;
+
+    //                 $csvData = $response->body();
+    //                 $rows = $this->parseCsv($csvData);
+    //                 $chunks = array_chunk($rows, $chunkSize);
+
+    //                 foreach ($chunks as $chunk) {
+    //                     foreach ($chunk as $item) {
+    //                         if (!empty($item['Product Name'])) {
+    //                             if($item['Product Name'] != null){
+    //                                 $possibleQuantityKeys = [
+    //                                     'suggested buy trial quantity',
+    //                                     'quantity',
+    //                                     'qty',
+    //                                     'trial quantity',
+    //                                     'buy qty',
+    //                                     'buy quantity'
+    //                                 ];
+
+    //                                 $quantity = 0;
+
+    //                                 // Normalize the $item keys to lowercase for flexible matching
+    //                                 $lowerItem = array_change_key_case($item, CASE_LOWER);
+
+    //                                 // Loop through lowercase keys and get the matching value
+    //                                 foreach ($possibleQuantityKeys as $key) {
+    //                                     if (!empty($lowerItem[$key]) && is_numeric($lowerItem[$key])) {
+    //                                         $quantity = (int) $lowerItem[$key];
+    //                                         break;
+    //                                     }
+    //                                 }
+    //                                 $data = [
+    //                                     'source_id'=> $source_id,
+    //                                     'date'=>date('Y-m-d H:i:s', strtotime($item['Date'])),
+    //                                     'name'=>$item['Product Name'],
+    //                                     'cost'=>$item['Cost'],
+    //                                     'asin'=>$item['ASIN'],
+    //                                     'url'=>$item['Source URL'],
+    //                                     'supplier'=>$item['Source Site'],
+    //                                     'category'=>$item['Category'],
+    //                                     'sell_price'=>$item['Current BB Price'],
+    //                                     'net_profit'=>$item['Net Profit'],
+    //                                     'roi'=>$item['ROI'],
+    //                                     'notes'=>$item['Notes'],
+    //                                     'promo'=>$item['Promo/Coupon Code'],
+    //                                     'quantity'=> $quantity,
+    //                                 ];
+    //                                 $priceFields = ['cost', 'sell_price', 'net_profit'];
+    //                                 foreach ($priceFields as $field) {
+    //                                     if (isset($data[$field])) {
+    //                                         // Remove the $ sign
+    //                                         $data[$field] = str_replace('$', '', $data[$field]);
+    //                                         // Keep only numbers and decimals
+    //                                         $data[$field] = preg_replace('/[^\d.]/', '', $data[$field]);
+    //                                         // If the value is empty or null, set it to 0
+    //                                         $data[$field] = $data[$field] === '' ? 0 : $data[$field];
+    //                                     } else {
+    //                                         // If the key is missing, set default value to 0
+    //                                         $data[$field] = 0;
+    //                                     }
+    //                                 }
+    //                                 if(isset($data['roi'])){
+    //                                     $data['roi'] = str_replace('%', '', $data['roi']);
+    //                                 }
+    //                                 $data['sell_price']  = $data['sell_price'] ==""?0:$data['sell_price'];  
+    //                                     // **Check if record already exists**
+    //                                 $existingLead = Lead::where('date', $data['date'])
+    //                                 ->where('name', $data['name'])
+    //                                 ->where('asin', $data['asin'])
+    //                                 ->where('source_id', $data['source_id'])
+    //                                 ->first();
+    //                                 if (!$existingLead) {
+    //                                     Lead::create($data);
+    //                                     $insertData[] = $data;
+    //                                     $insertedCount += count($insertData);
+
+    //                                 }else{
+                                        
+    //                                     $existingLead->quantity = $quantity;
+    //                                     $existingLead->save();
+    //                                 }
+                                
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+                    
+    //             }
+
+    //             // return response()->json([
+    //             //     'success' => true,
+    //             //     'tabs_found' => count($tabs),
+    //             //     'inserted_count' => $insertedCount,
+    //             // ]);
+
+    //             // // Parse the URL to extract the sheet ID
+    //             // $parsedUrl = parse_url($googleSheetUrl);
+    //             // $path = $parsedUrl['path']; // Path contains the sheet ID
+    //             // $pathParts = explode('/', $path); // Split by '/'
                 
-                // The sheet ID will be the second part in the URL path (after /d/)
-                $sheetId = $pathParts[3];
-                $url = "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv";
+    //             // // The sheet ID will be the second part in the URL path (after /d/)
+    //             // $sheetId = $pathParts[3];
+    //             // $url = "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv";
 
-                // Fetch the CSV data from Google Sheets
-                $response = Http::get($url);
-                if ($response->successful()) {
-                    // Get the CSV data
-                    $csvData = $response->body();
-                    $rows = $this->parseCsv($csvData);
-                    \Log::info($rows );
-                    foreach($rows as $index => $item){
-                        if($item['Product Name'] != null){
-                            $data = [
-                                'source_id'=> $source_id,
-                                'date'=>date('Y-m-d H:i:s', strtotime($item['Date'])),
-                                'name'=>$item['Product Name'],
-                                'cost'=>$item['Cost'],
-                                'asin'=>$item['ASIN'],
-                                'url'=>$item['Source URL'],
-                                'supplier'=>$item['Source Site'],
-                                'category'=>$item['Category'],
-                                'sell_price'=>$item['Current BB Price'],
-                                'net_profit'=>$item['Net Profit'],
-                                'roi'=>$item['ROI'],
-                                'notes'=>$item['Notes'],
-                                'promo'=>$item['Promo/Coupon Code'],
+    //             // // Fetch the CSV data from Google Sheets
+    //             // $response = Http::get($url);
+    //             // if ($response->successful()) {
+    //             //     // Get the CSV data
+    //             //     $csvData = $response->body();
+    //             //     $rows = $this->parseCsv($csvData);
+    //             //     \Log::info($rows );
+    //             //     foreach($rows as $index => $item){
+    //             //         if($item['Product Name'] != null){
+    //             //             $data = [
+    //             //                 'source_id'=> $source_id,
+    //             //                 'date'=>date('Y-m-d H:i:s', strtotime($item['Date'])),
+    //             //                 'name'=>$item['Product Name'],
+    //             //                 'cost'=>$item['Cost'],
+    //             //                 'asin'=>$item['ASIN'],
+    //             //                 'url'=>$item['Source URL'],
+    //             //                 'supplier'=>$item['Source Site'],
+    //             //                 'category'=>$item['Category'],
+    //             //                 'sell_price'=>$item['Current BB Price'],
+    //             //                 'net_profit'=>$item['Net Profit'],
+    //             //                 'roi'=>$item['ROI'],
+    //             //                 'notes'=>$item['Notes'],
+    //             //                 'promo'=>$item['Promo/Coupon Code'],
+    //             //             ];
+    //             //             $priceFields = ['cost', 'sell_price', 'net_profit'];
+    //             //             foreach ($priceFields as $field) {
+    //             //                 if (isset($data[$field])) {
+    //             //                     // Remove the $ sign
+    //             //                     $data[$field] = str_replace('$', '', $data[$field]);
+    //             //                     // Keep only numbers and decimals
+    //             //                     $data[$field] = preg_replace('/[^\d.]/', '', $data[$field]);
+    //             //                     // If the value is empty or null, set it to 0
+    //             //                     $data[$field] = $data[$field] === '' ? 0 : $data[$field];
+    //             //                 } else {
+    //             //                     // If the key is missing, set default value to 0
+    //             //                     $data[$field] = 0;
+    //             //                 }
+    //             //             }
+    //             //             if(isset($data['roi'])){
+    //             //                 $data['roi'] = str_replace('%', '', $data['roi']);
+    //             //             }
+    //             //             $data['sell_price']  = $data['sell_price'] ==""?0:$data['sell_price'];  
+    //             //                 // **Check if record already exists**
+    //             //             $existingLead = Lead::where('date', $data['date'])
+    //             //             ->where('name', $data['name'])
+    //             //             ->where('asin', $data['asin'])
+    //             //             ->where('source_id', $data['source_id'])
+    //             //             ->exists();
+    //             //             if (!$existingLead) {
+    //             //                 Lead::create($data);
+    //             //             }
+                      
+    //             //         }
+                      
+    //             //     }
+    //             } else {
+    //                 // Handle failure
+    //                 return response()->json(['error' => 'Failed to fetch data from Google Sheets'], 500);
+    //             }
+    //         }
+    // }
+    public function syncEmployeeLeadsCron()
+    {
+        $employees = User::whereNotNull('sync_lead_url')->get();
+
+        foreach ($employees as $employee) {
+            $insertedCount = 0;
+            $insertData = [];
+
+            $checkSource = Source::where('employee_id', $employee->id)->first();
+
+            if (!$checkSource) {
+                $checkSource = new Source;
+                $checkSource->list_name = $employee->name;
+                $checkSource->employee_id = $employee->id;
+                $checkSource->save();
+            }
+
+            $source_id = $checkSource->id;
+            $sync_lead_url = $employee->sync_lead_url;
+
+            // Extract Sheet ID
+            $sheetId = null;
+            if (preg_match('/\/d\/([a-zA-Z0-9-_]+)/', $sync_lead_url, $match)) {
+                $sheetId = $match[1];
+            }
+
+            if (!$sheetId) {
+                \Log::warning("Invalid Google Sheet URL for user: {$employee->id}");
+                continue;
+            }
+
+            $tabs = $this->getGoogleSheetTabs($sheetId);
+            if (empty($tabs)) {
+                \Log::warning("No tabs found in sheet for user: {$employee->id}");
+                continue;
+            }
+
+            $chunkSize = 50;
+
+            foreach ($tabs as $tab) {
+                $gid = $tab['gid'];
+                $csvUrl = "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv&gid={$gid}";
+                $response = Http::get($csvUrl);
+                if (!$response->successful()) continue;
+
+                $csvData = $response->body();
+                $rows = $this->parseCsv($csvData);
+                $chunks = array_chunk($rows, $chunkSize);
+
+                foreach ($chunks as $chunk) {
+                    foreach ($chunk as $item) {
+                        if (!empty($item['Product Name'])) {
+                            $possibleQuantityKeys = [
+                                'suggested buy trial quantity',
+                                'quantity',
+                                'qty',
+                                'trial quantity',
+                                'buy qty',
+                                'buy quantity'
                             ];
-                            $priceFields = ['cost', 'sell_price', 'net_profit'];
-                            foreach ($priceFields as $field) {
-                                if (isset($data[$field])) {
-                                    // Remove the $ sign
-                                    $data[$field] = str_replace('$', '', $data[$field]);
-                                    // Keep only numbers and decimals
-                                    $data[$field] = preg_replace('/[^\d.]/', '', $data[$field]);
-                                    // If the value is empty or null, set it to 0
-                                    $data[$field] = $data[$field] === '' ? 0 : $data[$field];
-                                } else {
-                                    // If the key is missing, set default value to 0
-                                    $data[$field] = 0;
+
+                            $quantity = 0;
+                            $lowerItem = array_change_key_case($item, CASE_LOWER);
+
+                            foreach ($possibleQuantityKeys as $key) {
+                                if (!empty($lowerItem[$key]) && is_numeric($lowerItem[$key])) {
+                                    $quantity = (int)$lowerItem[$key];
+                                    break;
                                 }
                             }
-                            if(isset($data['roi'])){
+
+                            $data = [
+                                'source_id' => $source_id,
+                                'date' => date('Y-m-d H:i:s', strtotime($item['Date'])),
+                                'name' => $item['Product Name'],
+                                'cost' => $item['Cost'],
+                                'asin' => $item['ASIN'],
+                                'url' => $item['Source URL'],
+                                'supplier' => $item['Source Site'],
+                                'category' => $item['Category'],
+                                'sell_price' => $item['Current BB Price'],
+                                'net_profit' => $item['Net Profit'],
+                                'roi' => $item['ROI'],
+                                'notes' => $item['Notes'],
+                                'promo' => $item['Promo/Coupon Code'],
+                                'quantity' => $quantity,
+                            ];
+
+                            // Clean price fields
+                            $priceFields = ['cost', 'sell_price', 'net_profit'];
+                            foreach ($priceFields as $field) {
+                                $data[$field] = isset($data[$field])
+                                    ? preg_replace('/[^\d.]/', '', str_replace('$', '', $data[$field]))
+                                    : 0;
+                                $data[$field] = $data[$field] === '' ? 0 : $data[$field];
+                            }
+
+                            if (isset($data['roi'])) {
                                 $data['roi'] = str_replace('%', '', $data['roi']);
                             }
-                            $data['sell_price']  = $data['sell_price'] ==""?0:$data['sell_price'];  
-                                // **Check if record already exists**
-                            $existingLead = Lead::where('date', $data['date'])
-                            ->where('name', $data['name'])
-                            ->where('asin', $data['asin'])
-                            ->where('source_id', $data['source_id'])
-                            ->exists();
+
+                            $data['sell_price'] = $data['sell_price'] == "" ? 0 : $data['sell_price'];
+
+                            // Check for existing lead
+                            $existingLead = Lead::where('asin', $data['asin'])
+                                // where('date', $data['date'])
+                                // ->where('name', $data['name'])
+                                ->where('source_id', $data['source_id'])
+                                ->first();
+
                             if (!$existingLead) {
                                 Lead::create($data);
+                                $insertData[] = $data;
+                                $insertedCount++;
+                            } else {
+                                // $existingLead->quantity = $quantity;
+                                // $existingLead->save();
                             }
-                      
                         }
-                      
                     }
-                } else {
-                    // Handle failure
-                    return response()->json(['error' => 'Failed to fetch data from Google Sheets'], 500);
                 }
             }
 
+            // Optional: Send summary email to admin
+            // if ($insertedCount > 0) {
+            //     $body = "<h2>Leads Uploaded for {$employee->name}</h2>";
+            //     $body .= "<p><strong>Total Leads Inserted:</strong> {$insertedCount}</p>";
+            //     $body .= "<table border='1' cellpadding='5' cellspacing='0'>";
+            //     $body .= "<tr><th>Date</th><th>Name</th><th>ASIN</th><th>ASIN</th><th>Cost</th><th>Sell Price</th><th>Profit</th><th>ROI</th> </tr>";
+            //     foreach (array_slice($insertData, 0, 10) as $lead) {
+            //         $currentDateEST = (new \DateTime('now', new \DateTimeZone('America/New_York')))->format('Y-m-d h:i A');
+            //         $body .= "<tr>
+            //             <td>
+            //                 <a href='" . url('leads-new?asin=' . $lead['asin']) . "' target='_blank'>
+            //                     {$currentDateEST}
+            //                 </a>
+            //             </td>
+            //             <td>{$lead['name']}</td>
+            //             <td>
+            //                 <a href='https://www.amazon.com/dp/{$lead['asin']}' target='_blank'>
+            //                     {$lead['asin']}
+            //                 </a>
+            //             </td>
+            //             <td>
+            //                 <a href='{$lead['url']}' target='_blank'>
+            //                     {$lead['supplier']}
+            //                 </a>
+            //             </td>
+            //             <td>\${$lead['cost']}</td>
+            //             <td>\${$lead['sell_price']}</td>
+            //             <td>\${$lead['net_profit']}</td>
+            //             <td>{$lead['roi']}%</td>
+                        
+            //         </tr>";
+            //     }
+            //     $body .= "</table>";
+            //     $mail = new MailController();
+            //     $mail->sendEmail(
+            //         "Lead Upload Summary for {$employee->name}",
+            //         $body,
+            //         'dailyreport@znzinc.com', // Replace with admin email
+            //         'Admin'
+            //     );
+            // }
+
+            \Log::info("Lead sync completed for {$employee->name}. Inserted: {$insertedCount}");
+        }
+
+        return response()->json(['success' => true, 'message' => 'Cron finished syncing leads.']);
+    }
+    public function sendDailyEmailCron(){
+        $employees = User::with('source')
+        ->whereNotNull('sync_lead_url')
+        ->get();
+        //Get today's date
+        $start = Carbon::yesterday('America/New_York')->setTime(8, 0); // Yesterday 8 AM EST
+        $end = Carbon::today('America/New_York')->setTime(8, 0);       // Today 8 AM EST
+        $leads = Lead::whereBetween('created_at', [$start, $end])->get()->groupBy('source_id');
+        foreach ($employees as $employee)
+        {
+            $source = $employee->source;
+            $sourceId = $source?->id;
+            $employeeLeads = $leads[$sourceId] ?? collect();
+            if ($source && $employeeLeads->isNotEmpty()){
+                $body = "<h2>Leads Uploaded for {$employee->name}</h2>";
+                $body .= "<p><strong>Total Leads Inserted:</strong> " . count($employeeLeads) . "</p>";
+                $body .= "<table border='1' cellpadding='5' cellspacing='0'>";
+                $body .= "<tr><th>Date</th><th>Name</th><th>ASIN</th><th>Source</th><th>Cost</th><th>Sell Price</th><th>Profit</th><th>ROI</th> </tr>";
+                foreach ($employeeLeads as $lead) {
+                    $currentDateEST = (new \DateTime($lead->created_at, new \DateTimeZone('America/New_York')))->format('Y-m-d h:i A');
+                    $body .= "<tr>
+                        <td>
+                            <a href='" . url('leads-new?asin=' . $lead['asin']) . "' target='_blank'>
+                                {$currentDateEST}
+                            </a>
+                        </td>
+                        <td>{$lead->name}</td>
+                        <td>
+                            <a href='https://www.amazon.com/dp/{$lead->asin}' target='_blank'>
+                                {$lead->asin}
+                            </a>
+                        </td>
+                        <td>
+                            <a href='{$lead->url}' target='_blank'>
+                                {$lead->supplier}
+                            </a>
+                        </td>
+                        <td>\${$lead->sell_price}</td>
+                        <td>\${$lead->cost}</td>
+                        <td>\${$lead->net_profit}</td>
+                        <td>{$lead->roi}%</td>
+                        
+                    </tr>";
+                }
+                $body .= "</table>";
+                $mail = new MailController();
+                $mail->sendEmail(
+                    "Lead Upload Summary for {$employee->name}",
+                    $body,
+                    'dailyreport@znzinc.com', // Replace with admin email
+                    'Admin'
+                );
+            }else{
+                $mail = new MailController();
+                $body = "<h2>No Leads Uploaded for {$employee->name}</h2>";
+                $mail->sendEmail(
+                    "Lead Upload Summary for {$employee->name}",
+                    $body,
+                    'dailyreport@znzinc.com', // Replace with admin email
+                    'Admin'
+                );
+            }
+            \Log::info("Lead sync completed for {$employee->name}");
         }
     }
+
     // Helper function to parse CSV data
     private function parseCsv($csvData)
     {
@@ -399,9 +749,9 @@ class EmployeeController extends Controller
                                 }
                                 $data['sell_price']  = $data['sell_price'] ==""?0:$data['sell_price'];  
                                     // **Check if record already exists**
-                                $existingLead = Lead::where('date', $data['date'])
-                                ->where('name', $data['name'])
-                                ->where('asin', $data['asin'])
+                                $existingLead = Lead::where('asin', $data['asin'])
+                                // where('date', $data['date'])
+                                // ->where('name', $data['name'])
                                 ->where('source_id', $data['source_id'])
                                 ->exists();
                                 if (!$existingLead) {
@@ -427,143 +777,291 @@ class EmployeeController extends Controller
             }
         }
     }
-    public function getEmployeeLeadsNew(Request $request,$id){
-        $employee = User::where('id',$id)->first();
-        $sync_lead_url = null;
-        if (!is_null($employee->sync_lead_url)) {
-            // Run next procedure here
-            $sync_lead_url = $employee->sync_lead_url;
-        }else if(!is_null($request->sync_lead_url)){
-            $sync_lead_url = $request->sync_lead_url;
-        }
-        if($sync_lead_url != null){
-            $checkSource = Source::where('employee_id',$employee->id)->first();
-            if($checkSource){
-                $source_id = $checkSource->id;
-            }else{
-                $newSource = new Source;
-                $newSource->list_name = $employee->first_name .' ' .$employee->last_name;
-                $newSource->employee_id = $employee->id;
-                $newSource->save();
-                $source_id = $newSource->id;
-            }
-                // URL to the Google Sheet's CSV export
-            // Provided Google Sheets URL
-            $googleSheetUrl = $sync_lead_url;
+    // public function getEmployeeLeadsNew(Request $request,$id){
+    //     $employee = User::where('id',$id)->first();
+    //     $sync_lead_url = null;
+    //     if (!is_null($employee->sync_lead_url)) {
+    //         // Run next procedure here
+    //         $sync_lead_url = $employee->sync_lead_url;
+    //     }else if(!is_null($request->sync_lead_url)){
+    //         $sync_lead_url = $request->sync_lead_url;
+    //     }
+    //     if($sync_lead_url != null){
+    //         $checkSource = Source::where('employee_id',$employee->id)->first();
+    //         if($checkSource){
+    //             $source_id = $checkSource->id;
+    //         }else{
+    //             $newSource = new Source;
+    //             $newSource->list_name = $employee->first_name .' ' .$employee->last_name;
+    //             $newSource->employee_id = $employee->id;
+    //             $newSource->save();
+    //             $source_id = $newSource->id;
+    //         }
+    //             // URL to the Google Sheet's CSV export
+    //         // Provided Google Sheets URL
+    //         $googleSheetUrl = $sync_lead_url;
+    //         $sheetUrl =  $googleSheetUrl; // pass URL in request
     
-            // Parse the URL to extract the sheet ID
-            $parsedUrl = parse_url($googleSheetUrl);
-            $path = $parsedUrl['path']; // Path contains the sheet ID
-            $pathParts = explode('/', $path); // Split by '/'
+    //         // Parse the URL to extract the sheet ID
+    //         $parsedUrl = parse_url($googleSheetUrl);
+    //         $path = $parsedUrl['path']; // Path contains the sheet ID
+    //         $pathParts = explode('/', $path); // Split by '/'
             
-            // The sheet ID will be the second part in the URL path (after /d/)
-            $sheetId = $pathParts[3];
-            $url = "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv";
+    //         // The sheet ID will be the second part in the URL path (after /d/)
+    //         $sheetId = $pathParts[3];
+    //         $url = "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv";
     
-            // Fetch the CSV data from Google Sheets
-            $response = Http::get($url);
-            if (!$response->successful()) {
-                return response()->json(['error' => 'Failed to fetch data from Google Sheets'], 500);
-            }
-            if ($response->successful()) {
-                // Get the CSV data
-                $csvData = $response->body();
-                $rows = $this->parseCsv($csvData);
-                $chunkSize = 50; // Adjust chunk size
-                $chunks = array_chunk($rows, $chunkSize);
-                $chunkCount = count($chunks);
-                $insertedCount = 0;
-                foreach($chunks as $index => $chunk){
-                    $insertData = [];
-                    foreach ($chunk as $item) {
-                        if (!empty($item['Product Name'])) {
-                            if($item['Product Name'] != null){
-                                $possibleQuantityKeys = [
-                                    'suggested buy trial quantity',
-                                    'quantity',
-                                    'qty',
-                                    'trial quantity',
-                                    'buy qty',
-                                    'buy quantity'
-                                ];
+    //         // Fetch the CSV data from Google Sheets
+    //         $response = Http::get($url);
+    //         if (!$response->successful()) {
+    //             return response()->json(['error' => 'Failed to fetch data from Google Sheets'], 500);
+    //         }
+    //         if ($response->successful()) {
+    //             // Get the CSV data
+    //             $csvData = $response->body();
+    //             $rows = $this->parseCsv($csvData);
+    //             $chunkSize = 50; // Adjust chunk size
+    //             $chunks = array_chunk($rows, $chunkSize);
+    //             $chunkCount = count($chunks);
+    //             $insertedCount = 0;
+    //             foreach($chunks as $index => $chunk){
+    //                 $insertData = [];
+    //                 foreach ($chunk as $item) {
+    //                     if (!empty($item['Product Name'])) {
+    //                         if($item['Product Name'] != null){
+    //                             $possibleQuantityKeys = [
+    //                                 'suggested buy trial quantity',
+    //                                 'quantity',
+    //                                 'qty',
+    //                                 'trial quantity',
+    //                                 'buy qty',
+    //                                 'buy quantity'
+    //                             ];
 
-                                $quantity = 0;
+    //                             $quantity = 0;
 
-                                // Normalize the $item keys to lowercase for flexible matching
-                                $lowerItem = array_change_key_case($item, CASE_LOWER);
+    //                             // Normalize the $item keys to lowercase for flexible matching
+    //                             $lowerItem = array_change_key_case($item, CASE_LOWER);
 
-                                // Loop through lowercase keys and get the matching value
-                                foreach ($possibleQuantityKeys as $key) {
-                                    if (!empty($lowerItem[$key]) && is_numeric($lowerItem[$key])) {
-                                        $quantity = (int) $lowerItem[$key];
-                                        break;
-                                    }
-                                }
-                                $data = [
-                                    'source_id'=> $source_id,
-                                    'date'=>date('Y-m-d H:i:s', strtotime($item['Date'])),
-                                    'name'=>$item['Product Name'],
-                                    'cost'=>$item['Cost'],
-                                    'asin'=>$item['ASIN'],
-                                    'url'=>$item['Source URL'],
-                                    'supplier'=>$item['Source Site'],
-                                    'category'=>$item['Category'],
-                                    'sell_price'=>$item['Current BB Price'],
-                                    'net_profit'=>$item['Net Profit'],
-                                    'roi'=>$item['ROI'],
-                                    'notes'=>$item['Notes'],
-                                    'promo'=>$item['Promo/Coupon Code'],
-                                    'quantity'=> $quantity,
-                                ];
-                                $priceFields = ['cost', 'sell_price', 'net_profit'];
-                                foreach ($priceFields as $field) {
-                                    if (isset($data[$field])) {
-                                        // Remove the $ sign
-                                        $data[$field] = str_replace('$', '', $data[$field]);
-                                        // Keep only numbers and decimals
-                                        $data[$field] = preg_replace('/[^\d.]/', '', $data[$field]);
-                                        // If the value is empty or null, set it to 0
-                                        $data[$field] = $data[$field] === '' ? 0 : $data[$field];
-                                    } else {
-                                        // If the key is missing, set default value to 0
-                                        $data[$field] = 0;
-                                    }
-                                }
-                                if(isset($data['roi'])){
-                                    $data['roi'] = str_replace('%', '', $data['roi']);
-                                }
-                                $data['sell_price']  = $data['sell_price'] ==""?0:$data['sell_price'];  
-                                    // **Check if record already exists**
-                                $existingLead = Lead::where('date', $data['date'])
-                                ->where('name', $data['name'])
-                                ->where('asin', $data['asin'])
-                                ->where('source_id', $data['source_id'])
-                                ->first();
-                                if (!$existingLead) {
-                                    Lead::create($data);
-                                    $insertData[] = $data;
-                                    $insertedCount += count($insertData);
+    //                             // Loop through lowercase keys and get the matching value
+    //                             foreach ($possibleQuantityKeys as $key) {
+    //                                 if (!empty($lowerItem[$key]) && is_numeric($lowerItem[$key])) {
+    //                                     $quantity = (int) $lowerItem[$key];
+    //                                     break;
+    //                                 }
+    //                             }
+    //                             $data = [
+    //                                 'source_id'=> $source_id,
+    //                                 'date'=>date('Y-m-d H:i:s', strtotime($item['Date'])),
+    //                                 'name'=>$item['Product Name'],
+    //                                 'cost'=>$item['Cost'],
+    //                                 'asin'=>$item['ASIN'],
+    //                                 'url'=>$item['Source URL'],
+    //                                 'supplier'=>$item['Source Site'],
+    //                                 'category'=>$item['Category'],
+    //                                 'sell_price'=>$item['Current BB Price'],
+    //                                 'net_profit'=>$item['Net Profit'],
+    //                                 'roi'=>$item['ROI'],
+    //                                 'notes'=>$item['Notes'],
+    //                                 'promo'=>$item['Promo/Coupon Code'],
+    //                                 'quantity'=> $quantity,
+    //                             ];
+    //                             $priceFields = ['cost', 'sell_price', 'net_profit'];
+    //                             foreach ($priceFields as $field) {
+    //                                 if (isset($data[$field])) {
+    //                                     // Remove the $ sign
+    //                                     $data[$field] = str_replace('$', '', $data[$field]);
+    //                                     // Keep only numbers and decimals
+    //                                     $data[$field] = preg_replace('/[^\d.]/', '', $data[$field]);
+    //                                     // If the value is empty or null, set it to 0
+    //                                     $data[$field] = $data[$field] === '' ? 0 : $data[$field];
+    //                                 } else {
+    //                                     // If the key is missing, set default value to 0
+    //                                     $data[$field] = 0;
+    //                                 }
+    //                             }
+    //                             if(isset($data['roi'])){
+    //                                 $data['roi'] = str_replace('%', '', $data['roi']);
+    //                             }
+    //                             $data['sell_price']  = $data['sell_price'] ==""?0:$data['sell_price'];  
+    //                                 // **Check if record already exists**
+    //                             $existingLead = Lead::where('date', $data['date'])
+    //                             ->where('name', $data['name'])
+    //                             ->where('asin', $data['asin'])
+    //                             ->where('source_id', $data['source_id'])
+    //                             ->first();
+    //                             if (!$existingLead) {
+    //                                 Lead::create($data);
+    //                                 $insertData[] = $data;
+    //                                 $insertedCount += count($insertData);
 
-                                }else{
+    //                             }else{
                                    
-                                    $existingLead->quantity = $quantity;
-                                    $existingLead->save();
-                                }
+    //                                 $existingLead->quantity = $quantity;
+    //                                 $existingLead->save();
+    //                             }
                             
+    //                         }
+    //                     }
+    //                 }
+                    
+    //             }
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'chunk_count' => $chunkCount,
+    //                 'inserted_count' => $insertedCount,
+    //             ]);
+    //         } else {
+    //             // Handle failure
+    //             return response()->json(['error' => 'Failed to fetch data from Google Sheets'], 500);
+    //         }
+    //     }
+    // }
+    public function getEmployeeLeadsNew(Request $request, $id)
+    {
+        $employee = User::findOrFail($id);
+        $sync_lead_url = $employee->sync_lead_url ?? $request->sync_lead_url;
+        if (!$sync_lead_url) {
+            return response()->json(['error' => 'No sync URL found'], 400);
+        }
+        // Get Sheet ID from URL
+        $sheetId = null;
+        if (preg_match('/\/d\/([a-zA-Z0-9-_]+)/', $sync_lead_url, $match)) {
+            $sheetId = $match[1];
+        }
+        if (!$sheetId) {
+            return response()->json(['error' => 'Invalid Sheet URL'], 400);
+        }
+        $tabs = $this->getGoogleSheetTabs($sheetId);
+        if (empty($tabs)) {
+            return response()->json(['error' => 'No tabs found'], 400);
+        }
+        $checkSource = Source::firstOrCreate(
+            ['employee_id' => $employee->id],
+            ['list_name' => $employee->first_name . ' ' . $employee->last_name]
+        );
+        $source_id = $checkSource->id;
+        $insertedCount = 0;
+        $chunkSize = 50;
+        foreach ($tabs as $tab) {
+            $gid = $tab['gid'];
+            $csvUrl = "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv&gid={$gid}";
+
+            $response = Http::get($csvUrl);
+            if (!$response->successful()) continue;
+
+            $csvData = $response->body();
+            $rows = $this->parseCsv($csvData);
+            $chunks = array_chunk($rows, $chunkSize);
+
+            foreach ($chunks as $chunk) {
+                foreach ($chunk as $item) {
+                    if (!empty($item['Product Name'])) {
+                        if($item['Product Name'] != null){
+                            $possibleQuantityKeys = [
+                                'suggested buy trial quantity',
+                                'quantity',
+                                'qty',
+                                'trial quantity',
+                                'buy qty',
+                                'buy quantity'
+                            ];
+
+                            $quantity = 0;
+
+                            // Normalize the $item keys to lowercase for flexible matching
+                            $lowerItem = array_change_key_case($item, CASE_LOWER);
+
+                            // Loop through lowercase keys and get the matching value
+                            foreach ($possibleQuantityKeys as $key) {
+                                if (!empty($lowerItem[$key]) && is_numeric($lowerItem[$key])) {
+                                    $quantity = (int) $lowerItem[$key];
+                                    break;
+                                }
                             }
+                            $data = [
+                                'source_id'=> $source_id,
+                                'date'=>date('Y-m-d H:i:s', strtotime($item['Date'])),
+                                'name'=>$item['Product Name'],
+                                'cost'=>$item['Cost'],
+                                'asin'=>$item['ASIN'],
+                                'url'=>$item['Source URL'],
+                                'supplier'=>$item['Source Site'],
+                                'category'=>$item['Category'],
+                                'sell_price'=>$item['Current BB Price'],
+                                'net_profit'=>$item['Net Profit'],
+                                'roi'=>$item['ROI'],
+                                'notes'=>$item['Notes'],
+                                'promo'=>$item['Promo/Coupon Code'],
+                                'quantity'=> $quantity,
+                            ];
+                            $priceFields = ['cost', 'sell_price', 'net_profit'];
+                            foreach ($priceFields as $field) {
+                                if (isset($data[$field])) {
+                                    // Remove the $ sign
+                                    $data[$field] = str_replace('$', '', $data[$field]);
+                                    // Keep only numbers and decimals
+                                    $data[$field] = preg_replace('/[^\d.]/', '', $data[$field]);
+                                    // If the value is empty or null, set it to 0
+                                    $data[$field] = $data[$field] === '' ? 0 : $data[$field];
+                                } else {
+                                    // If the key is missing, set default value to 0
+                                    $data[$field] = 0;
+                                }
+                            }
+                            if(isset($data['roi'])){
+                                $data['roi'] = str_replace('%', '', $data['roi']);
+                            }
+                            $data['sell_price']  = $data['sell_price'] ==""?0:$data['sell_price'];  
+                                // **Check if record already exists**
+                            $existingLead = Lead::where('asin', $data['asin'])
+                                // where('date', $data['date'])
+                            // ->where('name', $data['name'])
+                            ->where('source_id', $data['source_id'])
+                            ->first();
+                            if (!$existingLead) {
+                                Lead::create($data);
+                                $insertData[] = $data;
+                                $insertedCount += count($insertData);
+
+                            }else{
+                                
+                                $existingLead->quantity = $quantity;
+                                $existingLead->save();
+                            }
+                        
                         }
                     }
-                    
                 }
-                return response()->json([
-                    'success' => true,
-                    'chunk_count' => $chunkCount,
-                    'inserted_count' => $insertedCount,
-                ]);
-            } else {
-                // Handle failure
-                return response()->json(['error' => 'Failed to fetch data from Google Sheets'], 500);
             }
+        }
+
+        return response()->json([
+            'success' => true,
+            'tabs_found' => count($tabs),
+            'inserted_count' => $insertedCount,
+        ]);
+    }
+    public function getGoogleSheetTabs($sheetId)
+    {
+        $url = "https://sheets.googleapis.com/v4/spreadsheets/{$sheetId}?fields=sheets.properties&key=AIzaSyAh1JAhw3XLl012NP8Q5v6JBYJjZVOULaM";
+
+        $response = Http::get($url);
+
+        if ($response->successful()) {
+            $tabs = collect($response->json()['sheets'])->map(function ($sheet) {
+                return [
+                    'name' => $sheet['properties']['title'],
+                    'gid' => $sheet['properties']['sheetId'],
+                ];
+            });
+
+            return $tabs; // 🔁 Make sure to return this
+        } else {
+            return response()->json([
+                'error' => 'Unable to fetch sheet tabs.',
+                'details' => $response->body(),
+            ], $response->status());
         }
     }
 }
