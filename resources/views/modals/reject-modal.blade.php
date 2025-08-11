@@ -10,11 +10,11 @@
                     <div data-v-c14627b0="" class="form-group">
                         <label data-v-c14627b0="" for="rejectionReason" class="col-form-label mr-2">Rejection Reason:</label>
                         <select data-v-c14627b0="" name="reasonInput"  class="form-select select2" id="rejectionReason" class="custom-select custom-select-sm" data-gtm-form-interact-field-id="8">
-                            <option data-v-c14627b0="" value="Out of stock">Out of stock</option>
+                            {{-- <option data-v-c14627b0="" value="Out of stock">Out of stock</option>
                             <option data-v-c14627b0="" value="Source page error">Source page error</option>
                             <option data-v-c14627b0="" value="Coupon/Sale expired">Coupon/Sale expired</option>
                             <option data-v-c14627b0="" value="Failed Payment">Failed Payment</option>
-                            <option data-v-c14627b0="" value="custom">Custom...</option>
+                            <option data-v-c14627b0="" value="custom">Custom...</option> --}}
                         </select>
                     </div>
                     <div id="customReasonContainer" style="display: none;" data-v-c14627b0="">

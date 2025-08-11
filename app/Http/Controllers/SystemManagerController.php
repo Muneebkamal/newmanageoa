@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CashBack;
 use App\Models\Location;
+use App\Models\RejectReason;
 use App\Models\UserEmail;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -242,6 +243,44 @@ class SystemManagerController extends Controller
         })
         ->rawColumns(['actions']) // To render HTML instead of plain text
         ->make(true);
+    }
+     // DataTable JSON
+    public function reasonData()
+    {
+        $reasons = RejectReason::orderBy('id', 'asc');
+
+        return DataTables::of($reasons)
+        ->addColumn('actions', function ($row) {
+            return '<button class="btn btn-sm btn-primary" onclick="editRejectedReason('.$row->id.', \'' . e($row->reason) . '\')">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteRejectedReason('.$row->id.')">Delete</button>';
+        })
+        ->rawColumns(['actions'])
+        ->make(true);
+    }
+
+    // Store or Update
+    public function storeReason(Request $request)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        RejectReason::updateOrCreate(
+            ['id' => $request->reason_id],
+            ['reason' => $request->reason]
+        );
+        return response()->json(['message' => 'Saved successfully']);
+    }
+
+    // Delete
+    public function destroyReason($id)
+    {
+        RejectReason::findOrFail($id)->delete();
+        return response()->json(['message' => 'Deleted successfully']);
+    }
+    public function Rasonlist()
+    {
+        return RejectReason::select('id', 'reason')->orderBy('id', 'desc')->get();
     }
 
 }

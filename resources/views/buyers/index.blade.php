@@ -945,7 +945,9 @@
         const buylistId = $('#selectedbuylistID').val();
         const itemId = $('#itemIdEdit').val();
         if(Modaltype == 'reject'){
-            var modalMode = 'reject';
+            $('#rejectModal').modal('show');
+            return;
+            // var modalMode = 'reject';
         }else{ 
             var modalMode = $('#modalMode').val();
         }
@@ -1030,6 +1032,7 @@
                     success: function (response) {
                         Swal.fire('Rejected!', 'The item has been rejected.', 'success');
                         $('#rejectModal').modal('hide');
+                        $('#editBuyListLeadModal').modal('hide');
                         const buylistId = $('#selectedbuylistID').val();
                         loadBuylistData(buylistId);
                     },
@@ -1392,5 +1395,28 @@
         }
         return params;
     }
+    function loadRejectionReasons() {
+        $.get('{{ url("rejected-reasons/list") }}', function (data) {
+            let $select = $('#rejectionReason');
+            $select.empty(); // Remove existing options
+
+            // Add dynamic reasons
+            data.forEach(function(reason) {
+                $select.append(`<option value="${reason.reason}">${reason.reason}</option>`);
+            });
+
+            // Add "Custom" option at the end
+            // $select.append('<option value="custom">Custom...</option>');
+
+            // Refresh Select2 if applied
+            if ($select.hasClass('select2')) {
+                $select.trigger('change.select2');
+            }
+        });
+    }
+    // Load when modal opens
+    $('#rejectModal').on('show.bs.modal', function () {
+        loadRejectionReasons();
+    });
 </script>
 @endsection

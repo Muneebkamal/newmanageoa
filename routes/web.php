@@ -133,6 +133,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/save-buylist', [BuyerController::class, 'store'])->name('save-buylist');
     Route::get('/get-buylists', [BuyerController::class, 'getBuylists'])->name('get-buylist');
     Route::get('buylists/{buylistId}/items', [BuyerController::class, 'getItems']);
+    Route::get('buylists/items', [BuyerController::class, 'getItemsAll']);
     Route::get('/aprroved/buylist', [BuyerController::class, 'index2'])->name('buylist.index2');
     Route::post('rename-buylist', [BuyerController::class, 'remnameBuyList']);
     Route::post('delete-buylist', [BuyerController::class, 'deleteBuyList']);
@@ -174,6 +175,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/getProductByAsin/{asin?}', [LeadsController::class, 'getProductByAsin'])->name('getProductByAsin.data');
     Route::post('assign-work-order', [OrderController::class, 'assignedWorkOrder'])->name('assignedWorkOrder');
     Route::get('updateLineItemLeadIds', [BuyerController::class, 'updateLineItemLeadIds'])->name('updateLineItemLeadIds');
+    Route::get('rejected-reasons/data', [SystemManagerController::class, 'reasonData'])->name('rejected-reasons.data');
+    Route::post('add-rejected-reason', [SystemManagerController::class, 'storeReason']);
+    Route::delete('delete-rejected-reason/{id}', [SystemManagerController::class, 'destroyReason']);
+    Route::get('rejected-reasons/list', [SystemManagerController::class, 'Rasonlist']);
+
 
 
 

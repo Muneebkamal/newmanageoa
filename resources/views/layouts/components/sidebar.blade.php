@@ -47,6 +47,11 @@
                         <i class="ri-filter-2-line"></i> <span data-key="t-widgets">Leads</span>
                     </a>
                 </li>
+                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ Request::is('leads-rejected') ? 'active' : '' }}" href="{{ url('leads-rejected') }}">
+                        <i class="ri-filter-2-line"></i> <span data-key="t-widgets">Rejected Leads</span>
+                    </a>
+                </li>
                 @endcan
                 @can('view_oa_manage_lists')
                 <li class="nav-item d-none">

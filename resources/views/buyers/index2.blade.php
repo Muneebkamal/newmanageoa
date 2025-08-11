@@ -63,7 +63,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-3 d-none">
         <div class="leads-btns">
             <input type="hidden" name="is_rejected_yes" id="is_rejected_yes" value="0">
             <button class="btn btn-outline-primary w-100 mb-2" onclick="opendLeadModal()">Add Lead</button>
@@ -76,7 +76,7 @@
         </ul>
     </div>
 
-    <div class="col-md-9">
+    <div class="col-md-12">
         <!-- Table to display buylist data -->
          <!-- Dynamic Buylist Header -->
         
@@ -528,7 +528,7 @@
             // Update the buylist header dynamically
             $('#buylistHeader').html(`
                 <div class="d-flex align-items-center mb-3">
-                    <h5 class="mb-0">${buylistName}</h5>
+                    <h5 class="mb-0">Aprroved Buylist</h5>
                     ${dotsHtml}
                 </div>
             `);
@@ -566,7 +566,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: `/buylists/${buylistId}/items`,
+                url: `{{ url('buylists/items') }}`,
                 type: 'GET',
                 data: {
                     is_rejected: is_rejected, // Replace 'someParameter' with the name of the parameter you want to send
