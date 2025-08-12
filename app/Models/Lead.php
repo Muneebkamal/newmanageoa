@@ -33,7 +33,8 @@ class Lead extends Model
         'quantity',
         'is_disputed',
         'is_rejected',
-        'created_by'
+        'created_by',
+        'reason',
     ];
 
     public function source()

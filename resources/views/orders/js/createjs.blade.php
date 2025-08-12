@@ -885,13 +885,13 @@ document.addEventListener('DOMContentLoaded', function () {
 });
     $('#resetAll').on('click', function() {
        // Trigger beforeunload only if changes exist
-        window.addEventListener('beforeunload', function (e) {
-            if (isFormChanged) {
-                e.preventDefault();
-                e.returnValue = ''; // Required for most browsers
-            }
-        });
-        window.location.reload(true)
+        // window.addEventListener('beforeunload', function (e) {
+        //     if (isFormChanged) {
+        //         e.preventDefault();
+        //         e.returnValue = ''; // Required for most browsers
+        //     }
+        // });
+        // window.location.reload(true)
     });
 
 </script>

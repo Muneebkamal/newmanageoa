@@ -41,9 +41,9 @@ class BuyerController extends Controller
         if (!\Auth::user()->can('view_buy_list')) {
             abort(403);
         }
-        $sku = LineItem::where('is_approved',1)->where('is_rejected',0)->count();
-        $cost = LineItem::where('is_approved',1)->where('is_rejected',0)->sum('buy_cost');
-        $units = LineItem::where('is_approved',1)->where('is_rejected',0)->sum('unit_purchased');
+        $sku = LineItem::where('is_approved',1)->whereNotNull('buylist_id')->where('is_buylist',1)->where('is_rejected',0)->count();
+        $cost = LineItem::where('is_approved',1)->whereNotNull('buylist_id')->where('is_buylist',1)->where('is_rejected',0)->sum('buy_cost');
+        $units = LineItem::where('is_approved',1)->whereNotNull('buylist_id')->where('is_buylist',1)->where('is_rejected',0)->sum('unit_purchased');
         return view('buyers.index2',get_defined_vars());
     }
 
@@ -253,13 +253,13 @@ class BuyerController extends Controller
     public function getItemsAll(Request $request){
         if($request->has('is_approved') && $request->is_approved != 'false'){
             if($request->has('is_rejected') && $request->is_rejected== 1){
-                $items = LineItem::where('is_rejected', 1)->where('is_approved',1)->select([
+                $items = LineItem::where('is_rejected', 1)->whereNotNull('buylist_id')->where('is_buylist',1)->where('is_approved',1)->select([
                     'id', 'is_disputed', 'is_hazmat', 'created_at', 'source_url', 'supplier', 
                     'name', 'order_note', 'asin', 'unit_purchased', 'buy_cost', 'product_buyer_notes','is_rejected','rejection_reason','is_approved'
                 ]);
     
             }else{
-                $items = LineItem::where('is_rejected', 0)->where('is_approved',1)->select([
+                $items = LineItem::where('is_rejected', 0)->whereNotNull('buylist_id')->where('is_buylist',1)->where('is_approved',1)->select([
                     'id', 'is_disputed', 'is_hazmat', 'created_at', 'source_url', 'supplier', 
                     'name', 'order_note', 'asin', 'unit_purchased', 'buy_cost', 'product_buyer_notes','is_rejected','rejection_reason','is_approved'
                 ]);
@@ -267,13 +267,13 @@ class BuyerController extends Controller
 
         }else{
             if($request->has('is_rejected') && $request->is_rejected== 1){
-                $items = LineItem::where('is_rejected', 1)->where('is_approved',0)->select([
+                $items = LineItem::where('is_rejected', 1)->whereNotNull('buylist_id')->where('is_buylist',1)->where('is_approved',0)->select([
                     'id', 'is_disputed', 'is_hazmat', 'created_at', 'source_url', 'supplier', 
                     'name', 'order_note', 'asin', 'unit_purchased', 'buy_cost', 'product_buyer_notes','is_rejected','rejection_reason','is_approved'
                 ]);
     
             }else{
-                $items = LineItem::where('is_rejected', 0)->where('is_approved',0)->select([
+                $items = LineItem::where('is_rejected', 0)->whereNotNull('buylist_id')->where('is_buylist',1)->where('is_approved',0)->select([
                     'id', 'is_disputed', 'is_hazmat', 'created_at', 'source_url', 'supplier', 
                     'name', 'order_note', 'asin', 'unit_purchased', 'buy_cost', 'product_buyer_notes','is_rejected','rejection_reason','is_approved'
                 ]);
@@ -640,12 +640,12 @@ class BuyerController extends Controller
 
             // Update line item with the new order ID, set is_buylist to 1, and nullify buylist_id
             $lineItem->update([
-                'is_buylist' => 0,
-                'buylist_id' => null,
+                // 'is_buylist' => 0,
+                // 'buylist_id' => null,
                 'order_id' => $order->id,
                 'sku_total' => $total_sku,
             ]);
-            return response()->json(['success' => true, 'message' => 'Order created and item moved successfully.','order_id'=>$order->id]);
+            return response()->json(['success' => true, 'message' => 'Order created and item moved successfully.','order_id'=>$order->id,'buylist_id'=>$lineItem->buylist_id]);
         } else {
             return response()->json(['success' => false, 'message' => 'Item not found.']);
         }

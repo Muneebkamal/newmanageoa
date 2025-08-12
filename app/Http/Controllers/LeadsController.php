@@ -1042,6 +1042,7 @@ use Yajra\DataTables\Facades\DataTables;
             }
 
             $lead->is_rejected = 1; // Assuming you have a `status` field
+            $lead->reason = $request->reason; // Assuming you have a `status` field
             $lead->save();
 
             return response()->json([

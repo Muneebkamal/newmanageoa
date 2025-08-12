@@ -61,6 +61,7 @@ table.dataTable {
     @include('modals.tags.select-tag')
     @include('modals.add-bundle-buylist')
     @include('modals.add-bundle-create-order')
+    @include('modals.reject-modal')
 
     <div class="row">
         <div class="col-12">
@@ -1056,7 +1057,51 @@ table.dataTable {
             }
             return params;
         }
+
         function rejectLead(id, source = '') {
+            $('#rejectModal').modal('show');
+            $('#itemID').val(id);
+        }
+        function loadRejectionReasons() {
+            $.get('{{ url("rejected-reasons/list") }}', function (data) {
+                let $select = $('#rejectionReason');
+                $select.empty(); // Remove existing options
+
+                // Add dynamic reasons
+                data.forEach(function(reason) {
+                    $select.append(`<option value="${reason.reason}">${reason.reason}</option>`);
+                });
+
+                // Add "Custom" option at the end
+                // $select.append('<option value="custom">Custom...</option>');
+
+                // Refresh Select2 if applied
+                if ($select.hasClass('select2')) {
+                    $select.trigger('change.select2');
+                }
+            });
+        }
+        // Load when modal opens
+        $('#rejectModal').on('show.bs.modal', function () {
+            loadRejectionReasons();
+        });
+        $('#rejectSubmit').on('click', function () {
+            const id = $('#itemID').val();
+            const reason = $('#rejectionReason').val();
+            const customReason = $('#customReason').val();
+
+            if (!reason && !customReason) {
+                alert('Please select or enter a rejection reason.');
+                return;
+            }
+
+            // If "Custom" is selected, use the custom reason
+            const finalReason = (reason === 'custom') ? customReason : reason;
+
+            // Call the function to submit the rejection
+            rejectLeadSubmit(id, finalReason);
+        });
+        function rejectLeadSubmit(id, finalReason){
             if (!confirm("Are you sure you want to reject this lead?")) {
                 return;
             }
@@ -1066,6 +1111,7 @@ table.dataTable {
                 method: 'POST',
                 data: {
                     id: id,
+                    reason:finalReason,
                     _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
                 },
                 success: function(response) {
@@ -1073,6 +1119,7 @@ table.dataTable {
                         alert(response.message); // You can replace this with a toast
                         // Optionally reload or remove the row
                         $('#leads-table').DataTable().ajax.reload(null, false); // false => keep current pagination
+                        $('#rejectModal').modal('hide');
 
                     } else {
                         alert(response.message || 'Failed to reject lead');

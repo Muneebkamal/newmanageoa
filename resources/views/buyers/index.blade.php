@@ -840,7 +840,7 @@
                 $('#editOrderAsin').val(data.asin).trigger('input');
                 $('#editOrderCost').val(data.buy_cost);
                 $('#editOrderNote').val(data.product_buyer_notes);
-                $('#editListPrice').val(data.list_price);
+                $('#editListPrice').val(data.selling_price);
                 $('#editOrderSellingPrice').val(data.selling_price);
                 // Check if net_profit is null or 0, then calculate it
                 let netProfit = data.net_profit;
@@ -946,6 +946,7 @@
         const itemId = $('#itemIdEdit').val();
         if(Modaltype == 'reject'){
             $('#rejectModal').modal('show');
+            $('#itemID').val(itemId);
             return;
             // var modalMode = 'reject';
         }else{ 
@@ -1004,46 +1005,90 @@
         });
     }
     // Reject Button Functionality
+    // $(document).on('click', '.rejectItem', function () {
+    //     const itemId = $(this).data('id'); // Get the item ID
+    //     $('#rejectModal').modal('show');
+
+    //     $('#rejectSubmit').off('click').on('click', function () {
+    //         const selectedReason = $('#rejectionReason').val(); // Get the selected value from the dropdown
+    //         let reason; // Variable to hold the reason
+
+    //         // Check if the selected reason is "Custom..."
+    //         if (selectedReason === 'custom') {
+    //             // Get the value from the textarea if the custom option is selected
+    //             reason = $('#customReason').val().trim(); // Use .trim() to remove any leading/trailing whitespace
+    //         } else {
+    //             reason = selectedReason; // Use the selected reason directly
+    //         }
+
+    //         // Validate the reason
+    //         if (reason) {
+    //             $.ajax({
+    //                 url: `{{ url('/items/${itemId}/reject') }}`, // Use the item ID in the URL
+    //                 type: 'POST',
+    //                 data: { reason: reason },
+    //                 headers: {
+    //                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    //                 },
+    //                 success: function (response) {
+    //                     Swal.fire('Rejected!', 'The item has been rejected.', 'success');
+    //                     $('#rejectModal').modal('hide');
+    //                     $('#editBuyListLeadModal').modal('hide');
+    //                     const buylistId = $('#selectedbuylistID').val();
+    //                     loadBuylistData(buylistId);
+    //                 },
+    //                 error: function () {
+    //                     Swal.fire('Error', 'There was an error rejecting the item.', 'error');
+    //                 }
+    //             });
+    //         } else {
+    //             Swal.fire('Please enter a reason', '', 'warning');
+    //         }
+    //     });
+    // });
     $(document).on('click', '.rejectItem', function () {
         const itemId = $(this).data('id'); // Get the item ID
+        $('#itemID').val(itemId)
         $('#rejectModal').modal('show');
 
-        $('#rejectSubmit').off('click').on('click', function () {
-            const selectedReason = $('#rejectionReason').val(); // Get the selected value from the dropdown
-            let reason; // Variable to hold the reason
 
-            // Check if the selected reason is "Custom..."
-            if (selectedReason === 'custom') {
-                // Get the value from the textarea if the custom option is selected
-                reason = $('#customReason').val().trim(); // Use .trim() to remove any leading/trailing whitespace
-            } else {
-                reason = selectedReason; // Use the selected reason directly
-            }
+    });
+    $('#rejectSubmit').off('click').on('click', function () {
+        const selectedReason = $('#rejectionReason').val(); // Get the selected value from the dropdown
+        const itemId = $('#itemID').val(); // Get the selected value from the dropdown
+        let reason; // Variable to hold the reason
 
-            // Validate the reason
-            if (reason) {
-                $.ajax({
-                    url: `{{ url('/items/${itemId}/reject') }}`, // Use the item ID in the URL
-                    type: 'POST',
-                    data: { reason: reason },
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    success: function (response) {
-                        Swal.fire('Rejected!', 'The item has been rejected.', 'success');
-                        $('#rejectModal').modal('hide');
-                        $('#editBuyListLeadModal').modal('hide');
-                        const buylistId = $('#selectedbuylistID').val();
-                        loadBuylistData(buylistId);
-                    },
-                    error: function () {
-                        Swal.fire('Error', 'There was an error rejecting the item.', 'error');
-                    }
-                });
-            } else {
-                Swal.fire('Please enter a reason', '', 'warning');
-            }
-        });
+        // Check if the selected reason is "Custom..."
+        if (selectedReason === 'custom') {
+            // Get the value from the textarea if the custom option is selected
+            reason = $('#customReason').val().trim(); // Use .trim() to remove any leading/trailing whitespace
+        } else {
+            reason = selectedReason; // Use the selected reason directly
+        }
+
+        // Validate the reason
+        if (reason) {
+            $.ajax({
+                url: `{{ url('/items/${itemId}/reject') }}`, // Use the item ID in the URL
+                type: 'POST',
+                data: { reason: reason },
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                success: function (response) {
+                    Swal.fire('Rejected!', 'The item has been rejected.', 'success');
+                    $('#rejectModal').modal('hide');
+                    const buylistId = $('#selectedbuylistID').val();
+                    loadBuylistData(buylistId);
+                    $('#editBuyListLeadModal').modal('hide');
+                },
+                error: function () {
+                    Swal.fire('Error', 'There was an error rejecting the item.', 'error');
+                }
+            });
+        } else {
+            Swal.fire('Please enter a reason', '', 'warning');
+        }
     });
     $(document).on('click', '.undoRejectItem', function() {
         var itemId = $(this).data('id');

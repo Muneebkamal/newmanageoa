@@ -621,9 +621,6 @@ table.dataTable {
                                         </div>
                                         <div class="col-md-6">
                                             <div class="d-flex justify-content-end">
-                                                <button class="btn btn-sm btn-outline-danger me-1" onclick="rejectLead(${data.id}, 'card')">
-                                                    Reject Lead
-                                                </button>
                                                 <button class="btn btn-sm btn-outline-info me-1" onclick="copyToClipBoard(${data.id}, 'card')">
                                                     <i class="ri-file-copy-fill me-1"></i> Copy
                                                 </button>

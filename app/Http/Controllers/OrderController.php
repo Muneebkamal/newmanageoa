@@ -548,6 +548,10 @@ class OrderController extends Controller
             $data['sales_tax_rate'] = number_format(0, 2); // Format to 2 decimal places
         }
         $order = Order::where('id',$data['id'])->first();
+        LineItem::where('order_id',$data['id'])->update([
+            'buylist_id' => null,
+            'is_buylist' => 0,
+        ]);
         if($order){
             $data['is_pending'] =  0;
             // dd($data);
