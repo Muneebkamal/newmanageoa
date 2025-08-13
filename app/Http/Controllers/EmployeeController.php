@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -577,7 +578,8 @@ class EmployeeController extends Controller
             $employeeLeads = $leads[$sourceId] ?? collect();
             if ($source && $employeeLeads->isNotEmpty()){
                 $body = "<h2>Leads Uploaded for {$employee->name}</h2>";
-                $body .= "<p><strong>Total Leads Inserted:</strong> " . count($employeeLeads) . "</p>";
+                $body .= "<p><strong>Total Leads Inserted:</strong> " . count($employeeLeads) . " <strong>Date:</strong> " . Carbon::today('America/New_York')->format('Y-m-d') . "</p>";
+                $body .= "<p></p>";
                 $body .= "<table border='1' cellpadding='5' cellspacing='0'>";
                 $body .= "<tr><th>Date</th><th>Name</th><th>ASIN</th><th>Source</th><th>Cost</th><th>Sell Price</th><th>Profit</th><th>ROI</th> </tr>";
                 foreach ($employeeLeads as $lead) {
@@ -607,6 +609,41 @@ class EmployeeController extends Controller
                     </tr>";
                 }
                 $body .= "</table>";
+                // Second Table (Not in buylist & Not rejected)
+                $extraLeads =  Lead::query()
+                ->where('is_rejected', 0)
+                ->where('source_id', $sourceId)
+                ->where('created_at', '>=', now()->subDays(30))
+                ->whereNotIn('asin', function ($query) {
+                    $query->select('asin')
+                        ->from('line_items');
+                })
+                ->orderByDesc('created_at')
+                ->get();
+
+
+                if ($extraLeads->isNotEmpty()) {
+                    $body .= "<br><h3>Leads Not in Buylist & Not Rejected</h3>";
+                    $body .= "<p><strong>Total Leads:</strong> " . count($extraLeads) . " </p>";
+                    $body .= "<table border='1' cellpadding='5' cellspacing='0'>";
+                    $body .= "<tr><th>Date</th><th>Name</th><th>ASIN</th><th>Source</th><th>Cost</th><th>Sell Price</th><th>Profit</th><th>ROI</th></tr>";
+
+                    foreach ($extraLeads as $lead) {
+                        $currentDateEST = (new \DateTime($lead->created_at, new \DateTimeZone('America/New_York')))->format('Y-m-d h:i A');
+                        $body .= "<tr>
+                            <td><a href='" . url('leads-new?asin=' . $lead['asin']) . "' target='_blank'>{$currentDateEST}</a></td>
+                            <td>{$lead->name}</td>
+                            <td><a href='https://www.amazon.com/dp/{$lead->asin}' target='_blank'>{$lead->asin}</a></td>
+                            <td><a href='{$lead->url}' target='_blank'>{$lead->supplier}</a></td>
+                            <td>\${$lead->sell_price}</td>
+                            <td>\${$lead->cost}</td>
+                            <td>\${$lead->net_profit}</td>
+                            <td>{$lead->roi}%</td>
+                        </tr>";
+                    }
+
+                    $body .= "</table>";
+                }
                 $mail = new MailController();
                 $mail->sendEmail(
                     "Lead Upload Summary for {$employee->name}",
@@ -617,6 +654,41 @@ class EmployeeController extends Controller
             }else{
                 $mail = new MailController();
                 $body = "<h2>No Leads Uploaded for {$employee->name}</h2>";
+                // Second Table (Not in buylist & Not rejected)
+                $extraLeads =  Lead::query()
+                ->where('is_rejected', 0)
+                ->where('source_id', $sourceId)
+                ->where('created_at', '>=', now()->subDays(30))
+                ->whereNotIn('asin', function ($query) {
+                    $query->select('asin')
+                        ->from('line_items');
+                })
+                ->orderByDesc('created_at')
+                ->get();
+
+
+                if ($extraLeads->isNotEmpty()) {
+                    $body .= "<br><h3>Leads Not in Buylist & Not Rejected</h3>";
+                    $body .= "<p><strong>Total Leads:</strong> " . count($extraLeads) . " </p>";
+                    $body .= "<table border='1' cellpadding='5' cellspacing='0'>";
+                    $body .= "<tr><th>Date</th><th>Name</th><th>ASIN</th><th>Source</th><th>Cost</th><th>Sell Price</th><th>Profit</th><th>ROI</th></tr>";
+
+                    foreach ($extraLeads as $lead) {
+                        $currentDateEST = (new \DateTime($lead->created_at, new \DateTimeZone('America/New_York')))->format('Y-m-d h:i A');
+                        $body .= "<tr>
+                            <td><a href='" . url('leads-new?asin=' . $lead['asin']) . "' target='_blank'>{$currentDateEST}</a></td>
+                            <td>{$lead->name}</td>
+                            <td><a href='https://www.amazon.com/dp/{$lead->asin}' target='_blank'>{$lead->asin}</a></td>
+                            <td><a href='{$lead->url}' target='_blank'>{$lead->supplier}</a></td>
+                            <td>\${$lead->sell_price}</td>
+                            <td>\${$lead->cost}</td>
+                            <td>\${$lead->net_profit}</td>
+                            <td>{$lead->roi}%</td>
+                        </tr>";
+                    }
+
+                    $body .= "</table>";
+                }
                 $mail->sendEmail(
                     "Lead Upload Summary for {$employee->name}",
                     $body,

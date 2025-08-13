@@ -32,6 +32,11 @@
                             Rejected Reasons
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tags-tab" data-bs-toggle="tab" data-bs-target="#tags" type="button" role="tab" aria-controls="tags" aria-selected="false">
+                            Tags
+                        </button>
+                    </li>
                 </ul>   
 
                 <!-- Tab Content -->
@@ -77,6 +82,31 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Reason</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags Tab -->
+                    <div class="tab-pane fade" id="tags" role="tabpanel" aria-labelledby="tags-tab">
+                        <div class="card">
+                            <div class="card-head">
+                                <button class="btn btn-primary float-end mt-2 mb-2" data-bs-toggle="modal" data-bs-target="#addTagModal">
+                                    Add New Tag
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered" id="tags-table" style="width: 100%">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Tag Name</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -137,12 +167,34 @@
     </div>
 </div>
 
+<!-- Modal for Adding Tag -->
+<div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTagLabel">Add Tag</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTagForm">
+                    <input type="hidden" name="tag_id" id="tag_id">
+                    <div class="mb-3">
+                        <label class="form-label">Tag Name</label>
+                        <input type="text" class="form-control" id="tag-name" name="name" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Tag</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('script')
 <script>
 $(function () {
-    // Cashback Sources Table
+    // Cashback Table
     var cashbackTable = $('#cashback-table').DataTable({
         processing: true,
         serverSide: true,
@@ -150,11 +202,11 @@ $(function () {
         columns: [
             { data: 'id', name: 'id' },
             { data: 'name', name: 'name' },
-            { data: 'actions', name: 'actions' },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ]
     });
 
-    // Rejected Reasons Table
+    // Rejected Table
     var rejectedTable = $('#rejected-table').DataTable({
         processing: true,
         serverSide: true,
@@ -162,7 +214,19 @@ $(function () {
         columns: [
             { data: 'id', name: 'id' },
             { data: 'reason', name: 'reason' },
-            { data: 'actions', name: 'actions' },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ]
+    });
+
+    // Tags Table
+    var tagsTable = $('#tags-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route("tags.data.list") }}',
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'name', name: 'name' },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ]
     });
 
@@ -187,11 +251,27 @@ $(function () {
         }, function () {
             $('#addRejectedReasonModal').modal('hide');
             $('#addRejectedReasonForm')[0].reset();
+            $('#reason_id').val('');
+            $('#rejected-reason-name').val('');
             rejectedTable.draw();
         }).fail(() => alert('Failed to add rejected reason.'));
     });
-
+    $('#addTagForm').on('submit', function (e) {
+        e.preventDefault();
+        $.post('{{ url("add-tag-data") }}', {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            tag_id: $('#tag_id').val(),
+            name: $('#tag-name').val()
+        }, function () {
+            $('#addTagModal').modal('hide');
+            $('#addTagForm')[0].reset();
+            $('#tag_id').val('');
+            $('#tag-name').val('');
+            tagsTable.draw();
+        }).fail(() => alert('Failed to add rejected reason.'));
+    });
 });
+
 
 // Edit Functions
 function editCashback(id, name) {
@@ -203,6 +283,11 @@ function editRejectedReason(id, reason) {
     $('#reason_id').val(id);
     $('#rejected-reason-name').val(reason);
     $('#addRejectedReasonModal').modal('show');
+}
+function editTag(id, name) {
+    $('#tag_id').val(id);
+    $('#tag-name').val(name);
+    $('#addTagModal').modal('show');
 }
 </script>
 @endsection

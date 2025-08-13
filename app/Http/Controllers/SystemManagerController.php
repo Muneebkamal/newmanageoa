@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CashBack;
 use App\Models\Location;
 use App\Models\RejectReason;
+use App\Models\Tag;
 use App\Models\UserEmail;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -247,7 +248,7 @@ class SystemManagerController extends Controller
      // DataTable JSON
     public function reasonData()
     {
-        $reasons = RejectReason::orderBy('id', 'asc');
+        $reasons = RejectReason::query();
 
         return DataTables::of($reasons)
         ->addColumn('actions', function ($row) {
@@ -281,6 +282,47 @@ class SystemManagerController extends Controller
     public function Rasonlist()
     {
         return RejectReason::select('id', 'reason')->orderBy('id', 'desc')->get();
+    }
+    public function addTag(Request $request){
+        if ($request->has('tag_id') && $request->tag_id != null) {
+            // Update existing tag
+            $tag = Tag::find($request->tag_id);
+            if ($tag) {
+            $tag->name = $request->name;
+            $tag->color = "primary";
+            $tag->is_enable = 0;
+            $tag->save();
+            return response()->json([
+                'message' => 'Tag updated successfully!'
+            ]);
+            } else {
+            return response()->json([
+                'message' => 'Tag not found!'
+            ], 404);
+            }
+        } else {
+            // Add new tag
+            $tag = new Tag();
+            $tag->name = $request->name;
+            $tag->color = "primary";
+            $tag->is_enable = 0;
+            $tag->save();
+            return response()->json([
+            'message' => 'Tag added successfully!'
+            ]);
+        }
+    }
+    public function tagsList()
+    {
+        $reasons = Tag::query();
+
+        return DataTables::of($reasons)
+        ->addColumn('actions', function ($row) {
+            return '<button class="btn btn-sm btn-primary" onclick="editTag('.$row->id.', \'' . e($row->name) . '\')">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteTag('.$row->id.')">Delete</button>';
+        })
+        ->rawColumns(['actions'])
+        ->make(true);
     }
 
 }

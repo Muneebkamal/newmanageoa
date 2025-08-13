@@ -179,6 +179,9 @@ Route::middleware('auth')->group(function () {
     Route::post('add-rejected-reason', [SystemManagerController::class, 'storeReason']);
     Route::delete('delete-rejected-reason/{id}', [SystemManagerController::class, 'destroyReason']);
     Route::get('rejected-reasons/list', [SystemManagerController::class, 'Rasonlist']);
+    Route::get('tags-data-list', [SystemManagerController::class, 'tagsList'])->name('tags.data.list');
+    Route::post('add-tag-data', [SystemManagerController::class, 'addTag'])->name('tags.data.add');
+    Route::delete('delete-tag-data/{id}', [SystemManagerController::class, 'destroyTags'])->name('tags.data.delete');
 
 
 
