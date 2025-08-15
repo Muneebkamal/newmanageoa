@@ -134,13 +134,17 @@ class BuyerController extends Controller
             $items->whereBetween('created_at', [$startDate, $endDate]);
         }
         $is_rejected = $request->is_rejected;
-        
+        // Apply default sort only if no dynamic sorting is provided by DataTables
+        if (!$request->has('order') || empty($request->order)) {
+            $items->orderBy('created_at', 'desc');
+        }
+                
             // Get the count of rejected items
         $rejectedCount = LineItem::where('buylist_id', $buylistId)
         ->where('is_rejected', true)
         ->count();
 
-        return DataTables::of($items->orderBy('created_at', 'desc'))
+        return DataTables::of($items)
             ->editColumn('actions', function($order) use ($request) {
                 $undoRejectButton = '<button class="dropdown-item text-success undoRejectItem" data-id="' . $order->id . '">
                     <i class=" ri-arrow-go-back-line text-success"></i> Undo Rejected
@@ -288,8 +292,11 @@ class BuyerController extends Controller
         
             // Get the count of rejected items
         $rejectedCount = LineItem::where('is_rejected', true)->count();
-
-        return DataTables::of($items->orderBy('created_at', 'desc'))
+        if (!$request->has('order') || empty($request->order)) {
+            $items->orderBy('created_at', 'desc');
+        }
+     
+        return DataTables::of($items)
             ->editColumn('actions', function($order) use ($request) {
                 $undoRejectButton = '<button class="dropdown-item text-success undoRejectItem" data-id="' . $order->id . '">
                     <i class=" ri-arrow-go-back-line text-success"></i> Undo Rejected

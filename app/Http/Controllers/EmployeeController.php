@@ -157,6 +157,7 @@ class EmployeeController extends Controller
         $employee->first_name = $request->first_name;
         $employee->last_name = $request->last_name;
         $employee->sync_lead_url = $request->sync_lead_url;
+        $employee->send_email = isset($request->send_email) ? 1 : 0;
 
         // Check if password is provided and update it
         if ($request->filled('password')) {
@@ -573,6 +574,11 @@ class EmployeeController extends Controller
         $leads = Lead::whereBetween('created_at', [$start, $end])->get()->groupBy('source_id');
         foreach ($employees as $employee)
         {
+            $sendMail = 0;
+            $employeeEmail = $employee->email;
+            if($employee->send_email == 1){
+                $sendMail = 1;
+            }
             $source = $employee->source;
             $sourceId = $source?->id;
             $employeeLeads = $leads[$sourceId] ?? collect();
@@ -609,6 +615,16 @@ class EmployeeController extends Controller
                     </tr>";
                 }
                 $body .= "</table>";
+                if($sendMail == 1){
+                    // Send email to admin
+                    $mail = new MailController();
+                    $mail->sendEmail(
+                        "Lead Upload Summary for {$employee->name}",
+                        $body,
+                        $employeeEmail, // Employee's email
+                        $employee->name // Employee's name
+                    );
+                }
                 // Second Table (Not in buylist & Not rejected)
                 $extraLeads =  Lead::query()
                 ->where('is_rejected', 0)
@@ -619,6 +635,7 @@ class EmployeeController extends Controller
                         ->from('line_items');
                 })
                 ->orderByDesc('created_at')
+                ->take(30)
                 ->get();
 
 
@@ -654,6 +671,16 @@ class EmployeeController extends Controller
             }else{
                 $mail = new MailController();
                 $body = "<h2>No Leads Uploaded for {$employee->name}</h2>";
+                if($sendMail == 1){
+                    // Send email to admin
+                    $mail = new MailController();
+                    $mail->sendEmail(
+                        "Lead Upload Summary for {$employee->name}",
+                        $body,
+                        $employeeEmail, // Employee's email
+                        $employee->name // Employee's name
+                    );
+                }
                 // Second Table (Not in buylist & Not rejected)
                 $extraLeads =  Lead::query()
                 ->where('is_rejected', 0)
@@ -661,9 +688,10 @@ class EmployeeController extends Controller
                 ->where('created_at', '>=', now()->subDays(30))
                 ->whereNotIn('asin', function ($query) {
                     $query->select('asin')
-                        ->from('line_items');
+                    ->from('line_items');
                 })
                 ->orderByDesc('created_at')
+                ->take(30)
                 ->get();
 
 

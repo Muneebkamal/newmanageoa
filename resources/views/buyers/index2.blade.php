@@ -591,7 +591,7 @@
                 },
             },
             columns: columns,
-            order: [[2, 'desc']], // Order by created_at by default
+            order: [[3, 'desc']], // Order by created_at by default
             destroy: true,
             autoWidth: false,  // Disable auto width to enable the specified width
             width: '100%',     // Set the table width to 100%

@@ -375,9 +375,9 @@
                     $('#lead-date-update').text(response.data.date);
                     $('#name').val(response.data.name);
                     $('#asin').val(response.data.asin);
-                    $('#cost').val(response.data.cost);
+                    $('#cost').val(parseFloat(response.data.cost).toFixed(2) );
                     $('#category').val(response.data.category);
-                    $('#sell_price').val(response.data.sell_price).trigger('change');
+                    $('#sell_price').val(parseFloat(response.data.sell_price).toFixed(2)).trigger('change');
                     let domain = response.data.url;
                     if (response.data.url) {
                         try {
@@ -518,6 +518,7 @@
                             $('#bundleModal #orderCost').val(data.cost)
                             $('#bundleModal #orderCategory').val(data.category)
                             $('#bundleModal #orderSellingPrice').val(data.sell_price)
+                            $('#bundleModal #listPrice').val(data.sell_price)
                             let domain = data.url;
                             if (data.url) {
                                 try {
@@ -596,10 +597,11 @@
                             $('#buyListLeadModal #msku').attr('readonly',true)
                             $('#buyListLeadModal #orderName').val(data.name)
                             $('#buyListLeadModal #orderAsin').val(data.asin)
-                            $('#buyListLeadModal #orderCost').val(data.cost)
+                            $('#buyListLeadModal #orderCost').val(parseFloat(data.cost).toFixed(2))
                             $('#buyListLeadModal #orderCategory').val(data.category)
-                            $('#buyListLeadModal #orderSellingPrice').val(data.sell_price)
-                            $('#buyListLeadModal #orderNetprofit').val(data.net_profit)
+                            $('#buyListLeadModal #orderSellingPrice').val(parseFloat(data.sell_price).toFixed(2))
+                            $('#buyListLeadModal #listPrice').val(parseFloat(data.sell_price).toFixed(2))
+                            $('#buyListLeadModal #orderNetprofit').val(parseFloat(data.net_profit).toFixed(2))
                             let domain = data.url;
                             if (data.url) {
                                 try {
@@ -608,6 +610,10 @@
                                     console.error('Invalid URL:', data.url);
                                 }
                             }
+                            var qty = (data.quantity == null || data.quantity == 0) ? 1 : data.quantity;
+                            $('#buyListLeadModal #orderQuantity').val(qty)
+                            $('#buyListLeadModal #quantity').val(qty)
+                            updateOrderCalculations()
                             $('#buyListLeadModal #orderSupplier').val(domain)
                             $('#buyListLeadModal #orderPromo').val(data.promo)
                             $('#buyListLeadModal #orderSourceUrl').val(data.url)
@@ -627,9 +633,10 @@
                             $('#addBundleBuyList #msku').attr('readonly',true)
                             $('#addBundleBuyList #editNameCreateOrderItem').val(data.name)
                             $('#addBundleBuyList #editAsinCreateOrderItem').val(data.asin)
-                            $('#addBundleBuyList #editCostCreateOrderItem').val(data.cost)
+                            $('#addBundleBuyList #editCostCreateOrderItem').val(parseFloat(data.cost).toFixed(2))
                             $('#addBundleBuyList #editCategoryCreateOrderItem').val(data.category)
-                            $('#addBundleBuyList #editSellingPriceCreateOrderItem').val(data.sell_price)
+                            $('#addBundleBuyList #editSellingPriceCreateOrderItem').val(parseFloat(data.sell_price).toFixed(2))
+                            $('#addBundleBuyList #editSellingPriceCreateOrderItem').val(parseFloat(data.sell_price).toFixed(2))
                             $('#addBundleBuyList #editSupplierCreateOrderItem').val(data.supplier)
                             $('#addBundleBuyList #orderPromo').val(data.promo)
                             $('#addBundleBuyList #orderSourceUrl').val(data.url)
@@ -668,6 +675,8 @@
                                     $('#bundleSection').html('<p>No bundles available.</p>');
                                 }
                             }
+                            $('#buyListLeadModal #orderQuantity').val(qty)
+                            $('#buyListLeadModal #quantity').val(qty)
                             $('#addBundleBuyList').modal('show');
                         }
                         
@@ -883,8 +892,12 @@
             
             if (!isNaN(currentValue)) {
                 input.val(currentValue + 1); // Increment the value
+                $('#orderQuantity').val(currentValue + 1).trigger('change'); // Update the order quantity input
+                updateOrderCalculations();
             } else {
                 input.val(1); // Set to 1 if input is not a number
+                $('#orderQuantity').val(1).trigger('change');
+                updateOrderCalculations();
             }
         });
         // Handle the minus button click
@@ -895,8 +908,12 @@
 
             if (!isNaN(currentValue) && currentValue > 1) {
                 input.val(currentValue - 1); // Decrement the value
+                $('#orderQuantity').val(currentValue - 1).trigger('change'); // Update the order quantity input
+                updateOrderCalculations();
             } else {
                 input.val(1); // Ensure value does not go below 1
+                $('#orderQuantity').val(1).trigger('change')
+                updateOrderCalculations();
             }
         });
         // Optional: Restrict direct input to only positive numbers
@@ -1324,7 +1341,7 @@
                             <tr>
                                 <td><strong>Per Pcs</strong></td>
                                 <td><strong></strong></td>
-                                <td><span class="perpcs_selling_price">$${sellPrice}</span></td>
+                                <td><span class="perpcs_selling_price">$${sellPrice.toFixed(2)}</span></td>
                                 <td><span class="perpcs_cost_price">$${cost.toFixed(2)}</span></td>
                                 <td><span class="perpcs_gross_profit">$${itemProfitPerPiece.toFixed(2)}</span></td>
                             </tr>

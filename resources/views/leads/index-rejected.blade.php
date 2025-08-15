@@ -663,35 +663,35 @@ table.dataTable {
                                         </div>
                                         <div class="col text-center">
                                             <small>Quantity</small><br>
-                                            <span class="fw-bold text-info">${data.quantity || '0'}</span>
+                                            <span class="fw-bold text-success">${data.quantity || '0'}</span>
                                         </div>
                                         <div class="col text-center">
                                             <small>ROI</small><br>
-                                            <span class="fw-bold text-info">${data.roi || 'N/A'}%</span>
+                                            <span class="fw-bold text-success">${data.roi || 'N/A'}%</span>
                                         </div>
                                         <div class="col text-center">
                                             <small>90 Day Average</small><br>
-                                            <span class="fw-bold text-info">${data.bsr || 'N/A'}</span>
+                                            <span class="fw-bold text-success">${data.bsr || 'N/A'}</span>
                                         </div>
                                         <div class="col text-center">
                                             <small>Category</small><br>
-                                            <span class="fw-bold text-info">${data.category || 'N/A'}</span>
+                                            <span class="fw-bold text-success">${data.category || 'N/A'}</span>
                                         </div>
                                         <div class="col text-center">
                                             <small>Supplier</small><br>
                                             <span class="fw-bold text-info">
-                                                <a target="_blank" href="${data.url}" class="mt-3">
-                                                ${data.supplier || 'N/A'} </a> </span>
+                                                <a target="_blank" href="${data.url}" class="mt-3 fw-bold text-primary" style="color: #0d6efd !important;  padding: 2px 8px; border-radius: 4px; text-decoration: underline;">
+                                                    ${data.supplier || 'N/A'}
+                                                </a>
+                                            </span>
                                         </div>
-                                        <div class="col text-center">
-                                            <a href="javascript:void(0);" onclick="redirectLinks('${data.url}', '${data.asin}')" class="mt-3">
-                                                <i class="ri-external-link-line text-primary fs-4"></i>
-                                            </a>
-                                        </div>
+
                                         <div class="col text-center">
                                             <small>Asin</small><br>
                                             <span class="fw-bold text-info">
-                                                <a target="_blank" href="https://www.amazon.com/dp/${data.asin}"> ${data.asin || 'N/A'}</a>
+                                                <a target="_blank" href="https://www.amazon.com/dp/${data.asin}" class="fw-bold text-primary" style="color: #0d6efd !important; text-decoration: underline;">
+                                                    ${data.asin || 'N/A'}
+                                                </a>
                                             </span>
                                         </div>
                                     </div>

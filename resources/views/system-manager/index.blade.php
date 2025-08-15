@@ -37,6 +37,16 @@
                             Tags
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="emails-tab" data-bs-toggle="tab" data-bs-target="#emails" type="button" role="tab" aria-controls="emails" aria-selected="false">
+                            Emails
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="locations-tab" data-bs-toggle="tab" data-bs-target="#locations" type="button" role="tab" aria-controls="locations" aria-selected="false">
+                            Locations
+                        </button>
+                    </li>
                 </ul>   
 
                 <!-- Tab Content -->
@@ -116,13 +126,168 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Emails Tab -->
+                    <div class="tab-pane fade" id="emails" role="tabpanel" aria-labelledby="emails-tab">
+                        <div class="card">
+                            <div class="card-head">
+                                <button class="btn btn-primary float-end mt-2 mb-2" data-bs-toggle="modal" data-bs-target="#emailModal" id="addNewEmail">
+                                    Add New Email
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="emailTable" class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Email</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Locations Tab -->
+                     <div class="tab-pane fade" id="locations" role="tabpanel" aria-labelledby="locations-tab">
+                        <div class="card">
+                            <div class="card-head">
+                                <button class="btn btn-primary float-end mt-2 mb-2" id="addNewLocation">
+                                    Add New Location
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="locationTable" class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Location</th>
+                                                <th>Type</th>
+                                                <th>Street Address</th>
+                                                <th>Street Address Line 2</th>
+                                                <th>City</th>
+                                                <th>State</th>
+                                                <th>Zip Code</th>
+                                                <th>Country</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div> <!-- End Tab Content -->
             </div>
         </div>
     </div>
 </div>
+<!--Locations Modal -->
+<div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="locationForm">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="locationModalLabel">Add Location</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="locationId" name="id">
 
+                    <!-- Location -->
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" id="location" name="location" class="form-control" required>
+                    </div>
+
+                    <!-- Type -->
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <select id="type" name="type" class="form-control" required>
+                            <option value="prep">Prep</option>
+                            <option value="inhouse">In House</option>
+                        </select>
+                    </div>
+
+                    <!-- Address Fields (Two Columns) -->
+                    <div class="row">
+                        <!-- Street Address -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="street_address" class="form-label">Street Address</label>
+                            <input type="text" id="street_address" name="street_address" class="form-control" required>
+                        </div>
+
+                        <!-- Apartment -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="apartment" class="form-label">Street Address Line 2</label>
+                            <input type="text" id="apartment" name="apartment" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- City -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" id="city" name="city" class="form-control" required>
+                        </div>
+
+                        <!-- State -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" id="state" name="state" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Country -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" id="country" name="country" value="USA" class="form-control" required>
+                        </div>
+
+                        <!-- Zip Code -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="zip" class="form-label">Zip Code</label>
+                            <input type="text" id="zip" name="zip" class="form-control" required>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Email Modal -->
+<div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="emailForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Add New Email</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="emailId" name="id">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" required placeholder="Enter email address">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveEmail">Save Email</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <!-- Modal for Adding Cashback Source -->
 <div class="modal fade" id="addCashbackSourceModal" tabindex="-1" aria-labelledby="addCashbackSourceLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -273,21 +438,241 @@ $(function () {
 });
 
 
-// Edit Functions
-function editCashback(id, name) {
-    $('#cash_back_id').val(id);
-    $('#cashback-source-name').val(name);
-    $('#addCashbackSourceModal').modal('show');
-}
-function editRejectedReason(id, reason) {
-    $('#reason_id').val(id);
-    $('#rejected-reason-name').val(reason);
-    $('#addRejectedReasonModal').modal('show');
-}
-function editTag(id, name) {
-    $('#tag_id').val(id);
-    $('#tag-name').val(name);
-    $('#addTagModal').modal('show');
-}
+    // Edit Functions
+    function editCashback(id, name) {
+        $('#cash_back_id').val(id);
+        $('#cashback-source-name').val(name);
+        $('#addCashbackSourceModal').modal('show');
+    }
+    function editRejectedReason(id, reason) {
+        $('#reason_id').val(id);
+        $('#rejected-reason-name').val(reason);
+        $('#addRejectedReasonModal').modal('show');
+    }
+    function editTag(id, name) {
+        $('#tag_id').val(id);
+        $('#tag-name').val(name);
+        $('#addTagModal').modal('show');
+    }
+    const emailTable = $('#emailTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route('emails.index') }}',
+        columns: [
+            { data: 'email', name: 'email' },
+            { data: 'action', name: 'action', orderable: false, searchable: false }
+        ],
+        columnDefs: [
+            { width: '70%', targets: 0 }, // Adjust the email column width
+            { width: '30%', targets: 1 }  // Adjust the action column width
+        ],
+        autoWidth: false // Disable auto width to allow manual settings
+    });
+    // Reset modal for adding new email
+    $('#addNewEmail').on('click', function() {
+        $('#emailModalLabel').text('Add New Email');
+        $('#emailForm')[0].reset();
+        $('#emailId').val('');
+    });
+    // Handle Add/Edit Email Form Submission
+    $('#emailForm').on('submit', function(e) {
+        e.preventDefault();
+
+        const formData = $(this).serialize();
+        const url = $('#emailId').val() ? '{{ route('emails.update', ':id') }}'.replace(':id', $('#emailId').val()) : '{{ route('emails.store') }}';
+
+        $.ajax({
+            url: url,
+            method: $('#emailId').val() ? 'PUT' : 'POST',
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#emailModal').modal('hide');
+                    emailTable.ajax.reload();
+                    toastr.success(response.message || 'Email saved successfully!');
+                } else {
+                    toastr.error(response.message || 'An error occurred.');
+                }
+            },
+            error: function() {
+                toastr.error('An error occurred. Please try again.');
+            }
+        });
+    });
+    // Edit Email
+    $('#emailTable').on('click', '.edit-email', function() {
+        const id = $(this).data('id');
+        const email = $(this).data('email');
+
+        $('#emailModalLabel').text('Edit Email');
+        $('#emailId').val(id);
+        $('#email').val(email);
+        $('#emailModal').modal('show');
+    });
+    // Delete Email
+    $('#emailTable').on('click', '.delete-email', function() {
+        const id = $(this).data('id');
+        
+        Swal.fire({
+        title: 'Are you sure?',
+        text: 'This action cannot be undone!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route('emails.destroy', ':id') }}'.replace(':id', id),
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            emailTable.ajax.reload();
+                            Swal.fire(
+                                'Deleted!',
+                                response.message || 'The email has been deleted.',
+                                'success'
+                            );
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                response.message || 'An error occurred while deleting the email.',
+                                'error'
+                            );
+                        }
+                    },
+                    error: function() {
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred. Please try again.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
+    //locatosn js 
+    const locationTable = $('#locationTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route('locations.list') }}',
+        columns: [
+            { data: 'location', name: 'location' },
+            { data: 'type', name: 'type' },
+            { data: 'street_address', name: 'street_address' },
+            { data: 'apartment', name: 'apartment' },
+            { data: 'city', name: 'city' },
+            { data: 'state', name: 'state' },
+            { data: 'country', name: 'country' },
+            { data: 'zip', name: 'zip' },
+            { data: 'action', name: 'action', orderable: false, searchable: false }
+        ],
+        columnDefs: [
+            { width: '10%', targets: 0 }, // Adjust the email column width
+            { width: '10%', targets: 1 },  // Adjust the action column width
+            { width: '20%', targets: 1 }  // Adjust the action column width
+        ],
+        autoWidth: false // Disable auto width to allow manual settings
+    });
+
+    // Add Location
+    $('#addNewLocation').click(function() {
+        $('#locationModalLabel').text('Add Location');
+        $('#locationForm')[0].reset();
+        $('#locationId').val('');
+        $('#locationModal').modal('show');
+    });
+
+    // Submit Location Form
+    $('#locationForm').on('submit', function(e) {
+        e.preventDefault();
+        const formData = $(this).serialize();
+        const url = $('#locationId').val() ? '{{ route('locations.update', ':id') }}'.replace(':id', $('#locationId').val()) : '{{ route('locations.store') }}';
+
+        $.ajax({
+            url: url,
+            method: $('#locationId').val() ? 'PUT' : 'POST',
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            success: function(response) {
+                $('#locationModal').modal('hide');
+                locationTable.ajax.reload();
+                toastr.success(response.message);
+            },
+            error: function() {
+                toastr.error('An error occurred.');
+            }
+        });
+    });
+
+    // Edit Location
+    $('#locationTable').on('click', '.edit-location', function() {
+        const id = $(this).data('id');
+        const location = $(this).data('location');
+        const type = $(this).data('type');
+        const streetAddress = $(this).data('street_address');
+        const apartment = $(this).data('apartment');
+        const city = $(this).data('city');
+        const state = $(this).data('state');
+        const country = $(this).data('country');
+        const zip = $(this).data('zip');
+
+        // Set the modal title to 'Edit Location'
+        $('#locationModalLabel').text('Edit Location');
+
+        // Populate the modal fields with the data
+        $('#locationId').val(id);
+        $('#location').val(location);
+        $('#type').val(type);
+        $('#street_address').val(streetAddress);
+        $('#apartment').val(apartment);
+        $('#city').val(city);
+        $('#state').val(state);
+        $('#country').val(country);
+        $('#zip').val(zip);
+
+        // Show the modal
+        $('#locationModal').modal('show');
+
+    });
+
+    // Delete Location
+    $('#locationTable').on('click', '.delete-location', function() {
+        const id = $(this).data('id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route('locations.destroy', ':id') }}'.replace(':id', id),
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    success: function(response) {
+                        locationTable.ajax.reload();
+                        Swal.fire('Deleted!', response.message, 'success');
+                    },
+                    error: function() {
+                        Swal.fire('Error!', 'An error occurred.', 'error');
+                    }
+                });
+            }
+        });
+    });
 </script>
 @endsection

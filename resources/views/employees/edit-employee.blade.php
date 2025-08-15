@@ -109,7 +109,16 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="department_id" class="d-flex  justify-content-between"> <span>Sync Leads Url</span>
+                                    <label for="department_id" class="d-flex  justify-content-between"> 
+                                        <span class="d-flex justify-content-between">
+                                        <span class="me-2">Sync Leads Url</span>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="send_email" name="send_email" value="1" {{ $employee->send_email == 1 ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="send_email">
+                                                Send email to employee
+                                            </label>
+                                        </div>
+                                    </span>
                                         <span> <button id="fetchLeadsBtn" type="button" class="btn btn-sm btn-primary"><i class="ri-refresh-fill"></i> Refresh Leads</button> </span>
 
                                     </label>

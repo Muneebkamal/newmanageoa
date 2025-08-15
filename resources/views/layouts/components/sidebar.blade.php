@@ -101,14 +101,14 @@
                 </li>
                 @endcan
                 @can('view_locations')
-                <li class="nav-item">
+                <li class="nav-item d-none">
                     <a class="nav-link menu-link {{ Request::is('locations') ? 'active' : '' }}" href="{{ route('locations.index') }}">
                         <i class="bx bx-current-location"></i> <span data-key="t-widgets">Locations</span>
                     </a>
                 </li>
                 @endcan
                 @can('view_users_email')
-                <li class="nav-item">
+                <li class="nav-item d-none">
                     <a class="nav-link menu-link {{ Request::is('emails') ? 'active' : '' }}" href="{{ route('emails.index') }}">
                         <i class="mdi mdi-email-multiple-outline"></i> <span data-key="t-widgets">Users Email</span>
                     </a>

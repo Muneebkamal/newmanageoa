@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('department_id')->nullable();
              $table->longText('sync_lead_url')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('send_email')->default(0);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

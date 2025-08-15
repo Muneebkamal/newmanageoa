@@ -27,7 +27,8 @@ class User extends Authenticatable
         'department_id',
         'status',
         'role_id',
-        'sync_lead_url'
+        'sync_lead_url',
+        'send_email'
     ];
 
     /**
