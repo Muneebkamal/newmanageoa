@@ -641,7 +641,7 @@ class EmployeeController extends Controller
 
                 if ($extraLeads->isNotEmpty()) {
                     $body .= "<br><h3>Leads Not in Buylist & Not Rejected</h3>";
-                    $body .= "<p><strong>Total Leads:</strong> " . count($extraLeads) . " </p>";
+                    $body .= "<p><strong>Last " . count($extraLeads) . " Leads</strong>  </p>";
                     $body .= "<table border='1' cellpadding='5' cellspacing='0'>";
                     $body .= "<tr><th>Date</th><th>Name</th><th>ASIN</th><th>Source</th><th>Cost</th><th>Sell Price</th><th>Profit</th><th>ROI</th></tr>";
 
@@ -697,7 +697,7 @@ class EmployeeController extends Controller
 
                 if ($extraLeads->isNotEmpty()) {
                     $body .= "<br><h3>Leads Not in Buylist & Not Rejected</h3>";
-                    $body .= "<p><strong>Total Leads:</strong> " . count($extraLeads) . " </p>";
+                    $body .= "<p><strong>Last " . count($extraLeads) . " Leads</strong>  </p>";
                     $body .= "<table border='1' cellpadding='5' cellspacing='0'>";
                     $body .= "<tr><th>Date</th><th>Name</th><th>ASIN</th><th>Source</th><th>Cost</th><th>Sell Price</th><th>Profit</th><th>ROI</th></tr>";
 
