@@ -166,6 +166,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/sync-lead-cron', 'App\Http\Controllers\EmployeeController@syncEmployeeLeadsCron');
     Route::get('/sync-lead-cron-email', 'App\Http\Controllers\EmployeeController@sendDailyEmailCron');
     Route::get('//get-employee-leads/{id?}', 'App\Http\Controllers\EmployeeController@getEmployeeLeadsNew');
+    Route::get('/reports/daily/{employee}/{date}', 'App\Http\Controllers\EmployeeController@dailyReport')->name('reports.daily');
     Route::get('settings', [SystemManagerController::class, 'settingsIndex'])->name('settings.index');
     Route::post('add-cashback-source', [SystemManagerController::class, 'storeCashBack'])->name('settings.storeCashBack');
     Route::get('/cashbacks-data', [SystemManagerController::class, 'getCashbacks'])->name('cashbacks.data');

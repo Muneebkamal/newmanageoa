@@ -507,7 +507,8 @@
             },
             success:function(data){
                 if(data){
-                    msku = getMsku(data.asin);
+                    msku = '';
+                    // getMsku(data.asin);
                     // console.log(msku);
                     if(is_buylist == 0){
                         if(data.bundle == 0){

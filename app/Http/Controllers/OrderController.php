@@ -565,8 +565,9 @@ class OrderController extends Controller
         $order = new Order;
         if($order){
             $order->note = $request->orderNote;
+            $order->is_pending = 1;
             $order->date = now();
-            $order->status = 'ordered';
+            $order->status = 'draft';
             $order->total = $request->cost * $request->unit_purchased;
             $order->total_units_purchased  = $request->unit_purchased;
             $order->source  = $request->source_url;
@@ -580,7 +581,7 @@ class OrderController extends Controller
             $orderItems->max = $request->max ?? 0;
             $orderItems->list_price = $request->list_price ?? 0;
             $orderItems->buy_cost = $request->buy_cost ?? 0;
-            $orderItems->sku_total = $request->buy_cost ??0 * $request->unit_purchased ?? 1;
+            $orderItems->sku_total = ($request->buy_cost ?? 0) * ($request->unit_purchased ?? 1);
             $orderItems->unit_purchased = $request->unit_purchased ?? 1;
             $orderItems->product_buyer_notes = $request->orderNote;
             $orderItems->is_disputed = $request->isDisputed;

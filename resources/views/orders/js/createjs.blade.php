@@ -166,7 +166,7 @@
         var calcType = $('#buy_cost_type').val();
         var units = parseFloat(parentRow.find('.unit-input').val()) || 0;
         var buyCost = parseFloat(parentRow.find('.cost-input').val()) || 0;
-        var skuTotal = parseFloat(parentRow.find('.total-cost-input').val()) || 0;
+        var skuTotal = parseFloat(buyCost*units).toFixed(2) || 0;
         var itemId = $input.data('id');  // Assuming each row has a unique identifier for the line item
 
 
@@ -181,8 +181,7 @@
                 parentRow.find('.cost-input').val(buyCost);
             }
 
-            // Update calculated-cost cell only with the per-unit buyCost
-            parentRow.find('.calculated-cost').text(`$${parseFloat(buyCost).toFixed(2)}`);
+            parentRow.find('.calculated-cost').text(`$${parseFloat(buyCost*units).toFixed(2)}`);
             // AJAX call to update the values in the database
             $.ajax({
                 url: "{{ url('update-order-item') }}",  // Update this with the correct endpoint URL
@@ -204,6 +203,7 @@
                 }
             });
         }
+        calculateTotals();
     });
     var grandTotal = 0;
     var totalSalesTaxTotal = 0;
@@ -224,7 +224,6 @@
             var itemTotal = units * buyCost;
             lineItemsTotal += itemTotal;
             totalQty +=units;
-            // $(this).find('.calculated-cost').text(`$${itemTotal.toFixed(2)}`);
         });
         subtotal = (lineItemsTotal)  - preTaxDiscount ;
         var totalSalesTax = (salesTaxRate / subtotal) * 100;
@@ -268,7 +267,7 @@
                     console.error(`Error saving item ${itemId}:`, error);
                 },
             });
-            $(this).find('.calculated-cost').text(`$${(buyCost).toFixed(2)}`);
+            $(this).find('.calculated-cost').text(`$${(itemTotal).toFixed(2)}`);
         });
         if(isSalesTaxOnShipping == 1){
             totalSalesTax = (salesTaxRate / (subtotal+shippingCost)) * 100;
@@ -341,11 +340,13 @@
         let calcType = $('#buy_cost_type').val();
 
         items.forEach(function(item) {
+            console.log(calcType);
             let calculatedCost = calcType === 'sku'
-                ? (item.sku_total / item.unit_purchased).toFixed(2)
+                ? (item.buy_cost * item.unit_purchased).toFixed(2)
                 : (item.buy_cost).toFixed(2);
                 var bundleItem = '';
-                console.log(item.bundles);
+                // console.log(item.buy_cost);
+                // console.log(calculatedCost);
                 if(item.bundles != null){
                     $.each(item.bundles  ,function(index,val){
                         bundleItem +='<i class="ri-handbag-fill mx-1" title="Bundle" style="font-size:17px;"></i><br>'

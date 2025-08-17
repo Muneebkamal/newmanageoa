@@ -402,7 +402,7 @@
                                     </div>
                                 </div>
                                 <button type="button" class="btn btn-success mt-2 btn-sm" data-product-id="${product.id}" onclick="popWorkOrders(${product.id})">
-                                    Send To Prep Work Order
+                                   Work Order info
                                 </button>
                                 </div>
                             </td>
@@ -1170,6 +1170,10 @@
         // Check if order_id is null
         if (!formData['order_id']) { 
             toastr.error('Order ID is required'); // Display error toaster message
+            return false; // Prevent further submission
+        }
+        if (!formData['buyer_id']) {
+            toastr.error('Buyer is required'); // Display error toaster message
             return false; // Prevent further submission
         }
         formData['id'] = orderId;
@@ -2618,7 +2622,7 @@ async function popWorkOrders(id) {
             data.forEach(value => {
                 const employeeName = value.employee ? ` | ${value.employee.name}` : 'Unassigned';
                 $('#workOrderSelect').append(
-                    `<option value="${value.custom_id}">${value.custom_id}${employeeName}</option>`
+                    `<option value="${value.custom_id}">${value.custom_id}-- ${value.name}</option>`
                 );
             });
         } else {

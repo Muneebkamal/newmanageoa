@@ -14,7 +14,10 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->call('App\Http\Controllers\EmployeeController@syncEmployeeLeadsCron')->everySixHours();
-        $schedule->call('App\Http\Controllers\EmployeeController@sendDailyEmailCron')->everySixHours();
+        $schedule->call('App\Http\Controllers\EmployeeController@sendDailyEmailCron')
+        ->cron('0 8 * * *')
+        ->timezone('America/New_York'); // EST/EDT timezone
+
     }
 
     /**
