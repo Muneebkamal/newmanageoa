@@ -1102,9 +1102,9 @@ table.dataTable {
             rejectLeadSubmit(id, finalReason);
         });
         function rejectLeadSubmit(id, finalReason){
-            if (!confirm("Are you sure you want to reject this lead?")) {
-                return;
-            }
+            // if (!confirm("Are you sure you want to reject this lead?")) {
+            //     return;
+            // }
 
             $.ajax({
                 url: `{{ url('/leads/reject') }}`,  // Your Laravel route
@@ -1116,13 +1116,15 @@ table.dataTable {
                 },
                 success: function(response) {
                     if (response.status) {
-                        alert(response.message); // You can replace this with a toast
+                        toastr.success(response.message);
+                        // alert(response.message); // You can replace this with a toast
                         // Optionally reload or remove the row
                         $('#leads-table').DataTable().ajax.reload(null, false); // false => keep current pagination
                         $('#rejectModal').modal('hide');
 
                     } else {
-                        alert(response.message || 'Failed to reject lead');
+                        toastr.error(response.message);
+                        // alert(response.message || 'Failed to reject lead');
                     }
                 },
                 error: function(xhr) {
