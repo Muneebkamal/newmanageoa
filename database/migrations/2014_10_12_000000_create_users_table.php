@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('role_id')->nullable();
             $table->string('name')->unique();
             $table->string('email')->unique();
+            $table->string('lead_email')->unique();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->boolean('status')->default(false);

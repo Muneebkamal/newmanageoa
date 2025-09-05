@@ -24,59 +24,67 @@ class ReportsController extends Controller
     }
     public function filterReport(Request $request){
        
-$startDate = Carbon::parse($request->input('start_date'))->startOfDay();
-$endDate = Carbon::parse($request->input('end_date'))->endOfDay();
-$employeeIds = explode(',', $request->input('employee_id'));
+        $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
+        $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
+        $employeeIds = explode(',', $request->input('employee_id'));
 
-$period = CarbonPeriod::create($startDate, $endDate);
-$data = [];
+        $period = CarbonPeriod::create($startDate, $endDate);
+        $data = [];
 
-// Get employee names
-$employees = User::whereIn('id', $employeeIds)->get()->keyBy('id');
+        // Get employee names
+        $employees = User::whereIn('id', $employeeIds)->with('source')->get()->keyBy('id');
 
-foreach ($employeeIds as $empId) {
-    $employeeName = $employees[$empId]->name ?? 'Unknown';
+        foreach ($employeeIds as $empId) {
+            $employee = $employees[$empId] ?? null;
+            $employeeName = $employee->name ?? 'Unknown';
+            $sourceId     = $employee->source->id ?? null; // get source_id from relation
 
-    $employeeData = [
-        'employee_id' => $empId,
-        'employee_name' => $employeeName,
-        'data' => []
-    ];
-
-    foreach ($period as $date) {
-        $startOfDay = $date->copy()->startOfDay();
-        $endOfDay = $date->copy()->endOfDay();
-
-        // Leads
-        $leadsCount = Lead::where('created_by', $empId)
-            ->whereBetween('created_at', [$startOfDay, $endOfDay])
-            ->count();
-
-        // Buylists
-        $buylistIds = Buylist::where(function ($query) use ($empId) {
-        $query->orWhere('creatd_by', $empId);
-        })->pluck('id');
-
-        $buylistUnits = LineItem::whereIn('buylist_id', $buylistIds)
-        ->whereBetween('created_at', [$startOfDay, $endOfDay])
-        ->count();
-        // Only add if either has value
-        if ($leadsCount > 0 || $buylistUnits > 0) {
-            $employeeData['data'][] = [
-                'date' => $date->format('Y-m-d'),
-                'leads' => $leadsCount,
-                'buylist' => $buylistUnits
+            $employeeData = [
+                'employee_id' => $empId,
+                'employee_name' => $employeeName,
+                'data' => []
             ];
+
+            foreach ($period as $date) {
+                $startOfDay = $date->copy()->startOfDay();
+                $endOfDay = $date->copy()->endOfDay();
+
+                // Leads
+                $leadsQuery = Lead::whereBetween('created_at', [$startOfDay, $endOfDay])
+                ->where(function($q) use ($empId, $sourceId) {
+                    $q->where('created_by', $empId);
+                    // add the OR only when source exists
+                    if ($sourceId) {
+                        $q->orWhere('source_id', $sourceId);
+                    }
+                });
+                $leadsCount = $leadsQuery->count();
+
+                // Buylists
+                $buylistIds = Buylist::where(function ($query) use ($empId) {
+                $query->orWhere('creatd_by', $empId);
+                })->pluck('id');
+
+                $buylistUnits = LineItem::whereIn('buylist_id', $buylistIds)
+                ->whereBetween('created_at', [$startOfDay, $endOfDay])
+                ->count();
+                // Only add if either has value
+                if ($leadsCount > 0 || $buylistUnits > 0) {
+                    $employeeData['data'][] = [
+                        'date' => $date->format('Y-m-d'),
+                        'leads' => $leadsCount,
+                        'buylist' => $buylistUnits
+                    ];
+                }
+            }
+
+            // Only add if there’s at least one entry
+            if (!empty($employeeData['data'])) {
+                $data[] = $employeeData;
+            }
         }
-    }
 
-    // Only add if there’s at least one entry
-    if (!empty($employeeData['data'])) {
-        $data[] = $employeeData;
-    }
-}
-
-return response()->json($data);
+        return response()->json($data);
 
         $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
         $endDate = Carbon::parse($request->input('end_date'))->endOfDay();

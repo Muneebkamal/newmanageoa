@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Buylist;
 use App\Models\Lead;
 use App\Models\Source;
 use App\Models\User;
@@ -16,6 +17,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Carbon\CarbonPeriod;
 
 class EmployeeController extends Controller
 {
@@ -158,6 +160,7 @@ class EmployeeController extends Controller
         $employee->last_name = $request->last_name;
         $employee->sync_lead_url = $request->sync_lead_url;
         $employee->send_email = isset($request->send_email) ? 1 : 0;
+        $employee->lead_email = $request->lead_email;
 
         // Check if password is provided and update it
         if ($request->filled('password')) {
@@ -379,7 +382,7 @@ class EmployeeController extends Controller
         foreach ($employees as $employee)
         {
             $sendMail = 0;
-            $employeeEmail = $employee->email;
+            $employeeEmail = $employee->lead_email? $employee->lead_email : $employee->email;
             if($employee->send_email == 1){
                 $sendMail = 1;
             }
@@ -429,26 +432,82 @@ class EmployeeController extends Controller
                 $body .= "<p>No leads uploaded in this period.</p>";
             }
             // 🔗 Append "View Report" link below the table/summary
-            $body .= "<p>Click the Link to view the report: <a href='{$link}' target='_blank'> View Full Report</a></p>";
+            $body2 = $body;
+            if($sendMail == 0){
+                $body .= "<p>Click the Link to view the report: <a href='{$link}' target='_blank'> View Full Report</a></p>";
+            }else{
+                $source = $employee->source;
+                $sourceId = $source?->id;
 
-            $mail = new MailController();
-            if($sendMail == 1){
+                $startOfMonth = Carbon::now()->startOfMonth();
+                $endOfMonth   = Carbon::now()->endOfMonth();
+
+                // Get all leads for this source in the month
+                $monthlyLeads = Lead::where('source_id', $sourceId)
+                    ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                    ->get()
+                    ->groupBy(function ($lead) {
+                        return Carbon::parse($lead->created_at)->format('Y-m-d');
+                    });
+
+                // Generate full list of days for the month
+                $days = CarbonPeriod::create($startOfMonth, $endOfMonth);
+
+                // Month label (e.g. "Aug")
+                $monthLabel = $startOfMonth->format('M');
+
+                $body2  = "<table border='1' cellpadding='5' cellspacing='0'>";
+
+                // Row 1 → Day letters
+                $body2 .= "<tr>";
+                $body2 .= "<th>Day</th>"; // first column heading
+                foreach ($days as $day) {
+                    $body2 .= "<th>" . $day->format('D')[0] . "</th>"; // F, S, S, M, T ...
+                }
+                $body2 .= "</tr>";
+
+                // Row 2 → Date numbers
+                $body2 .= "<tr>";
+                $body2 .= "<td>{$monthLabel}</td>"; // first column with month name
+                foreach (CarbonPeriod::create($startOfMonth, $endOfMonth) as $day) {
+                    $body2 .= "<td>" . $day->format('j') . "</td>"; // 1, 2, 3, 4 ...
+                }
+                $body2 .= "</tr>";
+
+                // Row 3 → Lead counts
+                $totalLeads = 0;
+                $body2 .= "<tr>";
+                foreach (CarbonPeriod::create($startOfMonth, $endOfMonth) as $day) {
+                    $dateStr = $day->format('Y-m-d');
+                    $count   = isset($monthlyLeads[$dateStr]) ? $monthlyLeads[$dateStr]->count() : 0;
+                    $totalLeads += $count;
+                }
+                $body2 .= "<td>{$totalLeads}</td>"; // first column with label
+                foreach (CarbonPeriod::create($startOfMonth, $endOfMonth) as $day) {
+                    $dateStr = $day->format('Y-m-d');
+                    $count   = isset($monthlyLeads[$dateStr]) ? $monthlyLeads[$dateStr]->count() : 0;
+                    $body2 .= "<td>" . $count . "</td>";
+                }
+                $body2 .= "</tr>";
+
+                $body2 .= "</table>";
+
+                $mail = new MailController();
                 $mail->sendEmail(
                     "Lead Upload Summary for {$employee->name}",
-                    "Click the link to view the report: <a href='{$link}'>View Report</a>",
+                    $body2,
                     $employeeEmail,
                     $employee->name
                 );
-            }
-           
-
+            } 
+            $mail = new MailController();
             // Also send to admin
             $mail->sendEmail(
                 "Lead Upload Summary for {$employee->name}",
                 $body,
                 'dailyreport@znzinc.com',
                 'Admin'
-            );
+            ); 
             // if ($source && $employeeLeads->isNotEmpty()){
             //     $body = "<h2>Leads Uploaded for {$employee->name}</h2>";
             //     $body .= "<p><strong>Total Leads Inserted:</strong> " . count($employeeLeads) . " <strong>Date:</strong> " . Carbon::today('America/New_York')->format('Y-m-d') . "</p>";
@@ -899,9 +958,14 @@ class EmployeeController extends Controller
         // Date range: yesterday 8AM to today 8AM EST
         $start = Carbon::yesterday('America/New_York')->setTime(8, 0);
         $end   = Carbon::today('America/New_York')->setTime(8, 0);
+        $buylist = Buylist::where('employee_id', $employee->id)->first();
 
         $leads = Lead::whereBetween('created_at', [$start, $end])
+        ->where('is_rejected', 0)
         ->where('source_id', $employee->source?->id)
+        ->whereNotIn('asin', function ($query) {
+            $query->select('asin')->from('line_items');
+        })
         ->get();
 
         // collect asins from leads
@@ -920,6 +984,7 @@ class EmployeeController extends Controller
         ->take(30)
         ->get();
 
-        return view('employees.daily-leads', compact('employee', 'leads', 'extraLeads', 'start', 'end'));
+        return view('employees.daily-leads', compact('employee', 'leads', 'extraLeads', 'start', 'end'
+        ,'buylist'));
     }
 }

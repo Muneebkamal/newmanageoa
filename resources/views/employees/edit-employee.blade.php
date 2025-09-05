@@ -6,8 +6,12 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">Edit Employee</h3>
+                    <a href="{{ route('reports.daily', ['employee' => $employee->id, 'date' => \Carbon\Carbon::today()->toDateString()]) }}" 
+                    class="btn btn-primary btn-sm">
+                        View Leads Report
+                    </a>
                 </div>
                 <div class="card-body">
 
@@ -112,12 +116,7 @@
                                     <label for="department_id" class="d-flex  justify-content-between"> 
                                         <span class="d-flex justify-content-between">
                                         <span class="me-2">Sync Leads Url</span>
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" id="send_email" name="send_email" value="1" {{ $employee->send_email == 1 ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="send_email">
-                                                Send email to employee
-                                            </label>
-                                        </div>
+                                       
                                     </span>
                                         <span> <button id="fetchLeadsBtn" type="button" class="btn btn-sm btn-primary"><i class="ri-refresh-fill"></i> Refresh Leads</button> </span>
 
@@ -127,6 +126,20 @@
                             </div>
                             <div class="col-md-6">
                                 <span id="leadStatus"></span>
+                                 <label for="department_id" class="d-flex  justify-content-between"> 
+                                    <span class="d-flex justify-content-between">
+                                    <span class="me-2">Send Lead Email</span>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="send_email" name="send_email" value="1" {{ $employee->send_email == 1 ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="send_email">
+                                            Send email to employee
+                                        </label>
+                                    </div>
+                                </span>
+                                 
+                                </label>
+                                <input type="text" name="lead_email" id="lead_email" class="form-control" value="{{ $employee->lead_email ? $employee->lead_email : $employee->email }}
+">
                             </div>
                         </div>
                         <div class="mb-3">

@@ -898,90 +898,155 @@ class OrderController extends Controller
 
         return back()->with('success', 'File uploaded and data imported successfully!');
     }
+    public function fetchOrders()
+    {
 
+        // Initialize cURL session
+        $ch = curl_init();
 
-public function fetchOrders()
-{
-
-    // Initialize cURL session
-    $ch = curl_init();
-
-    // Set the URL of the Cheddar login page
-    curl_setopt($ch, CURLOPT_URL, "https://app.oacheddar.com/login");
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, [
-        'username' => 'oacheddar@znzinc.com',
-        'password' => '^*VFUXl!*1&7O'
-    ]);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, 'cookies.txt'); // Save cookies
-
-    // Perform login
-    $response = curl_exec($ch);
-    dd( $response);
-
-    // Access the orders page
-    curl_setopt($ch, CURLOPT_URL, "https://your-cheddar-orders-page.com/orders");
-    curl_setopt($ch, CURLOPT_POST, false);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_COOKIEFILE, 'cookies.txt'); // Use saved cookies
-    $ordersPage = curl_exec($ch);
-
-    // Parse the HTML for order data
-    // $dom = new DOMDocument();
-    // @$dom->loadHTML($ordersPage);
-    // $xpath = new DOMXPath($dom);
-
-    // // Example: Get all rows from an orders table
-    // $rows = $xpath->query("//table[@id='orders-table']/tr");
-
-    // foreach ($rows as $row) {
-    //     $columns = $row->getElementsByTagName('td');
-    //     foreach ($columns as $column) {
-    //         echo $column->nodeValue . " ";
-    //     }
-    //     echo "\n";
-    // }
-
-    curl_close($ch);
-
-}
-public function assignedWorkOrder(Request $request){
-     $lineItem = LineItem::where('id', $request->lineItemId)->first();
-    
-    if (!$lineItem) {
-        return response()->json(['status' => false, 'message' => 'Line item not found'], 404);
-    }
-    
-    $data = [
-                'line_item_id' => $lineItem->id,
-                'work_order_id' => $request->prepOrderId,
-                'quantity' => $request->productQtyInput,
-                'name' => $lineItem->name ?? 'Unnamed',
-                'asin' => $lineItem->asin ?? 'SKU-' . time(),
-                'buy_cost' => $lineItem->buy_cost ?? '0',
-                'msku' => $lineItem->msku ?? null,
-            ];
-    
-   $response = Http::asForm()->post('http://app.prepcenter.me/api/assign-work-order', $data);
-
-    
-        if ($response->successful()) {
-        $json = $response->json();
-        return response()->json([
-            'status' => true,
-            'message' => $json['message'] ?? 'Work order assigned successfully',
-            'data' => $json['data'] ?? null,
+        // Set the URL of the Cheddar login page
+        curl_setopt($ch, CURLOPT_URL, "https://app.oacheddar.com/login");
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, [
+            'username' => 'oacheddar@znzinc.com',
+            'password' => '^*VFUXl!*1&7O'
         ]);
-    } else {
-        return response()->json([
-            'status' => false,
-            'message' => 'Failed to assign work order',
-            'error' => $response->body(),
-        ], $response->status());
-    }
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_COOKIEJAR, 'cookies.txt'); // Save cookies
 
-    return $response->json();
-}
+        // Perform login
+        $response = curl_exec($ch);
+        dd( $response);
+
+        // Access the orders page
+        curl_setopt($ch, CURLOPT_URL, "https://your-cheddar-orders-page.com/orders");
+        curl_setopt($ch, CURLOPT_POST, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_COOKIEFILE, 'cookies.txt'); // Use saved cookies
+        $ordersPage = curl_exec($ch);
+
+        // Parse the HTML for order data
+        // $dom = new DOMDocument();
+        // @$dom->loadHTML($ordersPage);
+        // $xpath = new DOMXPath($dom);
+
+        // // Example: Get all rows from an orders table
+        // $rows = $xpath->query("//table[@id='orders-table']/tr");
+
+        // foreach ($rows as $row) {
+        //     $columns = $row->getElementsByTagName('td');
+        //     foreach ($columns as $column) {
+        //         echo $column->nodeValue . " ";
+        //     }
+        //     echo "\n";
+        // }
+
+        curl_close($ch);
+
+    }
+    public function assignedWorkOrder(Request $request){
+        $lineItem = LineItem::where('id', $request->lineItemId)->first();
+        
+        if (!$lineItem) {
+            return response()->json(['status' => false, 'message' => 'Line item not found'], 404);
+        }
+        
+        $data = [
+                    'line_item_id' => $lineItem->id,
+                    'work_order_id' => $request->prepOrderId,
+                    'quantity' => $request->productQtyInput,
+                    'name' => $lineItem->name ?? 'Unnamed',
+                    'asin' => $lineItem->asin ?? 'SKU-' . time(),
+                    'buy_cost' => $lineItem->buy_cost ?? '0',
+                    'msku' => $lineItem->msku ?? null,
+                ];
+        
+     $response = Http::asForm()->post('http://app.prepcenter.me/api/assign-work-order', $data);
+
+        
+            if ($response->successful()) {
+            $json = $response->json();
+            return response()->json([
+                'status' => true,
+                'message' => $json['message'] ?? 'Work order assigned successfully',
+                'data' => $json['data'] ?? null,
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to assign work order',
+                'error' => $response->body(),
+            ], $response->status());
+        }
+
+        return $response->json();
+    }
+    public function allOrders()
+    {
+        $orders = Order::with('lineItems') // assuming relation exists
+            ->orderBy('date', 'desc')
+            ->get();
+    
+        $data = [];
+    
+        foreach ($orders as $order) {
+            $lineItems = LineItem::where('order_id', $order->id)
+                ->where('is_rejected', 0)
+                ->get();
+                $parse ='';
+                if( $order->source != null){
+                    $parse = parse_url($order->source);
+                    if(isset($parse['host'])){
+                        $parse = $parse['host'];
+                    }else{
+                        $parse = $order->source;
+                    }
+                    
+                }
+    
+            foreach ($lineItems as $lineItem) {
+                $amazonUrl = '=HYPERLINK("https://www.amazon.com/dp/'.$lineItem->asin.'")';
+    
+                $data[] = [
+                    'date' =>    Carbon::parse($order->date)->format('Y-m-d'),
+                    'name'              => $lineItem->name,
+                    'source_link'       => $lineItem->source_url,
+                    'host_link'         => $parse,
+                    'order_no'          => $order->order_id,
+                    'amz_short_link'    => $amazonUrl,
+                    'amz_asin'          => $lineItem->asin,
+                    'amz_title'         => $lineItem->name,
+                    'quantity_purchase' => $lineItem->unit_purchased,
+                    'cost_per_unit'     => $lineItem->buy_cost,
+                    'sku_total'         => $lineItem->sku_total,
+                    'order_total'       => $order->total,
+                    'blank1'            => '',
+                    'blank2'            => '',
+                    'tax_paid'          => $lineItem->tax_paid,
+                    'tax'               => $lineItem->tax_percent,
+                    'order_notes'       => $lineItem->order_note,
+                    'item_notes'        => $lineItem->product_buyer_notes,
+                    'cash_backs'        => $order->cash_back_percentage,
+                    'credit_card'       => $order->card_used,
+                    'received_status'   => '',
+                    'is_ups_match_asin' => '',
+                    'is_title_match'    => '',
+                    'is_img_match'      => '',
+                    'is_new_asin'       => '',
+                    'shipping_notes'    => '',
+                    'shipping_status'   => '',
+                    'msku'              => $lineItem->msku,
+                    'list_price'        => $lineItem->list_price,
+                    'order_status'      => $order->status,
+                    'min_list_price'    => $lineItem->min,
+                    'max_list_price'    => $lineItem->max,
+                    'upc'               => $lineItem->upc,
+                    'destination'       => $order->destination,
+                ];
+            }
+        }
+    
+        return response()->json($data);
+    }
 
 }

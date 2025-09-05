@@ -28,7 +28,8 @@ class User extends Authenticatable
         'status',
         'role_id',
         'sync_lead_url',
-        'send_email'
+        'send_email',
+        'lead_email'
     ];
 
     /**
