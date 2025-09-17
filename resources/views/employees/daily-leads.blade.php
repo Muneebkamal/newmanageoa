@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Employee')
+@section('title', 'Report Employee')
 
 @section('content')
 <style>
@@ -14,10 +14,13 @@
                 <div class="card-header">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="report-tab" data-bs-toggle="tab" data-bs-target="#report" type="button" role="tab" aria-controls="report" aria-selected="true">Report</button>
+                            <button class="nav-link active" id="report-tab" data-bs-toggle="tab" data-bs-target="#report" type="button" role="tab" aria-controls="report" aria-selected="true">Leads</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="false">Orders</button>
+                            <button class="nav-link" id="orders-tab-new" data-bs-toggle="tab" data-bs-target="#ordersNew" type="button" role="tab" aria-controls="orders" aria-selected="false">Orders</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="false">Orders Old</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="buylist-tab" data-bs-toggle="tab" data-bs-target="#buylist" type="button" role="tab" aria-controls="buylist" aria-selected="false">Buylist</button>
@@ -38,6 +41,7 @@
                                         <tr>
                                             <th>Date</th>
                                             <th>Name</th>
+                                            <th>Category</th>
                                             <th>ASIN</th>
                                             <th>Source</th>
                                             <th>Cost</th>
@@ -51,10 +55,11 @@
                                             <tr>
                                                 <td>
                                                     <a href="{{ url('leads-new?asin='.$lead->asin) }}" target="_blank">
-                                                        {{ \Carbon\Carbon::parse($lead->created_at)->timezone('America/New_York')->format('Y-m-d h:i A') }}
+                                                        {{ \Carbon\Carbon::parse($lead->date)->timezone('America/New_York')->format('Y-m-d h:i A') }}
                                                     </a>
                                                 </td>
                                                 <td>{{ $lead->name }}</td>
+                                                <td>{{ $lead->category }}</td>
                                                 <td>
                                                     <a href="https://www.amazon.com/dp/{{ $lead->asin }}" target="_blank">{{ $lead->asin }}</a>
                                                 </td>
@@ -77,11 +82,12 @@
                                 <h3>Leads Not in Buylist & Not Rejected</h3>
                                 <p><strong>Last {{ $extraLeads->count() }} Leads</strong></p>
 
-                                <table class="table table-bordered">
+                                <table id="leadsTable" class="table table-bordered">
                                     <thead>
                                         <tr>
                                             <th>Date</th>
                                             <th>Name</th>
+                                            <th>Category</th>
                                             <th>ASIN</th>
                                             <th>Source</th>
                                             <th>Cost</th>
@@ -97,6 +103,7 @@
                                                     {{ \Carbon\Carbon::parse($lead->created_at)->timezone('America/New_York')->format('Y-m-d h:i A') }}
                                                 </a></td>
                                                 <td>{{ $lead->name }}</td>
+                                                <td>{{ $lead->category }}</td>
                                                 <td><a href="https://www.amazon.com/dp/{{ $lead->asin }}" target="_blank">{{ $lead->asin }}</a></td>
                                                 <td><a href="{{ $lead->url }}" target="_blank">{{ $lead->supplier }}</a></td>
                                                 <td>${{ $lead->cost }}</td>
@@ -109,29 +116,78 @@
                                 </table>
                             @endif
                         </div>
+                        <div class="tab-pane fade" id="ordersNew" role="tabpanel" aria-labelledby="orders-tab-new">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="orders-table-new">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Order Id</th>
+                                            <th>Name</th>
+                                            <th>Category</th>
+                                            <th>ASIN</th>
+                                            <th>Source</th>
+                                            <th>Cost</th>
+                                            <th>Sell Price</th>
+                                            <th>Profit</th>
+                                            <th>ROI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($orders as $order)
+                                            @foreach($order->lineItems as $line)
+                                                <tr>
+                                                    <td>
+                                                        <a href="{{ url('leads-new?asin='.$line->asin) }}" target="_blank">
+                                                        {{ \Carbon\Carbon::parse($order->date)->timezone('America/New_York')->format('Y-m-d h:i A') }}
+                                                    </a>
+                                                    </td>
+                                                    <td>{{ $order->order_id }}</td>
+                                                    <td>{{ $line->name }}</td>
+                                                    <td>{{ $line->lead->category??'-' }}</td>
+                                                    <td>
+                                                        <a href="https://www.amazon.com/dp/{{ $line->asin }}" target="_blank">{{ $line->asin }}</a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ $line->source_url }}" target="_blank">{{ $line->supplier }}</a>
+                                                    </td>
+
+                                                    <td>${{ number_format($line->buy_cost ?? 0, 2) }}</td>
+                                                    <td>${{ number_format($line->selling_price ?? 0, 2) }}</td>
+                                                    <td>${{ number_format($line->net_profit ?? 0, 2) }}</td>
+
+                                                    <td>{{ $line->lead->roi??'0.00' }}% </td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                         <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                             <div class="table-responsive">
-                        <table class="table table-active table-bordered" id="orders-table">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Order ID</th>
-                                    <th>Source</th>
-                                    <th>O-R-S (E)</th>
-                                    <th>Order Date</th>
-                                    <th>Order Total</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                               
-                            </tbody>
-                        </table>
-                    </div>
+                                <table class="table table-bordered" id="orders-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Order ID</th>
+                                            <th>Source</th>
+                                            <th>O-R-S (E)</th>
+                                            <th>Order Date</th>
+                                            <th>Order Total</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="buylist" role="tabpanel" aria-labelledby="buylist-tab">
                            <div class="table-responsive">
-                                <table id="buylistTable" class="table table-striped table-bordered">
+                                <table id="buylistTable" class="table  table-bordered">
                                     <thead>
                                         <tr>
                                             <th>
@@ -164,16 +220,18 @@
                                                 </div>
                                             </th>
                                             <th class="bg-danger text-white">Rejcation Reason</th>
-                                            <th>Type</th>
-                                            <th>Created Date</th>
-                                            <th>Source</th>
-                                            <th>Product Name</th>
-                                            <th>Lead Notes</th>
+                                            <th>Date</th>
+                                            <th>Name</th>
                                             <th>ASIN</th>
+                                            <th>Source</th>
                                             <th>Qty</th>
                                             <th>Cost/Unit</th>
-                                            <th>Promo/Coupon</th>
-                                            <th>Product/Buyer Notes</th>
+                                            <th>Edit</th>
+                                            <th>Reject</th>
+                                            <th>Delete</th>
+                                            <th>Duplicate</th>
+                                            <th>Copy & Move</th>
+                                            <th>Create Single Item Order</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -183,12 +241,6 @@
                         </div>
                         </div>
                     </div>
-            </div>
-            <!-- Tab contents -->
-            
-
-            <div class="card">
-               
             </div>
         </div>
     </div>
@@ -351,6 +403,14 @@
     var endDateFromURL = '';
     var user_id = '';
     $(document).ready(function() {
+        $('#leadsTable').DataTable({
+            pageLength: 10, // default rows per page
+            order: [[0, 'desc']] // sort by date descending
+        });
+        $('#orders-table-new').DataTable({
+            pageLength: 10, // default rows per page
+            order: [[0, 'desc']] // sort by date descending
+        });
         const urlParams = new URLSearchParams(window.location.search);
         startDateFromURL = urlParams.get('start_date');
         endDateFromURL = urlParams.get('end_date');
@@ -451,18 +511,21 @@
         var is_rejected = $('#is_rejected_yes').val();
         $('#buylistTable').DataTable().destroy();
             var columns = [
-                { data: 'actions', name: 'actions', orderable: false, searchable: false },
+                { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                 { data: 'rejection_reason', name: 'rejection_reason', visible: is_rejected == 1,className: 'rejection-reason text-white' }, // Set visibility based on is_rejected
-                { data: 'flags', name: 'flags', orderable: false, searchable: false },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'source_url', name: 'source_url'},
                 { data: 'name', name: 'name' },
-                { data: 'order_note', name: 'order_note' },
                 { data: 'asin', name: 'asin'},
+                { data: 'source_url', name: 'source_url'},
                 { data: 'unit_purchased', name: 'unit_purchased' },
                 { data: 'buy_cost', name: 'buy_cost'},
-                { data: 'quantity_remaining', name: 'quantity_remaining', defaultContent: '--', orderable: false, searchable: false },
-                { data: 'product_buyer_notes', name: 'product_buyer_notes' }
+                // Actions always on the right
+                { data: 'edit', name: 'edit', orderable: false, searchable: false },
+                { data: 'reject', name: 'reject', orderable: false, searchable: false },
+                { data: 'delete', name: 'delete', orderable: false, searchable: false },
+                { data: 'duplicate', name: 'duplicate', orderable: false, searchable: false },
+                { data: 'move_copy', name: 'move_copy', orderable: false, searchable: false },
+                { data: 'order', name: 'order', orderable: false, searchable: false },
             ];
         $('#buylistTable').DataTable({
             processing: true,
@@ -493,6 +556,11 @@
                 },
             },
             columns: columns,
+            columnDefs: [
+                { width: "30%", targets: 3 },  // Name column wider
+                { width: "5%", targets: 0 },  // Name column wider
+                { width: "10%", targets: [0, 2, 3, 5, 6, 7] } // Other columns normal
+            ],
             order: [[3, 'desc']], // Order by created_at by default
             destroy: true,
             autoWidth: false,  // Disable auto width to enable the specified width

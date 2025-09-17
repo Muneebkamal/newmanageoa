@@ -145,113 +145,141 @@ class BuyerController extends Controller
         ->count();
 
         return DataTables::of($items)
-            ->editColumn('actions', function($order) use ($request) {
-                $undoRejectButton = '<button class="dropdown-item text-success undoRejectItem" data-id="' . $order->id . '">
-                    <i class=" ri-arrow-go-back-line text-success"></i> Undo Rejected
-                </button>';
-                if($request->has('is_approved') && $request->is_approved != 'false'){
-                    $isAprroved = '';
-                    $isAprrovedList = '';
-                }else{
-                    $isAprroved = '<button class="btn btn-success approvelItem" style="padding: 2px 6px; font-size: 11px; line-height: 1;" data-id="'.$order->id.'" data-viewonly="true">
-                        <i class="ri-check-fill text-white"></i> To Approve
-                    </button>';
-                    $isAprrovedList = '<li>
-                        <button class="dropdown-item text-success approvelItem" data-id="'.$order->id.'">
-                            <i class="ri-check-fill text-success"></i> To Approve
-                        </button>
-                    </li>';
-                }
-                $orderButton = '<button class="btn btn-success singleOrder" style="padding: 2px 6px; font-size: 11px; line-height: 1;" data-id="'.$order->id.'">
-                    <i class="ri-shopping-cart-2-line"></i> Create Single Item Order
-                    </button>'; 
+            // ->editColumn('actions', function($order) use ($request) {
+            //     $undoRejectButton = '<button class="btn btn-sm btn-success undoRejectItem py-0 px-1" data-id="' . $order->id . '">
+            //         <i class="ri-arrow-go-back-line"></i> Undo Rejected
+            //     </button>';
 
-                $rejectButton = '<button class="dropdown-item text-danger rejectItem" data-id="' . $order->id . '"><i class="ri-forbid-2-line text-danger"></i> Reject Item</button>';
-            return '<div class="d-flex align-items-center gap-2">
-                    <input type="checkbox" name="leadCheckBox" class="item-checkbox" onchange="singleChecked('.$order->id.')" value="'.$order->id.'">
-                    <a style="cursor: pointer" id="dropdownActions'.$order->id.'" class="me-2 mt-2" data-bs-toggle="dropdown" aria-expanded="false">
-                        <strong style="font-size: 17px;"><b><i class="ri-more-2-line ms-2"></i></b></strong>
-                    </a>
-                    <div class="d-flex align-items-center gap-2">
-                        '. $isAprroved.'
-                         <br>
-                         <br>
-                        '.$orderButton.'
-                    </div>
-                    
-                    <ul class="dropdown-menu">
-                        <li>
-                            <button class="dropdown-item text-danger deleteItem" data-id="'.$order->id.'">
-                                <i class="ri-delete-bin-line text-danger"></i> Delete
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item text-info editItem" data-id="'.$order->id.'">
-                                <i class="ri-pencil-fill text-primary"></i> Edit
-                            </button>
-                        </li>
-                        '.$isAprrovedList.'
-                        <li>
-                            <button class="dropdown-item text-info duplicateItem" data-id="'.$order->id.'">
-                                <i class="ri-file-copy-line text-info"></i> Duplicate
-                            </button>
-                        </li>
-                        <li>
-                            ' . ($order->is_rejected ? $undoRejectButton : $rejectButton) . '
-                        </li>
-                        <li>
-                            <button class="dropdown-item text-primary singleOrder" data-id="'.$order->id.'">
-                                <i class="ri-shopping-cart-2-line"></i> Create Single Item Order
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item text-primary moveCopy" data-id="'.$order->id.'">
-                                <i class="ri-share-forward-fill"></i> Move/Copy to Buylist...
-                            </button>
-                        </li>
-                    </ul>
+            //     if($request->has('is_approved') && $request->is_approved != 'false'){
+            //         $isAprroved = '';
+            //     } else {
+            //         $isAprroved = '<button class="btn btn-sm btn-success approvelItem py-0 px-1" data-id="'.$order->id.'" data-viewonly="true">
+            //             <i class="ri-check-fill"></i> Approve
+            //         </button>';
+            //     }
 
-                </div> 
-               
-                ';
+            //     $rejectButton = '<button class="btn btn-sm btn-danger rejectItem py-0 px-1" data-id="' . $order->id . '">
+            //         <i class="ri-forbid-2-line"></i> Reject
+            //     </button>';
+
+            //     $deleteButton = '<button class="btn btn-sm btn-danger deleteItem py-0 px-1" data-id="'.$order->id.'">
+            //         <i class="ri-delete-bin-line"></i> Delete
+            //     </button>';
+
+            //     $editButton = '<button class="btn btn-sm btn-info editItem py-0 px-1" data-id="'.$order->id.'">
+            //         <i class="ri-pencil-fill"></i> Edit
+            //     </button>';
+
+            //     $duplicateButton = '<button class="btn btn-sm btn-info duplicateItem py-0 px-1" data-id="'.$order->id.'">
+            //         <i class="ri-file-copy-line"></i> Duplicate
+            //     </button>';
+
+            //     $moveCopyButton = '<button class="btn btn-sm btn-secondary moveCopy py-0 px-1" data-id="'.$order->id.'">
+            //         <i class="ri-share-forward-fill"></i> Move/Copy
+            //     </button>';
+
+            //     $orderButton = '<button class="btn btn-primary btn-block w-100 mt-1 singleOrder" data-id="'.$order->id.'">
+            //         <i class="ri-shopping-cart-2-line"></i> Create Single Item Order
+            //     </button>';
+
+            //     return '
+            //         <div class="d-flex flex-column align-items-start" style="max-width: auto;">
+            //         <input type="checkbox" name="leadCheckBox" class="item-checkbox me-1" onchange="singleChecked('.$order->id.')" value="'.$order->id.'">
+            //             <div class="d-flex flex-wrap gap-1 mb-1">
+            //                 '.$isAprroved.'
+            //                 '.$editButton.'
+            //                 '.($order->is_rejected ? $undoRejectButton : $rejectButton).'
+                            
+            //                 '.$deleteButton.'
+            //                 '.$duplicateButton.'
+            //                 '.$moveCopyButton.'
+            //             </div>
+            //             '.$orderButton.'
+            //         </div>
+            //     ';
+            // })
+            ->addColumn('checkbox', function($order) {
+                return '<input type="checkbox" class="item-checkbox" onchange="singleChecked('.$order->id.')" value="'.$order->id.'">';
             })
             ->editColumn('rejection_reason', function($order) {
                 return  $order->rejection_reason;
             })
-            ->editColumn('flags', function($order) {
-                $outPut = '';
-                if($order->is_hazmat)
-                $outPut .= '<i class="ri-alarm-warning-fill text-danger ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Hazmat item"></i>';
-                if($order->is_disputed)
-                $outPut .=' <i class="ri-haze-2-line text-warning ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Item data may be disputed"></i>';
-                return $outPut;
-            })
+            // ->editColumn('flags', function($order) {
+            //     $outPut = '';
+            //     if($order->is_hazmat)
+            //     $outPut .= '<i class="ri-alarm-warning-fill text-danger ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Hazmat item"></i>';
+            //     if($order->is_disputed)
+            //     $outPut .=' <i class="ri-haze-2-line text-warning ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Item data may be disputed"></i>';
+            //     return $outPut;
+            // })
             ->editColumn('created_at', function($order) {
                 return  Carbon::parse($order->created_at) ->format('M d, Y');
             })
-            ->editColumn('source_url', function($order) {
-                return '<a href="' . $order->source_url . '">' . $order->supplier . '</a>';
-            })
             ->editColumn('name', function($order) {
-                return '<a href="#">' . $order->name . '</a>';
-            })
-            ->editColumn('order_note', function($order) {
-                return $order->order_note ;
+                $fullName = $order->name ?? '';
+                $truncated = strlen($fullName) > 40 ? substr($fullName, 0, 40) . '...' : $fullName;
+
+                return '<a href="#" title="'.e($fullName).'" data-bs-toggle="tooltip" data-bs-placement="top">'
+                        . e($truncated) .
+                    '</a>';
             })
             ->editColumn('asin', function($order) {
                 return '<a href="https://www.amazon.com/dp/'.$order->asin.'" target="_blank">'.$order->asin.'</a>';
             })
+            ->editColumn('source_url', function($order) {
+                return '<a href="' . $order->source_url . '" target="_blank">' . $order->supplier . '</a>';
+            })
+
             ->editColumn('unit_purchased', function($order) {
                 return $order->unit_purchased ;
             })
             ->editColumn('buy_cost', function($order) {
-                return $order->buy_cost ;
+                return  '$'.$order->buy_cost;
             })
-            ->editColumn('product_buyer_notes', function($order) {
-                return $order->product_buyer_notes ;
+            ->addColumn('approve', function($order) use ($request) {
+                if ($request->has('is_approved') && $request->is_approved != 'false') {
+                    return '';
+                }
+                return '<button class="btn btn-sm btn-success approvelItem" data-id="'.$order->id.'"  data-viewonly="true">
+                            <i class="ri-check-fill"></i>
+                        </button>';
             })
+            ->addColumn('edit', fn($order) =>
+                '<button class="btn btn-sm btn-info editItem" data-id="'.$order->id.'">
+                    <i class="ri-pencil-fill"></i>
+                </button>'
+            )
+            ->addColumn('reject', fn($order) =>
+                $order->is_rejected
+                    ? '<button class="btn btn-sm btn-success undoRejectItem" data-id="'.$order->id.'">
+                        <i class="ri-arrow-go-back-line"></i>
+                    </button>'
+                    : '<button class="btn btn-sm btn-danger rejectItem" data-id="'.$order->id.'">
+                        <i class="ri-forbid-2-line"></i>
+                    </button>'
+            )
+            ->addColumn('delete', fn($order) =>
+                '<button class="btn btn-sm btn-danger deleteItem" data-id="'.$order->id.'">
+                    <i class="ri-delete-bin-line"></i>
+                </button>'
+            )
+            ->addColumn('duplicate', fn($order) =>
+                '<button class="btn btn-sm btn-info duplicateItem" data-id="'.$order->id.'">
+                    <i class="ri-file-copy-line"></i>
+                </button>'
+            )
+            ->addColumn('move_copy', fn($order) =>
+                '<button class="btn btn-sm btn-secondary moveCopy" data-id="'.$order->id.'">
+                    <i class="ri-share-forward-fill"></i>
+                </button>'
+            )
+            ->addColumn('order', fn($order) =>
+                '<button class="btn btn-sm btn-primary singleOrder" data-id="'.$order->id.'">
+                    <i class="ri-shopping-cart-2-line"></i>
+                </button>'
+            )
             ->with('rejectedCount', $rejectedCount)
-            ->rawColumns(['actions', 'rejection_reason','flags','created_at','source_url','name','order_note','asin','unit_purchased','buy_cost','product_buyer_notes'])
+            ->rawColumns(['checkbox','approve','edit','reject','delete','duplicate','move_copy','order', 'rejection_reason','created_at','name','asin','source_url','unit_purchased','buy_cost',])
             ->make(true);
     }
     public function getItemsAll(Request $request){
@@ -297,75 +325,61 @@ class BuyerController extends Controller
         }
      
         return DataTables::of($items)
-            ->editColumn('actions', function($order) use ($request) {
-                $undoRejectButton = '<button class="dropdown-item text-success undoRejectItem" data-id="' . $order->id . '">
-                    <i class=" ri-arrow-go-back-line text-success"></i> Undo Rejected
-                </button>';
-                if($request->has('is_approved') && $request->is_approved != 'false'){
-                    $isAprroved = '';
-                    $isAprrovedList = '';
-                }else{
-                    $isAprroved = '<button class="btn btn-success approvelItem" style="padding: 2px 6px; font-size: 11px; line-height: 1;" data-id="'.$order->id.'" data-viewonly="true">
-                        <i class="ri-check-fill text-white"></i> To Approve
-                    </button>';
-                    $isAprrovedList = '<li>
-                        <button class="dropdown-item text-success approvelItem" data-id="'.$order->id.'">
-                            <i class="ri-check-fill text-success"></i> To Approve
-                        </button>
-                    </li>';
-                }
-                $orderButton = '<button class="btn btn-success singleOrder" style="padding: 2px 6px; font-size: 11px; line-height: 1;" data-id="'.$order->id.'">
-                    <i class="ri-shopping-cart-2-line"></i> Create Single Item Order
-                    </button>'; 
+            //  ->editColumn('actions', function($order) use ($request) {
+            //     $undoRejectButton = '<button class="btn btn-sm btn-success undoRejectItem py-0 px-1" data-id="' . $order->id . '">
+            //         <i class="ri-arrow-go-back-line"></i> Undo Rejected
+            //     </button>';
 
-                $rejectButton = '<button class="dropdown-item text-danger rejectItem" data-id="' . $order->id . '"><i class="ri-forbid-2-line text-danger"></i> Reject Item</button>';
-            return '<div class="d-flex align-items-center gap-2">
-                    <input type="checkbox" name="leadCheckBox" class="item-checkbox" onchange="singleChecked('.$order->id.')" value="'.$order->id.'">
-                    <a style="cursor: pointer" id="dropdownActions'.$order->id.'" class="me-2 mt-2" data-bs-toggle="dropdown" aria-expanded="false">
-                        <strong style="font-size: 17px;"><b><i class="ri-more-2-line ms-2"></i></b></strong>
-                    </a>
-                    <div class="d-flex align-items-center gap-2">
-                        '. $isAprroved.'
-                         <br>
-                         <br>
-                        '.$orderButton.'
-                    </div>
-                    
-                    <ul class="dropdown-menu">
-                        <li>
-                            <button class="dropdown-item text-danger deleteItem" data-id="'.$order->id.'">
-                                <i class="ri-delete-bin-line text-danger"></i> Delete
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item text-info editItem" data-id="'.$order->id.'">
-                                <i class="ri-pencil-fill text-primary"></i> Edit
-                            </button>
-                        </li>
-                        '.$isAprrovedList.'
-                        <li>
-                            <button class="dropdown-item text-info duplicateItem" data-id="'.$order->id.'">
-                                <i class="ri-file-copy-line text-info"></i> Duplicate
-                            </button>
-                        </li>
-                        <li>
-                            ' . ($order->is_rejected ? $undoRejectButton : $rejectButton) . '
-                        </li>
-                        <li>
-                            <button class="dropdown-item text-primary singleOrder" data-id="'.$order->id.'">
-                                <i class="ri-shopping-cart-2-line"></i> Create Single Item Order
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item text-primary moveCopy" data-id="'.$order->id.'">
-                                <i class="ri-share-forward-fill"></i> Move/Copy to Buylist...
-                            </button>
-                        </li>
-                    </ul>
+            //     if($request->has('is_approved') && $request->is_approved != 'false'){
+            //         $isAprroved = '';
+            //     } else {
+            //         $isAprroved = '<button class="btn btn-sm btn-success approvelItem py-0 px-1" data-id="'.$order->id.'" data-viewonly="true">
+            //             <i class="ri-check-fill"></i> Approve
+            //         </button>';
+            //     }
 
-                </div> 
-               
-                ';
+            //     $rejectButton = '<button class="btn btn-sm btn-danger rejectItem py-0 px-1" data-id="' . $order->id . '">
+            //         <i class="ri-forbid-2-line"></i> Reject
+            //     </button>';
+
+            //     $deleteButton = '<button class="btn btn-sm btn-danger deleteItem py-0 px-1" data-id="'.$order->id.'">
+            //         <i class="ri-delete-bin-line"></i> Delete
+            //     </button>';
+
+            //     $editButton = '<button class="btn btn-sm btn-info editItem py-0 px-1" data-id="'.$order->id.'">
+            //         <i class="ri-pencil-fill"></i> Edit
+            //     </button>';
+
+            //     $duplicateButton = '<button class="btn btn-sm btn-info duplicateItem py-0 px-1" data-id="'.$order->id.'">
+            //         <i class="ri-file-copy-line"></i> Duplicate
+            //     </button>';
+
+            //     $moveCopyButton = '<button class="btn btn-sm btn-secondary moveCopy py-0 px-1" data-id="'.$order->id.'">
+            //         <i class="ri-share-forward-fill"></i> Move/Copy
+            //     </button>';
+
+            //     $orderButton = '<button class="btn btn-primary btn-block w-100 mt-1 singleOrder" data-id="'.$order->id.'">
+            //         <i class="ri-shopping-cart-2-line"></i> Create Single Item Order
+            //     </button>';
+
+            //     return '
+            //         <div class="d-flex flex-column align-items-start" style="max-width: auto;">
+            //         <input type="checkbox" name="leadCheckBox" class="item-checkbox me-1" onchange="singleChecked('.$order->id.')" value="'.$order->id.'">
+            //             <div class="d-flex flex-wrap gap-1 mb-1">
+            //                 '.$isAprroved.'
+            //                 '.$editButton.'
+            //                 '.($order->is_rejected ? $undoRejectButton : $rejectButton).'
+                            
+            //                 '.$deleteButton.'
+            //                 '.$duplicateButton.'
+            //                 '.$moveCopyButton.'
+            //             </div>
+            //             '.$orderButton.'
+            //         </div>
+            //     ';
+            // })
+            ->addColumn('checkbox', function($order) {
+                return '<input type="checkbox" class="item-checkbox" onchange="singleChecked('.$order->id.')" value="'.$order->id.'">';
             })
             ->editColumn('rejection_reason', function($order) {
                 return  $order->rejection_reason;
@@ -382,10 +396,15 @@ class BuyerController extends Controller
                 return  Carbon::parse($order->created_at) ->format('M d, Y');
             })
             ->editColumn('source_url', function($order) {
-                return '<a href="' . $order->source_url . '">' . $order->supplier . '</a>';
+                return '<a href="' . $order->source_url . '" target="_blank">' . $order->supplier . '</a>';
             })
             ->editColumn('name', function($order) {
-                return '<a href="#">' . $order->name . '</a>';
+                $fullName = $order->name ?? '';
+                $truncated = strlen($fullName) > 40 ? substr($fullName, 0, 40) . '...' : $fullName;
+
+                return '<a href="#" title="'.e($fullName).'" data-bs-toggle="tooltip" data-bs-placement="top">'
+                        . e($truncated) .
+                    '</a>';
             })
             ->editColumn('order_note', function($order) {
                 return $order->order_note ;
@@ -397,13 +416,52 @@ class BuyerController extends Controller
                 return $order->unit_purchased ;
             })
             ->editColumn('buy_cost', function($order) {
-                return $order->buy_cost ;
+                return  '$'.$order->buy_cost ;
             })
-            ->editColumn('product_buyer_notes', function($order) {
-                return $order->product_buyer_notes ;
+            ->addColumn('approve', function($order) use ($request) {
+                if ($request->has('is_approved') && $request->is_approved != 'false') {
+                    return '';
+                }
+                return '<button class="btn btn-sm btn-success approvelItem" data-id="'.$order->id.'">
+                            <i class="ri-check-fill"></i>
+                        </button>';
             })
+            ->addColumn('edit', fn($order) =>
+                '<button class="btn btn-sm btn-info editItem" data-id="'.$order->id.'">
+                    <i class="ri-pencil-fill"></i>
+                </button>'
+            )
+            ->addColumn('reject', fn($order) =>
+                $order->is_rejected
+                    ? '<button class="btn btn-sm btn-success undoRejectItem" data-id="'.$order->id.'">
+                        <i class="ri-arrow-go-back-line"></i>
+                    </button>'
+                    : '<button class="btn btn-sm btn-danger rejectItem" data-id="'.$order->id.'">
+                        <i class="ri-forbid-2-line"></i>
+                    </button>'
+            )
+            ->addColumn('delete', fn($order) =>
+                '<button class="btn btn-sm btn-danger deleteItem" data-id="'.$order->id.'">
+                    <i class="ri-delete-bin-line"></i>
+                </button>'
+            )
+            ->addColumn('duplicate', fn($order) =>
+                '<button class="btn btn-sm btn-info duplicateItem" data-id="'.$order->id.'">
+                    <i class="ri-file-copy-line"></i>
+                </button>'
+            )
+            ->addColumn('move_copy', fn($order) =>
+                '<button class="btn btn-sm btn-secondary moveCopy" data-id="'.$order->id.'">
+                    <i class="ri-share-forward-fill"></i>
+                </button>'
+            )
+            ->addColumn('order', fn($order) =>
+                '<button class="btn btn-sm btn-primary singleOrder" data-id="'.$order->id.'">
+                    <i class="ri-shopping-cart-2-line"></i>
+                </button>'
+            )
             ->with('rejectedCount', $rejectedCount)
-            ->rawColumns(['actions', 'rejection_reason','flags','created_at','source_url','name','order_note','asin','unit_purchased','buy_cost','product_buyer_notes'])
+            ->rawColumns(['checkbox','approve','edit','reject','delete','duplicate','move_copy','order', 'rejection_reason','created_at','source_url','name','order_note','asin','unit_purchased','buy_cost'])
             ->make(true);
     }
 

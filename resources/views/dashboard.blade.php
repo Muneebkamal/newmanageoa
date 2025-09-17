@@ -146,7 +146,7 @@
                                             <tr>
                                                 <td> 
                                                     <a href="{{ url('leads-new') . '?asin=' . $lead->asin }}" target="_blank">
-                                                        {{ \Carbon\Carbon::parse($lead->created_at)->format('Y-m-d') }}    
+                                                        {{ \Carbon\Carbon::parse($lead->date)->format('Y-m-d') }}    
                                                     </a> 
                                                 </td>
 

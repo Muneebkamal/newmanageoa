@@ -581,8 +581,18 @@ table.dataTable {
                                 newbtn = `
                                     `
                             }
-                            return `<div class="card itemcard" id="item_${data.id}" onclick="activeCard(${data.id})">
+                            var styleClass ='';
+                            var btnclass ='';
+                            var rejectedicon ='';
+                            if(data.is_rejected ==1){
+                                styleClass ='border: 2px solid red;';
+                                btnclass ='d-none';
+                                rejectedicon =`<div class="row">
+                                        <div class="col-md-12"><h4 class="badge bg-danger ms-2 me-2">Rejected</h4>${data.reason} </div></div>`;
+                            }
+                            return `<div class="card itemcard" style="${styleClass}" id="item_${data.id}" onclick="activeCard(${data.id})">
                                 <div class="card-header">
+                                    ${rejectedicon}
                                     <div class="row d-flex justify-content-between">
                                         <div class="col-md-6 d-flex">
                                             <div class="me-2 ms-2 mt-1">

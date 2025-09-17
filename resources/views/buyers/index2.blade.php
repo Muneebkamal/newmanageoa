@@ -134,16 +134,18 @@
                                     </div>
                                 </th>
                                 <th class="bg-danger text-white">Rejcation Reason</th>
-                                <th>Type</th>
-                                <th>Created Date</th>
-                                <th>Source</th>
-                                <th>Product Name</th>
-                                <th>Lead Notes</th>
+                                <th>Date</th>
+                                <th>Name</th>
                                 <th>ASIN</th>
+                                <th>Source</th>
                                 <th>Qty</th>
                                 <th>Cost/Unit</th>
-                                <th>Promo/Coupon</th>
-                                <th>Product/Buyer Notes</th>
+                                <th>Edit</th>
+                                <th>Reject</th>
+                                <th>Delete</th>
+                                <th>Duplicate</th>
+                                <th>Copy & Move</th>
+                                <th>Create Single Item Order</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -549,18 +551,21 @@
         var is_rejected = $('#is_rejected_yes').val();
         $('#buylistTable').DataTable().destroy();
             var columns = [
-                { data: 'actions', name: 'actions', orderable: false, searchable: false },
+                { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                 { data: 'rejection_reason', name: 'rejection_reason', visible: is_rejected == 1,className: 'rejection-reason text-white' }, // Set visibility based on is_rejected
-                { data: 'flags', name: 'flags', orderable: false, searchable: false },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'source_url', name: 'source_url'},
                 { data: 'name', name: 'name' },
-                { data: 'order_note', name: 'order_note' },
                 { data: 'asin', name: 'asin'},
+                { data: 'source_url', name: 'source_url'},
                 { data: 'unit_purchased', name: 'unit_purchased' },
                 { data: 'buy_cost', name: 'buy_cost'},
-                { data: 'quantity_remaining', name: 'quantity_remaining', defaultContent: '--', orderable: false, searchable: false },
-                { data: 'product_buyer_notes', name: 'product_buyer_notes' }
+                // Actions always on the right
+                { data: 'edit', name: 'edit', orderable: false, searchable: false },
+                { data: 'reject', name: 'reject', orderable: false, searchable: false },
+                { data: 'delete', name: 'delete', orderable: false, searchable: false },
+                { data: 'duplicate', name: 'duplicate', orderable: false, searchable: false },
+                { data: 'move_copy', name: 'move_copy', orderable: false, searchable: false },
+                { data: 'order', name: 'order', orderable: false, searchable: false },
             ];
         $('#buylistTable').DataTable({
             processing: true,
@@ -591,6 +596,11 @@
                 },
             },
             columns: columns,
+            columnDefs: [
+                { width: "30%", targets: 3 },  // Name column wider
+                { width: "5%", targets: 0 },  // Name column wider
+                { width: "10%", targets: [0, 2, 3, 5, 6, 7] } // Other columns normal
+            ],
             order: [[3, 'desc']], // Order by created_at by default
             destroy: true,
             autoWidth: false,  // Disable auto width to enable the specified width

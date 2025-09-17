@@ -83,10 +83,25 @@
                 <button data-v-c2ce40f4="" class="btn btn-sm btn-outline-primary" data-original-title="" title="" id="refreshTable"><i data-v-c2ce40f4="" aria-hidden="true" class=" ri-refresh-fill"></i>&nbsp; Refresh Data</button>
             </div>
         </div>
+        <div class="col-md-auto">
+            <form class="d-flex align-items-center">
+                <div class="form-group d-flex align-items-center mr-3">
+                    <label for="UserDownloadOrderItemStartDate" class="mr-2 mb-0">Start</label>
+                    <input type="date" id="UserDownloadOrderItemStartDate" class="form-control">
+                </div>
+                <div class="form-group d-flex align-items-center mr-3">
+                    <label for="UserDownloadOrderItemEndDate" class="mr-2 mb-0">End</label>
+                    <input type="date" id="UserDownloadOrderItemEndDate" class="form-control">
+                </div>
+                <button type="button" id="downloadOrdersBtn" class="btn btn-primary ms-1">
+                    <i class="fa fa-download"></i> Download Orders
+                </button>
+            </form>
+        </div>
     </div>
     <hr class="mt-3">
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-12">
             <div class="card h-100">
                 <div class="card-header">
                     <div data-v-c2ce40f4="" class="col-md-3 pl-0 float-end">
@@ -113,37 +128,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Download</h5>
-                    <form class="form-inline float-right">
-                        <label for="UserDownloadOrderItemStartDate" class="sr-only">Start</label>
-                        <div class="input-group mb-2 mr-sm-2">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">Start</div>
-                            </div>
-                            <input type="date" id="UserDownloadOrderItemStartDate" class="form-control">
-                        </div>
-                        <label for="UserDownloadOrderItemEndDate" class="sr-only">End</label>
-                        <div class="input-group mb-2 mr-sm-2">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">End</div>
-                            </div>
-                            <input type="date" id="UserDownloadOrderItemEndDate" class="form-control">
-                        </div>
-                        <button type="button" id="downloadOrdersBtn" class="btn btn-primary">
-                            <i aria-hidden="true" class="fa fa-download"></i> Download Orders
-                        </button>
-                    </form>                    
-                </div>
-            </div>
-            
-            <script>
-               
-            </script>
-            
         </div>
     </div>     
 @endsection

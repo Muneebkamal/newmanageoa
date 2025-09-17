@@ -65,20 +65,20 @@ use Yajra\DataTables\Facades\DataTables;
                     if($request->is_rejected == 1){
                         $leads = Lead::whereIn('source_id', $selectedIds)->with('source')->where('is_rejected',1);
                     }else{
-                        $leads = Lead::whereIn('source_id', $selectedIds)->with('source')->where('is_rejected',0);
+                        $leads = Lead::whereIn('source_id', $selectedIds)->with('source');
                     }
                 }else{
                     if($request->is_rejected == 1){
                         $leads = Lead::with('source')->where('is_rejected',1);
                     }else{
-                        $leads = Lead::with('source')->where('is_rejected',0);
+                        $leads = Lead::with('source');
                     }
                 }
             }else{
                 if($request->is_rejected == 1){
                     $leads = Lead::with('source')->where('created_by', auth()->user()->id)->where('is_rejected',1);
                 }else{
-                    $leads = Lead::with('source')->where('created_by', auth()->user()->id)->where('is_rejected',0);
+                    $leads = Lead::with('source')->where('created_by', auth()->user()->id);
                 }
                
                 // Apply filtering based on selected IDs

@@ -52,4 +52,7 @@ class LineItem extends Model
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by');
     }
+    public function lead(){
+        return $this->hasOne(Lead::class, 'asin','asin');
+    }
 }

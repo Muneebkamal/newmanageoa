@@ -63,24 +63,8 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-3">
-        <div class="leads-btns">
-            <input type="hidden" name="is_rejected_yes" id="is_rejected_yes" value="0">
-            <button class="btn btn-outline-primary w-100 mb-2" onclick="opendLeadModal()">Add Lead</button>
-            <button class="btn btn-outline-danger w-100 mb-2 " id="rejectedButton">View Rejected <span id="countRejected"></span> </button>
-            <button class="btn btn-outline-info w-100 mb-2 d-none" id="backtoBtn"><i class=" ri-logout-circle-fill"></i> Back To <span id="listNameBtn"></span> </button>
-        </div>
-        <ul class="navbar-nav source-list mb-4 buyListsDev" id="navList">
-            
-           
-        </ul>
-    </div>
-
-    <div class="col-md-9">
-        <!-- Table to display buylist data -->
+    <div class="col-md-12">
          <!-- Dynamic Buylist Header -->
-        
-
          <div class="row d-flex align-items-center justify-content-center d-none" id="addNewCard">
             <div class="card align-self-center" style="min-width: 350px;">
                 <div class="card-body">
@@ -89,15 +73,35 @@
                     </p>
                     <div class="row justify-content-center">
                         <div class="col-md-12 text-center" id="noFoundLeadDev">
-                            
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="card h-100 d-none" id="tableCard">
-            <div id="buylistHeader" class="d-flex align-items-center card-header mb-3">
-                <!-- This will be populated dynamically based on selected buylist -->
+            <div class="card-header">
+                <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+                    <div>
+                        <input type="hidden" name="is_rejected_yes" id="is_rejected_yes" value="0">
+                        <button class="btn btn-outline-primary btn-sm" onclick="opendLeadModal()">Add Lead</button>
+                        <button class="btn btn-outline-danger  btn-sm" id="rejectedButton">
+                            View Rejected <span id="countRejected"></span>
+                        </button>
+                        <button class="btn btn-outline-info btn-sm d-none" id="backtoBtn">
+                            <i class="ri-logout-circle-fill"></i> Back To <span id="listNameBtn"></span>
+                        </button>
+                    </div>
+                    <div>
+                        <div class="modal-btn mt-2" style="cursor:pointer;font-size:17px; float: right;">
+                            <i data-bs-toggle="modal" style="font-weight: bold; cursor: pointer; margin-left: 5px;" data-bs-target="#modal-team-create-buylist" class="las la-plus d-block fs-5 text-primary"></i>
+                        </div>
+                        <select id="buylistSelect" class="form-select form-select-sm w-auto"></select>
+
+                    </div>
+                </div>
+                <div id="buylistHeader" class="d-flex align-items-center">
+                    <!-- This will be populated dynamically based on selected buylist -->
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -134,16 +138,19 @@
                                     </div>
                                 </th>
                                 <th class="bg-danger text-white">Rejcation Reason</th>
-                                <th>Type</th>
-                                <th>Created Date</th>
-                                <th>Source</th>
-                                <th>Product Name</th>
-                                <th>Lead Notes</th>
+                                <th>Date</th>
+                                <th>Name</th>
                                 <th>ASIN</th>
+                                <th>Source</th>
                                 <th>Qty</th>
                                 <th>Cost/Unit</th>
-                                <th>Promo/Coupon</th>
-                                <th>Product/Buyer Notes</th>
+                                <th>Approved</th>
+                                <th>Edit</th>
+                                <th>Reject</th>
+                                <th>Delete</th>
+                                <th>Duplicate</th>
+                                <th>Copy & Move</th>
+                                <th>Create Single Item Order</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -417,66 +424,92 @@
         $('input[name="leadCheckBox"]:checked').prop('checked', false);
     })
 
+    // function loadBuylists() {
+    //     $.ajax({
+    //         url: '{{ url("get-buylists") }}',
+    //         type: 'GET',
+    //         success: function(buylists) {
+    //             const buylistContainer = $('.buyListsDev');
+    //             buylistContainer.empty();
+                
+
+    //             const hasTeamBuy = buylists.some(buylist => buylist.name === 'Team Buylist');
+    //             if (hasTeamBuy && !buylistContainer.find('.team-buy-menu').length) {
+    //                 const teamBuyMenu = `
+    //                     <li class="nav-item d-flex justify-content-between align-items-center team-buy-menu mt-1" data-buylist-id="1">
+    //                         <span class="badge rounded-pill bg-secondary-subtle text-secondary" style="font-size:16px;cursor:pointer;">
+    //                             <a style="cursor: pointer" class="px-3 nav-link menu-link">
+    //                                 <i class="ri-folder-line"></i>
+    //                                 <strong data-key="t-widgets">Team Buylist <i class="ri-information-line" data-bs-toggle="tooltip" data-bs-placement="right" title="You can add up to 7 additional Buylists per team - the Team Buylist is used when no Buylist is selected"></i></strong>
+    //                             </a>
+    //                         </span>
+    //                         <div class="modal-btn" style="cursor:pointer;font-size:17px;">
+    //                             <i data-bs-toggle="modal" style="font-weight: bold; cursor: pointer; margin-left: 5px;" data-bs-target="#modal-team-create-buylist" class="las la-plus d-block fs-5 text-primary"></i>
+    //                         </div>
+    //                     </li>
+    //                 `;
+    //                 buylistContainer.append(teamBuyMenu);
+    //             }
+    //             var na = "Team Buylist";
+    //             buylists.forEach(buylist => {
+    //                 if (buylist.name !== 'Team Buylist') {
+    //                     const buylistButton = `
+    //                     <li class="nav-item mt-1" data-buylist-id="${buylist.id}">
+    //                         <span class="badge rounded-pill bg-secondary-subtle text-secondary" style="font-size:16px;cursor:pointer;">
+    //                             <a style="cursor: pointer" class="px-3 nav-link menu-link">
+    //                             <strong><i class="ri-folder-line"></i> ${buylist.name}</strong> 
+    //                             </a>
+    //                         </span>
+    //                     </li>`;
+    //                     buylistContainer.append(buylistButton);
+    //                 }
+    //                 if (buylist.employee_id != null && user_id != null && buylist.employee_id == user_id) {
+    //                     na = buylist.name;
+    //                 }
+    //             });
+    //             console.log(na);
+    //             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    //             tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+    //                 new bootstrap.Tooltip(tooltipTriggerEl);
+    //             });
+
+    //             // Initialize click handlers and set default buylist
+    //             initializeBuylistClickHandler();
+    //             selectDefaultBuylist(na);
+    //         },
+    //         error: function(xhr) {
+    //             console.error('Error fetching buylists:', xhr.responseText);
+    //         }
+    //     });
+    // }
     function loadBuylists() {
         $.ajax({
             url: '{{ url("get-buylists") }}',
             type: 'GET',
             success: function(buylists) {
-                const buylistContainer = $('.buyListsDev');
-                buylistContainer.empty();
-                
-
-                const hasTeamBuy = buylists.some(buylist => buylist.name === 'Team Buylist');
-                if (hasTeamBuy && !buylistContainer.find('.team-buy-menu').length) {
-                    const teamBuyMenu = `
-                        <li class="nav-item d-flex justify-content-between align-items-center team-buy-menu mt-1" data-buylist-id="1">
-                            <span class="badge rounded-pill bg-secondary-subtle text-secondary" style="font-size:16px;cursor:pointer;">
-                                <a style="cursor: pointer" class="px-3 nav-link menu-link">
-                                    <i class="ri-folder-line"></i>
-                                    <strong data-key="t-widgets">Team Buylist <i class="ri-information-line" data-bs-toggle="tooltip" data-bs-placement="right" title="You can add up to 7 additional Buylists per team - the Team Buylist is used when no Buylist is selected"></i></strong>
-                                </a>
-                            </span>
-                            <div class="modal-btn" style="cursor:pointer;font-size:17px;">
-                                <i data-bs-toggle="modal" style="font-weight: bold; cursor: pointer; margin-left: 5px;" data-bs-target="#modal-team-create-buylist" class="las la-plus d-block fs-5 text-primary"></i>
-                            </div>
-                        </li>
-                    `;
-                    buylistContainer.append(teamBuyMenu);
-                }
-                var na = "Team Buylist";
+                const buylistContainer = $('#buylistSelect');
+                buylistContainer.empty(); // clear old options
                 buylists.forEach(buylist => {
-                    if (buylist.name !== 'Team Buylist') {
-                        const buylistButton = `
-                        <li class="nav-item mt-1" data-buylist-id="${buylist.id}">
-                            <span class="badge rounded-pill bg-secondary-subtle text-secondary" style="font-size:16px;cursor:pointer;">
-                                <a style="cursor: pointer" class="px-3 nav-link menu-link">
-                                <strong><i class="ri-folder-line"></i> ${buylist.name}</strong> 
-                                </a>
-                            </span>
-                        </li>`;
-                        buylistContainer.append(buylistButton);
-                    }
-                    if (buylist.employee_id != null && user_id != null && buylist.employee_id == user_id) {
-                        na = buylist.name;
-                    }
+                    buylistContainer.append(
+                        `<option value="${buylist.id}" data-name="${buylist.name}">${buylist.name}</option>`
+                    );
                 });
-                console.log(na);
-                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-                    new bootstrap.Tooltip(tooltipTriggerEl);
-                });
-
-                // Initialize click handlers and set default buylist
-                initializeBuylistClickHandler();
-                selectDefaultBuylist(na);
+                // ✅ Select first option by default
+                if (buylists.length > 0) {
+                    const firstId = buylists[0].id;
+                    const name = buylists[0].name;
+                    buylistContainer.val(firstId).trigger('change');
+                    // loadBuylistData(firstId,name);
+                    appendHeader(firstId,name)
+                    $('#selectedbuylistID').val(firstId)
+                    $('#is_rejected_yes').val(0);
+                }
             },
             error: function(xhr) {
                 console.error('Error fetching buylists:', xhr.responseText);
             }
         });
     }
-
-
     // Function to select the default buylist
     function selectDefaultBuylist(buylistName) {
         const defaultBuylist = $('.buyListsDev').find(`.nav-item:contains(${buylistName})`);
@@ -546,23 +579,82 @@
         });
     }
 
+    // ✅ Run loadBuylistData on change
+    $(document).on('change', '#buylistSelect', function() {
+        const buylistId = $(this).val();
+        let buylistName = $(this).find(':selected').data('name');
+        $('#selectedbuylistID').val(buylistId)
+        if (buylistId) {
+            loadBuylistData(buylistId,buylistName);
+            appendHeader(buylistId,buylistName)
+        }
+    });
+    function appendHeader(buylistId,buylistName){
+        let dotsHtml = '';
+        let deleteBntDev = '';
+        if (buylistName !== 'Team Buylist') {
+            dotsHtml = `
+                <div class="btn-group">
+                    <a style="cursor: pointer" id="editListDropdown${buylistName}" class="me-2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <strong style="font-size: 17px;"><b><i class="ri-more-2-line ms-2"></i></b></strong>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button class="dropdown-item rename-buylist" 
+                                onclick="renameBuyList(${buylistId},'${buylistName}')">
+                                <i class="fas fa-pencil-alt text-primary"></i> Rename Buylist
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item delete-buylist"  
+                                onclick="deleteBuyList(${buylistId})">
+                                <i class="fas fa-trash text-danger"></i> Delete Buylist
+                            </button>
+                        </li>
+                    </ul>
+                </div>`;
+            
+            deleteBntDev = `
+                <button class="btn btn-lg btn-outline-danger" onclick="deleteBuyList(${buylistId})">
+                    <i class="fa fa-trash text-danger"></i>&nbsp; Delete Buylist
+                </button>`;
+        }
+        // Update the buylist header dynamically
+        $('#buylistHeader').html(`
+            <div class="d-flex align-items-center mb-3">
+                <h5 class="mb-0">${buylistName}</h5>
+                ${dotsHtml}
+            </div>
+        `);
 
-    function loadBuylistData(buylistId) {
+        $('#noFoundLeadDev').html(`
+            <button class="btn btn-lg btn-outline-primary" onclick="opendLeadModal()">
+                Add Lead to <span class="listNameSpan">${buylistName}</span>
+            </button>
+            ${deleteBntDev}
+        `);
+    }
+    function loadBuylistData(buylistId, buylistName) {
+        
         var is_rejected = $('#is_rejected_yes').val();
         $('#buylistTable').DataTable().destroy();
-            var columns = [
-                { data: 'actions', name: 'actions', orderable: false, searchable: false },
+             var columns = [
+                { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                 { data: 'rejection_reason', name: 'rejection_reason', visible: is_rejected == 1,className: 'rejection-reason text-white' }, // Set visibility based on is_rejected
-                { data: 'flags', name: 'flags', orderable: false, searchable: false },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'source_url', name: 'source_url'},
                 { data: 'name', name: 'name' },
-                { data: 'order_note', name: 'order_note' },
                 { data: 'asin', name: 'asin'},
+                { data: 'source_url', name: 'source_url'},
                 { data: 'unit_purchased', name: 'unit_purchased' },
                 { data: 'buy_cost', name: 'buy_cost'},
-                { data: 'quantity_remaining', name: 'quantity_remaining', defaultContent: '--', orderable: false, searchable: false },
-                { data: 'product_buyer_notes', name: 'product_buyer_notes' }
+                // Actions always on the right
+                { data: 'approve', name: 'approve', orderable: false, searchable: false },
+                { data: 'edit', name: 'edit', orderable: false, searchable: false },
+                { data: 'reject', name: 'reject', orderable: false, searchable: false },
+                { data: 'delete', name: 'delete', orderable: false, searchable: false },
+                { data: 'duplicate', name: 'duplicate', orderable: false, searchable: false },
+                { data: 'move_copy', name: 'move_copy', orderable: false, searchable: false },
+                { data: 'order', name: 'order', orderable: false, searchable: false },
             ];
         $('#buylistTable').DataTable({
             processing: true,
@@ -593,6 +685,11 @@
                 },
             },
             columns: columns,
+            columnDefs: [
+                { width: "30%", targets: 3 },  // Name column wider
+                { width: "5%", targets: 0 },  // Name column wider
+                { width: "10%", targets: [0, 2, 3, 5, 6, 7] } // Other columns normal
+            ],
             order: [[3, 'desc']], // Order by created_at by default
             destroy: true,
             autoWidth: false,  // Disable auto width to enable the specified width
@@ -601,13 +698,8 @@
             drawCallback: function (settings) {
                 // Check the displayed row count on each draw
                 var rowCount = this.api().rows({ page: 'current' }).count();
-                if (rowCount === 0) {
-                    $('#tableCard').addClass('d-none');
-                    $('#addNewCard').removeClass('d-none');
-                } else {
-                    $('#tableCard').removeClass('d-none');
-                    $('#addNewCard').addClass('d-none');
-                }
+                $('#tableCard').removeClass('d-none');
+                $('#addNewCard').addClass('d-none');
             }
         });
     }
@@ -702,10 +794,10 @@
     }
 
     function selectDefaultBuylistModal(buylistGroup, buylistName) {
-    const buylistButton = buylistGroup.querySelector('.buylist-button');
-    if (buylistButton) {
-        buylistButton.textContent = 'Add to '+ buylistName; // Set dropdown button text to the selected buylist
-    }
+        const buylistButton = buylistGroup.querySelector('.buylist-button');
+        if (buylistButton) {
+            buylistButton.textContent = 'Add to '+ buylistName; // Set dropdown button text to the selected buylist
+        }
     }
 
     function initializeBuylistClickHandlerModal() {
@@ -857,11 +949,6 @@
                 $('#editBuyListLeadModal #quantity').val(data.unit_purchased);
                 $('#editOrderProductNote').val(data.order_note);
                 $('#editOrderCategory').val(data.category);
-                // console.log(data.unit_purchased * data.buy_cost);
-                // console.log(data.unit_purchased * data.selling_price);
-                // $('.order-qty-cost').html('$' + (data.unit_purchased * data.buy_cost).toFixed(2));
-                // $('.order-qty-selling').html('$' + (data.unit_purchased * parseFloat(data.selling_price)).toFixed(2));
-                // $('.order-qty-gross-profit').html('$' + (data.unit_purchased * parseFloat(netProfit)).toFixed(2));
                 appendTotalHtl(data.buy_cost,data.unit_purchased,netProfit,data.selling_price)
 
                 buyCost = data.buy_cost;
@@ -926,11 +1013,7 @@
     }
 
     function updatePriceSpans(qty) {
-        // console.log(qty, buyCost, sellingPrice, netProfit);
-        // netProfit = parseFloat($("#editOrderNetProfit").val())
-        // $('.order-qty-cost').text('$' + (qty * buyCost).toFixed(2));
-        // $('.order-qty-selling').text('$' + (qty * sellingPrice).toFixed(2));
-        // $('.order-qty-gross-profit').text('$' + (qty * netProfit).toFixed(2));
+        
         let quantity_new = qty;
         let cost = buyCost;
         let sellPricenew = sellingPrice;
@@ -996,6 +1079,9 @@
                 // Open the modal using Bootstrap's modal method
                 loadBuylistData(buylistId)
                 $('#editBuyListLeadModal').modal('hide');
+                if(modalMode == 'approved'){
+                    window.location.href = `aprroved/buylist`;
+                }
                 // Handle success (e.g., show a success message, refresh the list, etc.)
             },
             error: function(xhr, status, error) {
@@ -1004,48 +1090,7 @@
             }
         });
     }
-    // Reject Button Functionality
-    // $(document).on('click', '.rejectItem', function () {
-    //     const itemId = $(this).data('id'); // Get the item ID
-    //     $('#rejectModal').modal('show');
-
-    //     $('#rejectSubmit').off('click').on('click', function () {
-    //         const selectedReason = $('#rejectionReason').val(); // Get the selected value from the dropdown
-    //         let reason; // Variable to hold the reason
-
-    //         // Check if the selected reason is "Custom..."
-    //         if (selectedReason === 'custom') {
-    //             // Get the value from the textarea if the custom option is selected
-    //             reason = $('#customReason').val().trim(); // Use .trim() to remove any leading/trailing whitespace
-    //         } else {
-    //             reason = selectedReason; // Use the selected reason directly
-    //         }
-
-    //         // Validate the reason
-    //         if (reason) {
-    //             $.ajax({
-    //                 url: `{{ url('/items/${itemId}/reject') }}`, // Use the item ID in the URL
-    //                 type: 'POST',
-    //                 data: { reason: reason },
-    //                 headers: {
-    //                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    //                 },
-    //                 success: function (response) {
-    //                     Swal.fire('Rejected!', 'The item has been rejected.', 'success');
-    //                     $('#rejectModal').modal('hide');
-    //                     $('#editBuyListLeadModal').modal('hide');
-    //                     const buylistId = $('#selectedbuylistID').val();
-    //                     loadBuylistData(buylistId);
-    //                 },
-    //                 error: function () {
-    //                     Swal.fire('Error', 'There was an error rejecting the item.', 'error');
-    //                 }
-    //             });
-    //         } else {
-    //             Swal.fire('Please enter a reason', '', 'warning');
-    //         }
-    //     });
-    // });
+  
     $(document).on('click', '.rejectItem', function () {
         const itemId = $(this).data('id'); // Get the item ID
         $('#itemID').val(itemId)

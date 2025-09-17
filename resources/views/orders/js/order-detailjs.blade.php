@@ -241,7 +241,17 @@
                     let value = product.sku_total;
                     let totalSalesTax = (percentage / 100) * value;
                     var totalNewSkuTotal = product.sku_total + sales_tax;
-                    var newBuyCost = totalNewSkuTotal / product.unit_purchased;
+                    if(items.length ==1){
+                       var orderViewGrandTotal = parseFloat($('#orderViewGrandTotal').val()) || 0;
+                       if(orderViewGrandTotal> 0){
+                            var newBuyCost = orderViewGrandTotal / product.unit_purchased;
+                       }else{
+                            var newBuyCost = totalNewSkuTotal / product.unit_purchased;
+                       }
+                    }else{
+                        var newBuyCost = totalNewSkuTotal / product.unit_purchased;
+                    }
+                    // var newBuyCost = totalNewSkuTotal / product.unit_purchased;
                     let cost = parseFloat(newBuyCost) || 0;
                     let sellingPrice = parseFloat(product.list_price) || 0;
                     let quantity = parseInt(product.unit_purchased) || 1;

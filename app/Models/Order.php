@@ -40,7 +40,7 @@ class Order extends Model
         'is_pending'
     ];
     public function LineItems(){
-         return $this->hasMany(LineItem::class, 'order_id', 'id'); // Adjust foreign and local keys as per your schema
+         return $this->hasMany(LineItem::class, 'order_id', 'id')->with('lead'); // Adjust foreign and local keys as per your schema
     }
     public function createdBy(){
         return $this->hasOne(User::class, 'id');

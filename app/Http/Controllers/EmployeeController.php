@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Buylist;
 use App\Models\Lead;
+use App\Models\Order;
 use App\Models\Source;
 use App\Models\User;
 use Carbon\Carbon;
@@ -268,10 +269,27 @@ class EmployeeController extends Controller
                                     break;
                                 }
                             }
+                            // Handle date column (can be under 'Date' or '' as key)
+                            $dateValue = null;
+
+                            if (!empty($item['Date'])) {
+                                $dateValue = $item['Date'];
+                            } elseif (!empty($item[''])) {   // when column header is missing
+                                $dateValue = $item[''];
+                            }
+
+                            // Validate the date
+                            $parsedDate = null;
+                            if ($dateValue) {
+                                $timestamp = strtotime($dateValue);
+                                if ($timestamp !== false) {
+                                    $parsedDate = date('Y-m-d H:i:s', $timestamp);
+                                }
+                            }
 
                             $data = [
                                 'source_id' => $source_id,
-                                'date' => date('Y-m-d H:i:s', strtotime($item['Date'])),
+                                'date' => $parsedDate??null,
                                 'name' => $item['Product Name'],
                                 'cost' => $item['Cost'],
                                 'asin' => $item['ASIN'],
@@ -378,7 +396,7 @@ class EmployeeController extends Controller
         //Get today's date
         $start = Carbon::yesterday('America/New_York')->setTime(8, 0); // Yesterday 8 AM EST
         $end = Carbon::today('America/New_York')->setTime(8, 0);       // Today 8 AM EST
-        $leads = Lead::whereBetween('created_at', [$start, $end])->get()->groupBy('source_id');
+        $leads = Lead::whereBetween('date', [$start, $end])->get()->groupBy('source_id');
         foreach ($employees as $employee)
         {
             $sendMail = 0;
@@ -409,7 +427,7 @@ class EmployeeController extends Controller
                             </tr>";
 
                 foreach ($employeeLeads as $lead) {
-                    $currentDateEST = \Carbon\Carbon::parse($lead->created_at)
+                    $currentDateEST = \Carbon\Carbon::parse($lead->date)
                         ->timezone('America/New_York')
                         ->format('Y-m-d h:i A');
 
@@ -444,12 +462,11 @@ class EmployeeController extends Controller
 
                 // Get all leads for this source in the month
                 $monthlyLeads = Lead::where('source_id', $sourceId)
-                    ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                    ->whereBetween('date', [$startOfMonth, $endOfMonth])
                     ->get()
                     ->groupBy(function ($lead) {
-                        return Carbon::parse($lead->created_at)->format('Y-m-d');
+                        return Carbon::parse($lead->date)->format('Y-m-d');
                     });
-
                 // Generate full list of days for the month
                 $days = CarbonPeriod::create($startOfMonth, $endOfMonth);
 
@@ -960,7 +977,7 @@ class EmployeeController extends Controller
         $end   = Carbon::today('America/New_York')->setTime(8, 0);
         $buylist = Buylist::where('employee_id', $employee->id)->first();
 
-        $leads = Lead::whereBetween('created_at', [$start, $end])
+        $leads = Lead::whereBetween('date', [$start, $end])
         ->where('is_rejected', 0)
         ->where('source_id', $employee->source?->id)
         ->whereNotIn('asin', function ($query) {
@@ -975,16 +992,17 @@ class EmployeeController extends Controller
         $extraLeads = Lead::query()
         ->where('is_rejected', 0)
         ->where('source_id', $employee->source?->id)
-        ->where('created_at', '>=', now()->subDays(30))
+        ->where('date', '>=', now()->subDays(30))
         ->whereNotIn('asin', function ($query) {
             $query->select('asin')->from('line_items');
         })
         ->whereNotIn('asin', $leadAsins) // exclude already selected leads
-        ->orderByDesc('created_at')
+        ->orderByDesc('date')
         ->take(30)
         ->get();
+        $orders = Order::latest('created_at')->with('LineItems.lead')->take('30')->get();
 
         return view('employees.daily-leads', compact('employee', 'leads', 'extraLeads', 'start', 'end'
-        ,'buylist'));
+        ,'buylist','orders'));
     }
 }

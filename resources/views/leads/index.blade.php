@@ -797,7 +797,13 @@ table.dataTable {
                         searchable: false,
                         render: function (data) {
                             // Generate the card layout
-                            return `<div class="card itemcard" id="item_${data.id}" onclick="activeCard(${data.id})">
+                            var redClass ='';
+                            if(data.is_rejected ==1){
+                                redClass ='bg-danger';
+                                alert('adfadsf');
+                                redClass ='bg-danger';
+                            }
+                            return `<div class="card itemcard ${redClass}" id="item_${data.id}" onclick="activeCard(${data.id})">
                                 <div class="card-header">
                                     <div class="row d-flex justify-content-between">
                                         <div class="col-md-8 d-flex">
