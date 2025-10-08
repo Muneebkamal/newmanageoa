@@ -100,7 +100,7 @@
                                         @foreach($extraLeads as $lead)
                                             <tr>
                                                 <td><a href="{{ url('leads-new?asin='.$lead->asin) }}" target="_blank">
-                                                    {{ \Carbon\Carbon::parse($lead->created_at)->timezone('America/New_York')->format('Y-m-d h:i A') }}
+                                                    {{ \Carbon\Carbon::parse($lead->date)->timezone('America/New_York')->format('Y-m-d h:i A') }}
                                                 </a></td>
                                                 <td>{{ $lead->name }}</td>
                                                 <td>{{ $lead->category }}</td>
@@ -404,11 +404,11 @@
     var user_id = '';
     $(document).ready(function() {
         $('#leadsTable').DataTable({
-            pageLength: 10, // default rows per page
+            pageLength: {{ $per_page }}, // default rows per page
             order: [[0, 'desc']] // sort by date descending
         });
         $('#orders-table-new').DataTable({
-            pageLength: 10, // default rows per page
+            pageLength: {{ $per_page }}, // default rows per page
             order: [[0, 'desc']] // sort by date descending
         });
         const urlParams = new URLSearchParams(window.location.search);
@@ -530,6 +530,7 @@
         $('#buylistTable').DataTable({
             processing: true,
             serverSide: true,
+            pageLength: {{ $per_page }},
             ajax: {
                 url: `{{ url('buylists/items') }}`,
                 type: 'GET',
@@ -561,7 +562,7 @@
                 { width: "5%", targets: 0 },  // Name column wider
                 { width: "10%", targets: [0, 2, 3, 5, 6, 7] } // Other columns normal
             ],
-            order: [[3, 'desc']], // Order by created_at by default
+            order: [[2, 'desc']], // Order by created_at by default
             destroy: true,
             autoWidth: false,  // Disable auto width to enable the specified width
             width: '100%',     // Set the table width to 100%

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CashBack;
 use App\Models\Location;
 use App\Models\RejectReason;
+use App\Models\SystemSetting;
 use App\Models\Tag;
 use App\Models\UserEmail;
 use Illuminate\Http\Request;
@@ -193,7 +194,8 @@ class SystemManagerController extends Controller
         if (!\Auth::user()->can('view_settings')) {
             abort(403);
         }
-        return view('system-manager.index');
+        $systemSettings = SystemSetting::allSettings();
+        return view('system-manager.index', compact('systemSettings'));
     }
     public function storeCashBack(Request $request)
     {
@@ -323,6 +325,19 @@ class SystemManagerController extends Controller
         })
         ->rawColumns(['actions'])
         ->make(true);
+    }
+    public function saveSettings(Request $request){
+  
+        $validated = $request->validate([
+            'per_page' => 'required|integer|min:-1',
+        ]);
+
+        SystemSetting::setValue('per_page', $validated['per_page']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'System settings saved successfully.'
+        ]);
     }
 
 }

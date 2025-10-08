@@ -183,6 +183,7 @@ Route::middleware('auth')->group(function () {
     Route::get('tags-data-list', [SystemManagerController::class, 'tagsList'])->name('tags.data.list');
     Route::post('add-tag-data', [SystemManagerController::class, 'addTag'])->name('tags.data.add');
     Route::delete('delete-tag-data/{id}', [SystemManagerController::class, 'destroyTags'])->name('tags.data.delete');
+    Route::post('system-settings-save', [SystemManagerController::class, 'saveSettings'])->name('system-settings.save');
 
 
 

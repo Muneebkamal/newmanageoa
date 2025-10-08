@@ -23,6 +23,11 @@
                 <!-- Nav Tabs -->
                 <ul class="nav nav-pills animation-nav gap-2 mb-3" id="settingsTabs" role="tablist">
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#system" type="button" role="tab" aria-controls="system" aria-selected="false">
+                            System Settings
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="cashback-tab" data-bs-toggle="tab" data-bs-target="#cashback" type="button" role="tab" aria-controls="cashback" aria-selected="true">
                             Cashback Sources
                         </button>
@@ -51,7 +56,33 @@
 
                 <!-- Tab Content -->
                 <div class="tab-content" id="settingsTabsContent">
-                    
+                    <!-- Ssytem sEttings Tab -->
+                    <div class="tab-pane fade" id="system" role="tabpanel" aria-labelledby="system-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>System Settings</h4>
+                                <form id="systemSettingsForm">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="per_page" class="form-label">Show Per Page</label>
+                                        <select class="form-select" id="per_page" name="per_page">
+                                            @php
+                                                $options = [10, 25, 50, 100, 250, 500, -1];
+                                                $selectedValue = $systemSettings['per_page'] ?? 10; // <-- pick saved value or fallback 10
+                                            @endphp
+                                            @foreach($options as $option)
+                                                <option value="{{ $option }}" {{ (int)$selectedValue === $option ? 'selected' : '' }}>
+                                                    {{ $option == -1 ? 'All' : $option }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Cashback Source Tab -->
                     <div class="tab-pane fade show active" id="cashback" role="tabpanel" aria-labelledby="cashback-tab">
                         <div class="card">
@@ -674,5 +705,27 @@ $(function () {
             }
         });
     });
+    $('#systemSettingsForm').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '{{ route("system-settings.save") }}',
+            type: 'POST',
+            data: $(this).serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message || 'Settings saved successfully!');
+                } else {
+                    toastr.error(response.message || 'Failed to save settings.');
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Something went wrong while saving.');
+            }
+        });
+    });
+
 </script>
 @endsection

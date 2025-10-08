@@ -690,7 +690,7 @@
                 { width: "5%", targets: 0 },  // Name column wider
                 { width: "10%", targets: [0, 2, 3, 5, 6, 7] } // Other columns normal
             ],
-            order: [[3, 'desc']], // Order by created_at by default
+            order: [[2, 'desc']], // Order by created_at by default
             destroy: true,
             autoWidth: false,  // Disable auto width to enable the specified width
             width: '100%',     // Set the table width to 100%

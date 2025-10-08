@@ -6,6 +6,7 @@ use App\Models\Buylist;
 use App\Models\Lead;
 use App\Models\Order;
 use App\Models\Source;
+use App\Models\SystemSetting;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\Rule;
@@ -987,7 +988,8 @@ class EmployeeController extends Controller
 
         // collect asins from leads
         $leadAsins = $leads->pluck('asin')->toArray();
-
+        $systemSettings = SystemSetting::allSettings();
+        $per_page = $systemSettings['per_page']  ?? 30;
         // Extra leads (not in buylist & not rejected & not already in leads)
         $extraLeads = Lead::query()
         ->where('is_rejected', 0)
@@ -998,11 +1000,10 @@ class EmployeeController extends Controller
         })
         ->whereNotIn('asin', $leadAsins) // exclude already selected leads
         ->orderByDesc('date')
-        ->take(30)
+        ->take($per_page)
         ->get();
         $orders = Order::latest('created_at')->with('LineItems.lead')->take('30')->get();
-
         return view('employees.daily-leads', compact('employee', 'leads', 'extraLeads', 'start', 'end'
-        ,'buylist','orders'));
+        ,'buylist','orders','per_page'));
     }
 }

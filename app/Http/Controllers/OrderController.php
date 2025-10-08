@@ -257,6 +257,10 @@ class OrderController extends Controller
         $emails = UserEmail::latest('created_at')->get();
         $locations = Location::latest('created_at')->get();
         $order = Order::where('id',$id)->with('createdBy')->first();
+        if ($order && !is_null($order->order_id) && $order->status === 'draft') {
+            $order->status = 'ordered';
+            $order->save();
+        }
         $buyers = User::where('role_id',3)->get();
         $cashback = CashBack::latest('created_at')->get();
         return view('orders.order-detail',get_defined_vars());
