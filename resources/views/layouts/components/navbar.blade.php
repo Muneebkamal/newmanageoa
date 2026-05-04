@@ -26,6 +26,9 @@
                     use App\Models\User;
                     $employees = User::whereNotNull('sync_lead_url')->orderBy('name')->get();
                 @endphp
+                <button class="btn btn-outline-primary square-btn" type="button" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable" onclick="formLeadClear(),fetchSources()">
+                    Add Lead
+                </button>
                 <div class="dropdown ms-3 header-item">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="employeeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         Employees Daily Report

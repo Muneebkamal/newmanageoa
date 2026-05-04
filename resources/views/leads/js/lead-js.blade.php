@@ -163,7 +163,7 @@
             contentType: 'application/json',
             success: function(response) {
                 $('#lead-form')[0].reset();
-                $('.close-btn').click();
+                $('#exampleModalScrollable .btn-close').click();
 
                 leadsTable(response.data);
                 // showAlert(response.message, 'secondary'); 

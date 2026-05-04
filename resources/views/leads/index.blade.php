@@ -669,7 +669,7 @@ table.dataTable {
         {{-- {{ $leads->links('pagination::bootstrap-5') }} --}}
     </div>
 
-    @include('modals.leads.add-modal')
+   
     @include('modals.create-order-modal')
     
 @endsection

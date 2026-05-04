@@ -339,6 +339,10 @@
             return moment(dateStr).format('MMM Do, YYYY');
         }
     </script>
+    @include('uploads.js.source-js')
+    @include('leads.js.lead-js')
+    @include('leads.js.tags-js')
+    @include('modals.leads.add-modal')
     @yield('script')
 
 </body>

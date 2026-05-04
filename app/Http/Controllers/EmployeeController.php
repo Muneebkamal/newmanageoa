@@ -414,7 +414,7 @@ class EmployeeController extends Controller
                 'employee' => $employee->id,
                 'date'     => $date
             ]);
-            $body = "<h2>Lead Upload Summary for {$employee->name}</h2>";
+            $body = "<h2>Lead Upload Summary for VA</h2>";
             $body .= "<p>
                 <strong>Total Leads Inserted:</strong> {$employeeLeads->count()}  
                 <strong>Date:</strong> {$end->format('Y-m-d')}
@@ -512,7 +512,7 @@ class EmployeeController extends Controller
 
                 $mail = new MailController();
                 $mail->sendEmail(
-                    "Lead Upload Summary for {$employee->name}",
+                    "Lead Upload Summary for VA",
                     $body2,
                     $employeeEmail,
                     $employee->name
@@ -521,7 +521,7 @@ class EmployeeController extends Controller
             $mail = new MailController();
             // Also send to admin
             $mail->sendEmail(
-                "Lead Upload Summary for {$employee->name}",
+                "Lead Upload Summary for VA",
                 $body,
                 'dailyreport@znzinc.com',
                 'Admin'
