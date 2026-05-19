@@ -4,6 +4,24 @@
 
 @section('content')
 <style>
+   #leads-table-view_wrapper .dataTables_filter{
+    float:left;
+}
+
+#leads-table-view_wrapper .dataTables_info{
+    float:right;
+    padding-top:8px;
+}
+
+#leads-table-view_wrapper .dataTables_paginate{
+    float:right;
+    margin-top:10px;
+}
+
+#leads-table-view_wrapper .dataTables_length{
+    float:left;
+    margin-top:10px;
+}
     .itemcard.active {
         border: 2px solid #007bff; /* Blue border for active state */
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for emphasis */
@@ -476,12 +494,12 @@ table.dataTable {
             user_id = urlParams.get('user_id');
 
             // Determine the start and end date
-            const startDate = startDateFromURL 
-                ? moment(startDateFromURL, 'YYYY-MM-DD') 
-                : moment().subtract(89, 'days');
+            const startDate = startDateFromURL
+                ? moment(startDateFromURL, 'YYYY-MM-DD')
+                : moment('2000-01-01');
 
-            const endDate = endDateFromURL 
-                ? moment(endDateFromURL, 'YYYY-MM-DD') 
+            const endDate = endDateFromURL
+                ? moment(endDateFromURL, 'YYYY-MM-DD')
                 : moment();
 
             // Set hidden input values
@@ -521,7 +539,7 @@ table.dataTable {
 
             // Force update initial visible value in picker
             $('#dateRangePicker').val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
-            $('#filterTitle').text(startDateFromURL && endDateFromURL ? 'Custom Range' : 'Last 90 Days');
+            $('#filterTitle').text(startDateFromURL && endDateFromURL ? 'Custom Range' : 'All');
 
             // Handle cancel
             $('#dateRangePicker').on('cancel.daterangepicker', function () {
@@ -738,14 +756,40 @@ table.dataTable {
             }).on('xhr.dt', function (e, settings, json, xhr) {
                 if (json.total_leads !== undefined) {
                     $('#leadsCount').text(json.total_leads); // Update count in your UI
-                    $('#lowFBAInputMin').val(json.fba_min); // Update count in your UI
-                    $('#lowFBAInputMax').val(json.fba_max); // Update count in your UI
-                    $('#netProfitInputMin').val(json.net_profit_min); // Update count in your UI
-                    $('#netProfitInputMax').val(json.net_profit_max); // Update count in your UI
-                    $('#ninetyDayAvgInputMin').val(json.bsr_min); // Update count in your UI
-                    $('#ninetyDayAvgInputMax').val(json.bsr_max); // Update count in your UI
-                    $('#roiInputMin').val(json.roi_min); // Update count in your UI
-                    $('#roiInputMax').val(json.roi_max); // Update count in your UI
+                    // $('#lowFBAInputMin').val(json.fba_min); // Update count in your UI
+                    // $('#lowFBAInputMax').val(json.fba_max); // Update count in your UI
+                    // $('#netProfitInputMin').val(json.net_profit_min); // Update count in your UI
+                    // $('#netProfitInputMax').val(json.net_profit_max); // Update count in your UI
+                    // $('#ninetyDayAvgInputMin').val(json.bsr_min); // Update count in your UI
+                    // $('#ninetyDayAvgInputMax').val(json.bsr_max); // Update count in your UI
+                    // $('#roiInputMin').val(json.roi_min); // Update count in your UI
+                    // $('#roiInputMax').val(json.roi_max); // Update count in your UI
+                    // if (!filterApplied) {
+
+                    //     if ($('#lowFBAInputMin').val() === '')
+                    //         $('#lowFBAInputMin').val(json.fba_min);
+
+                    //     if ($('#lowFBAInputMax').val() === '')
+                    //         $('#lowFBAInputMax').val(json.fba_max);
+
+                    //     if ($('#netProfitInputMin').val() === '')
+                    //         $('#netProfitInputMin').val(json.net_profit_min);
+
+                    //     if ($('#netProfitInputMax').val() === '')
+                    //         $('#netProfitInputMax').val(json.net_profit_max);
+
+                    //     if ($('#ninetyDayAvgInputMin').val() === '')
+                    //         $('#ninetyDayAvgInputMin').val(json.bsr_min);
+
+                    //     if ($('#ninetyDayAvgInputMax').val() === '')
+                    //         $('#ninetyDayAvgInputMax').val(json.bsr_max);
+
+                    //     if ($('#roiInputMin').val() === '')
+                    //         $('#roiInputMin').val(json.roi_min);
+
+                    //     if ($('#roiInputMax').val() === '')
+                    //         $('#roiInputMax').val(json.roi_max);
+                    // }
                     
 
                 }
@@ -762,6 +806,14 @@ table.dataTable {
             let tableDataTableView = $('#leads-table-view').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: savedPageSizeNew,
+                ordering: false,
+
+                dom: '<"top"fi>rt<"bottom"lp><"clear">',
+
+                language: {
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                },
                 ajax: {
                     url: "{{ url('table-view-data') }}", // Replace with your backend route
                     type: "GET",
@@ -795,7 +847,7 @@ table.dataTable {
                     { data: "tags", name: "tags" ,orderable: false, searchable: false},
                     { data: "date", name: "date" },
                     { data: "cost", name: "cost" },
-                    { data: "sale_price", name: "sale_price" },
+                    { data: "sell_price", name: "sell_price" },
                     { data: "net_profit", name: "net_profit" },
                     { data: "roi", name: "roi" },
                     { data: "bsr", name: "bsr" },
@@ -984,15 +1036,46 @@ table.dataTable {
                 $('.filterClass').removeClass('d-none')
             }
         })
-        $('#compactView').on('change',function(){
-            if($(this).is(':checked')){
-                $('#tableViewDev').removeClass('d-none')
-                $('#cardView').addClass('d-none')
-            }else{
-                $('#tableViewDev').addClass('d-none')
-                $('#cardView').removeClass('d-none')
-            }
-        })
+        // $('#compactView').on('change',function(){
+        //     if($(this).is(':checked')){
+        //         $('#tableViewDev').removeClass('d-none')
+        //         $('#cardView').addClass('d-none')
+        //     }else{
+        //         $('#tableViewDev').addClass('d-none')
+        //         $('#cardView').removeClass('d-none')
+        //     }
+        // })
+        $('#compactView').on('change', function () {
+
+    let cardTable = $('#leads-table').DataTable();
+    let compactTable = $('#leads-table-view').DataTable();
+
+    if ($(this).is(':checked')) {
+
+        // show compact view
+        $('#tableViewDev').removeClass('d-none');
+        $('#cardView').addClass('d-none');
+
+        // sync current page length
+        compactTable.page.len(cardTable.page.len());
+
+        // reload compact table
+        compactTable.ajax.reload(null, false);
+
+    } else {
+
+        // show card view
+        $('#tableViewDev').addClass('d-none');
+        $('#cardView').removeClass('d-none');
+
+        // sync current page length
+        cardTable.page.len(compactTable.page.len());
+
+        // reload card table
+        cardTable.ajax.reload(null, false);
+    }
+
+});
         function copyToClipBoard(id,type="card") {
             if(type == 'card'){
                 var asin = $('#asinDataCard'+id).val();

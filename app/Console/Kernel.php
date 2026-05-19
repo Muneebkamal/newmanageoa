@@ -13,6 +13,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->call(function () {
+            app(\App\Http\Controllers\NewLeadController::class)->dispatchGoogleSheetJobs();
+        })->name('dispatch-google-sheet-jobs')->everyMinute()->withoutOverlapping();
         $schedule->call('App\Http\Controllers\EmployeeController@syncEmployeeLeadsCron')->everySixHours();
         $schedule->call('App\Http\Controllers\EmployeeController@sendDailyEmailCron')
         ->cron('0 8 * * *')

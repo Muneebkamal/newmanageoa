@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\LeadsController;
+use App\Http\Controllers\NewLeadController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\ShippingController;
@@ -195,4 +196,10 @@ Route::middleware('auth')->group(function () {
 
 });
 
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/dispatchGoogleSheetJobs', [NewLeadController::class, 'dispatchGoogleSheetJobs']);
+Route::get('/google-sheet/import', [NewLeadController::class, 'importPage']);
+Route::post('/google-sheet/import', [NewLeadController::class, 'importGoogleSheet']);
+
+Route::get('/new-sources', [NewLeadController::class, 'sourcesPage']);
+Route::get('/new-sources/leads/{id}', [NewLeadController::class, 'getSourceLeads']);

@@ -43,6 +43,11 @@
                     </a>
                 </li> --}}
                  <li class="nav-item">
+                    <a class="nav-link menu-link {{ Request::is('new-sources') ? 'active' : '' }}" href="{{ url('/new-sources') }}">
+                        <i class="ri-filter-2-line"></i> <span data-key="t-widgets">New Leads</span>
+                    </a>
+                </li>
+                 <li class="nav-item">
                     <a class="nav-link menu-link {{ Request::is('leads-new') ? 'active' : '' }}" href="{{ url('/leads-new') }}">
                         <i class="ri-filter-2-line"></i> <span data-key="t-widgets">Leads</span>
                     </a>
